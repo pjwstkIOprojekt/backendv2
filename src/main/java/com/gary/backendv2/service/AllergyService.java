@@ -12,8 +12,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AllergyService {
-
-	@Autowired
 	private final AllergyRepository allergyRepository;
 
 	public List<Allergy> getAll(){
@@ -21,6 +19,6 @@ public class AllergyService {
 	}
 
 	public Allergy getById(Integer id){
-		return allergyRepository.findById(id).orElseThrow(()-> new NotFoundException("No record with that ID"));
+		return allergyRepository.findByAllergyId(id).orElseThrow(()-> new NotFoundException("No record with that ID"));
 	}
 }

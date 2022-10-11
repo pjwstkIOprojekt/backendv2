@@ -1,6 +1,6 @@
 package com.gary.backendv2.controller;
 
-import com.gary.backendv2.types.AllergyType;
+import com.gary.backendv2.model.enums.AllergyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface AllergyRepository extends JpaRepository<Allergy, Integer> {
-	Optional<Allergy> findById(Integer id);
+	Optional<Allergy> findByAllergyId(Integer id);
 }
 
