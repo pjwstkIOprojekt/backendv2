@@ -19,6 +19,7 @@ public class Allergy {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer allergyId;
 
+	@Enumerated(EnumType.STRING)
 	private AllergyType allergyType;
 
 	private String allergyName;
