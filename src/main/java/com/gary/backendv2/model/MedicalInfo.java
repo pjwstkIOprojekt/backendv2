@@ -1,5 +1,7 @@
 package com.gary.backendv2.model;
 
+import com.gary.backendv2.model.enums.BloodType;
+import com.gary.backendv2.model.enums.RhType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,6 +20,11 @@ public class MedicalInfo {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer medicalInfoId;
 
+	@Enumerated(EnumType.STRING)
+	private RhType rhType;
+
+	@Enumerated(EnumType.STRING)
+	private BloodType bloodType;
 
 	@OneToOne(mappedBy = "medicalInfo")
 	private User user;
