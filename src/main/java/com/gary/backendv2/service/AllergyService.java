@@ -6,6 +6,7 @@ import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.dto.request.AllergyRequest;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
+import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 public class AllergyService {
 	private final AllergyRepository allergyRepository;
 	private final MedicalInfoRepository medicalInfoRepository;
+	private final UserRepository userRepository;
 
 	public List<Allergy> getAll(){
 		return allergyRepository.findAll();
@@ -32,7 +34,7 @@ public class AllergyService {
 		if(allergyRequest.getMedicalInfoId()!= null) {
 			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
 		}else{
-			medicalInfo = MedicalInfo.builder().build();
+			medicalInfo = MedicalInfo.builder().user(userRepository.getByUserId(allergyRequest.getUserId())).build();
 		}
 		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
 			Set<MedicalInfo> medicalInfos = new HashSet<>();

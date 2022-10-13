@@ -11,8 +11,10 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class AllergyRequest {
-	@NotBlank
+
 	Integer medicalInfoId;
+
+	Integer userId;
 
 	@NotBlank
 	@Enumerated(EnumType.STRING)
