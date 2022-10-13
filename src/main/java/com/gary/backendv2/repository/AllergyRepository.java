@@ -14,6 +14,6 @@ public interface AllergyRepository extends JpaRepository<Allergy, Integer> {
 	boolean existsByAllergyType(AllergyType allergyType);
 	boolean existsByAllergyName(String allergyName);
 	boolean existsByOther(String other);
-	List<Allergy> findAllByAllergyName(String allergyName);
+	Allergy findByAllergyNameAndAllergyTypeAndOther(String allergyName, AllergyType allergyType, String other);
 }
 

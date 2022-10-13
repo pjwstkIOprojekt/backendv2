@@ -28,7 +28,12 @@ public class AllergyService {
 	}
 
 	public void addAllergy(AllergyRequest allergyRequest){
-		MedicalInfo medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
+		MedicalInfo medicalInfo;
+		if(allergyRequest.getMedicalInfoId()!= null) {
+			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
+		}else{
+			medicalInfo = MedicalInfo.builder().build();
+		}
 		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
 			Set<MedicalInfo> medicalInfos = new HashSet<>();
 			medicalInfos.add(medicalInfo);
@@ -41,9 +46,8 @@ public class AllergyService {
 			medicalInfo.getAllergies().add(allergy);
 		}else{
 			Allergy a = allergyRepository
-					.findAllByAllergyName(allergyRequest.getAllergyName()).stream()
-					.filter(allergy -> allergy.getAllergyType() == allergyRequest.getAllergyType() && allergyRequest.getOther().equals(allergy.getOther()))
-					.findFirst().orElseThrow();
+					.findByAllergyNameAndAllergyTypeAndOther(allergyRequest.getAllergyName(), allergyRequest.getAllergyType(),
+							allergyRequest.getOther());
 			medicalInfo.getAllergies().add(a);
 			a.getMedicalInfos().add(medicalInfo);
 			allergyRepository.save(a);
