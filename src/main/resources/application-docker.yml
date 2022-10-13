@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+gary:
+  app:
+    jwt:
+      expiration: 86400000
+    admin:
+      credentials:
+        email: "admin@gary.com"
+        password: "admin"
+
+
+
