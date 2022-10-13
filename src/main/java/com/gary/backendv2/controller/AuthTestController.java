@@ -17,7 +17,7 @@ public class AuthTestController {
     @GetMapping("/admin")
     @Operation(summary = "Endpoint for testing authentication flow", security = @SecurityRequirement(name = "bearerAuth"))
     public String helloAdmin() {
-        return "Hello admin";
+        return "Hello admin ;)";
     }
 
     @GetMapping("/user")

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.gary'
-version = '0.0.1-SNAPSHOT'
+version = ''
 sourceCompatibility = '17'
 
 configurations {
@@ -46,6 +46,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+jar {
+    enabled = false
 }
 
 tasks.named('test') {
