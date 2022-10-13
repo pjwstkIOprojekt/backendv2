@@ -18,6 +18,10 @@ public class MedicalInfo {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer medicalInfoId;
 
+
+	@OneToOne(mappedBy = "medicalInfo")
+	private User user;
+
 	@ManyToMany(mappedBy = "medicalInfos", fetch = FetchType.EAGER)
 	private Set<Allergy> allergies = new LinkedHashSet<>();
 }

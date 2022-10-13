@@ -6,6 +6,7 @@ import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.dto.request.AllergyRequest;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
+import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 public class AllergyService {
 	private final AllergyRepository allergyRepository;
 	private final MedicalInfoRepository medicalInfoRepository;
+	private final UserRepository userRepository;
 
 	public List<Allergy> getAll(){
 		return allergyRepository.findAll();
@@ -28,7 +30,12 @@ public class AllergyService {
 	}
 
 	public void addAllergy(AllergyRequest allergyRequest){
-		MedicalInfo medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
+		MedicalInfo medicalInfo;
+		if(allergyRequest.getMedicalInfoId()!= null) {
+			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
+		}else{
+			medicalInfo = MedicalInfo.builder().user(userRepository.getByUserId(allergyRequest.getUserId())).build();
+		}
 		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
 			Set<MedicalInfo> medicalInfos = new HashSet<>();
 			medicalInfos.add(medicalInfo);
@@ -41,9 +48,8 @@ public class AllergyService {
 			medicalInfo.getAllergies().add(allergy);
 		}else{
 			Allergy a = allergyRepository
-					.findAllByAllergyName(allergyRequest.getAllergyName()).stream()
-					.filter(allergy -> allergy.getAllergyType() == allergyRequest.getAllergyType() && allergyRequest.getOther().equals(allergy.getOther()))
-					.findFirst().orElseThrow();
+					.findByAllergyNameAndAllergyTypeAndOther(allergyRequest.getAllergyName(), allergyRequest.getAllergyType(),
+							allergyRequest.getOther());
 			medicalInfo.getAllergies().add(a);
 			a.getMedicalInfos().add(medicalInfo);
 			allergyRepository.save(a);
