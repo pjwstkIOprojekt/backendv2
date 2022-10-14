@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,24 +15,24 @@ import java.util.stream.Stream;
 @RequestMapping(path = "/enum")
 @RequiredArgsConstructor
 public class EnumController {
+	private static List<String> getEnumValues(Class<? extends Enum> cl) {
+		return Stream.of(cl.getEnumConstants())
+				.map(e -> e.name())
+				.collect(Collectors.toList());
+	}
+
 	@GetMapping("/allergy_type")
 	public List<String> getAllergyTypeList(){
-		return Stream.of(AllergyType.values())
-				.map(AllergyType::name)
-				.collect(Collectors.toList());
+		return getEnumValues(AllergyType.class);
 	}
 
 	@GetMapping("/rh_type")
 	public List<String> getRhTypeList(){
-		return Stream.of(RhType.values())
-				.map(RhType::name)
-				.collect(Collectors.toList());
+		return getEnumValues(RhType.class);
 	}
 
 	@GetMapping("/blood_type")
 	public List<String> getBloodTypeList(){
-		return Stream.of(BloodType.values())
-				.map(BloodType::name)
-				.collect(Collectors.toList());
+		return getEnumValues(BloodType.class);
 	}
 }
