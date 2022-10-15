@@ -3,6 +3,7 @@ package com.gary.backendv2.controller;
 import com.gary.backendv2.model.enums.AllergyType;
 import com.gary.backendv2.model.enums.BloodType;
 import com.gary.backendv2.model.enums.RhType;
+import com.gary.backendv2.utils.EnumUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,22 +19,16 @@ import java.util.stream.Stream;
 public class EnumController {
 	@GetMapping("/allergy_type")
 	public List<String> getAllergyTypeList(){
-		return Stream.of(AllergyType.values())
-				.map(AllergyType::name)
-				.collect(Collectors.toList());
+		return EnumUtils.getEnumValues(AllergyType.class);
 	}
 
 	@GetMapping("/rh_type")
 	public List<String> getRhTypeList(){
-		return Stream.of(RhType.values())
-				.map(RhType::name)
-				.collect(Collectors.toList());
+		return EnumUtils.getEnumValues(RhType.class);
 	}
 
 	@GetMapping("/blood_type")
 	public List<String> getBloodTypeList(){
-		return Stream.of(BloodType.values())
-				.map(BloodType::name)
-				.collect(Collectors.toList());
+		return EnumUtils.getEnumValues(BloodType.class);
 	}
 }
