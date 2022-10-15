@@ -15,11 +15,13 @@ import java.util.stream.Stream;
 @RequestMapping(path = "/enum")
 @RequiredArgsConstructor
 public class EnumController {
-	private static List<String> getEnumValues(Class<? extends Enum> cl) {
-		return Stream.of(cl.getEnumConstants())
+public class EnumUtils {
+    public static List<String> getEnumValues(Class <? extends Enum> enumClass) {
+        return Stream.of(enumClass.getEnumConstants())
 				.map(e -> e.name())
 				.collect(Collectors.toList());
-	}
+    }
+}
 
 	@GetMapping("/allergy_type")
 	public List<String> getAllergyTypeList(){
