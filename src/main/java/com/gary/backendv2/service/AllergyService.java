@@ -39,6 +39,7 @@ public class AllergyService {
 					.builder()
 					.user(userRepository.getByUserId(allergyRequest.getUserId()))
 					.allergies(new HashSet<>())
+					.diseases(new HashSet<>())
 					.build();
 		}
 		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
