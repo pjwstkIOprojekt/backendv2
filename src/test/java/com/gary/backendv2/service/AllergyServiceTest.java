@@ -1,16 +1,24 @@
 package com.gary.backendv2.service;
 
+import com.gary.backendv2.exception.NotFoundException;
 import com.gary.backendv2.model.Allergy;
+import com.gary.backendv2.model.MedicalInfo;
+import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.dto.request.AllergyRequest;
+import com.gary.backendv2.model.enums.AllergyType;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class AllergyServiceTest {
     private final AllergyRepository allergyRepository = mock(AllergyRepository.class);
@@ -29,20 +37,157 @@ class AllergyServiceTest {
         assertEquals(expected.size(), result.size());
     }
 
-    @Test
-    void getById() {
-       assertFalse(false);
+    @Test()
+    void getByIdShouldFind() {
+       int id = 1;
+       Allergy expected = new Allergy();
+       expected.setAllergyId(1);
+       expected.setAllergyName("test");
+
+       when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.of(expected));
+
+       Allergy result = allergyService.getById(1);
+
+       assertNotNull(result);
+       assertEquals(expected.getAllergyId(), result.getAllergyId());
+       assertEquals(expected.getAllergyName(), result.getAllergyName());
+
     }
 
     @Test
-    void addAllergy() {
+    void getByIdShouldNotFind() {
+        int id = 1;
+        Allergy expected = new Allergy();
+        expected.setAllergyId(1);
+        expected.setAllergyName("test");
+
+        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(NotFoundException.class, () -> {
+            allergyService.getById(id);
+        });
+
+        String expectedMessage = "No record with that ID";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
-    void updateAllergy() {
+    void addAllergyNoMedialInfoShouldCreateAllergy() {
+        AllergyRequest allergyRequest = new AllergyRequest();
+        allergyRequest.setUserId(1);
+        allergyRequest.setMedicalInfoId(null);
+        allergyRequest.setAllergyName("test");
+        allergyRequest.setAllergyType(AllergyType.INJECTION);
+
+        User user = new User();
+        MedicalInfo mi = new MedicalInfo();
+        mi.setAllergies(new HashSet<>());
+        user.setMedicalInfo(mi);
+
+        when(userRepository.getByUserId(allergyRequest.getUserId())).thenReturn(user);
+        when(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())).thenReturn(false);
+        when(allergyRepository.existsByAllergyType(allergyRequest.getAllergyType())).thenReturn(false);
+        when(allergyRepository.existsByOther(allergyRequest.getOther())).thenReturn(false);
+
+        allergyService.addAllergy(allergyRequest);
+
+        verify(allergyRepository, times(1)).save(any(Allergy.class));
+        verify(medicalInfoRepository, times(1)).save(any(MedicalInfo.class));
     }
 
     @Test
-    void removeAllergy() {
+    void addAllergyAllergyAndMedicalInfoFound() {
+        AllergyRequest allergyRequest = new AllergyRequest();
+        allergyRequest.setUserId(1);
+        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setAllergyName("test");
+        allergyRequest.setAllergyType(AllergyType.INJECTION);
+
+        MedicalInfo medicalInfo = new MedicalInfo();
+        medicalInfo.setAllergies(new HashSet<>());
+        Allergy allergy = new Allergy();
+
+        when(medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId())).thenReturn(Optional.of(medicalInfo));
+        when(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())).thenReturn(true);
+        when(allergyRepository.existsByAllergyType(allergyRequest.getAllergyType())).thenReturn(true);
+        when(allergyRepository.existsByOther(allergyRequest.getOther())).thenReturn(true);
+        when(allergyRepository.findByAllergyNameAndAllergyTypeAndOther(
+                allergyRequest.getAllergyName(), allergyRequest.getAllergyType(), allergyRequest.getOther()
+        )).thenReturn(allergy);
+
+        allergyService.addAllergy(allergyRequest);
+
+        verify(allergyRepository, times(1)).save(any(Allergy.class));
+        verify(medicalInfoRepository, times(1)).save(any(MedicalInfo.class));
+    }
+
+    @Test
+    void updateAllergyShouldUpdate() {
+        Integer id = 1337;
+        AllergyRequest allergyRequest = new AllergyRequest();
+        allergyRequest.setUserId(1);
+        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setAllergyName("test");
+        allergyRequest.setAllergyType(AllergyType.INJECTION);
+
+        Allergy allergy = new Allergy();
+
+        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.of(allergy));
+
+        allergyService.updateAllergy(id, allergyRequest);
+
+        verify(allergyRepository, times(1)).save(any(Allergy.class));
+    }
+
+    @Test
+    void updateAllergyShouldFail() {
+        Integer id = 1337;
+        AllergyRequest allergyRequest = new AllergyRequest();
+        allergyRequest.setUserId(1);
+        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setAllergyName("test");
+        allergyRequest.setAllergyType(AllergyType.INJECTION);
+
+        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(NoSuchElementException.class, () -> {
+            allergyService.updateAllergy(id, allergyRequest);
+        });
+
+        String expected = "No value present";
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void removeAllergyShouldDelete() {
+        Integer id = 1337;
+        Allergy allergy =new Allergy();
+
+        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.of(allergy));
+
+        allergyService.removeAllergy(id);
+
+        verify(allergyRepository, times(1)).delete(any(Allergy.class));
+    }
+
+    @Test
+    void removeAllergyShouldThrow() {
+        Integer id = 1337;
+        Allergy allergy =new Allergy();
+
+        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(NotFoundException.class, () -> {
+            allergyService.removeAllergy(id);
+        });
+
+        String expected = "No record with that ID";
+        String actual = exception.getMessage();
+
+        verify(allergyRepository, times(0)).delete(any(Allergy.class));
+        assertEquals(expected, actual);
     }
 }
