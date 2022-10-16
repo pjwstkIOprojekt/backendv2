@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -31,10 +32,14 @@ public class AllergyService {
 
 	public void addAllergy(AllergyRequest allergyRequest){
 		MedicalInfo medicalInfo;
-		if(allergyRequest.getMedicalInfoId()!= null) {
-			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId());
+		if(allergyRequest.getMedicalInfoId() != null) {
+			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId()).orElseThrow(() -> new NotFoundException("No record with that ID"));
 		}else{
-			medicalInfo = MedicalInfo.builder().user(userRepository.getByUserId(allergyRequest.getUserId())).build();
+			medicalInfo = MedicalInfo
+					.builder()
+					.user(userRepository.getByUserId(allergyRequest.getUserId()))
+					.allergies(new HashSet<>())
+					.build();
 		}
 		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
 			Set<MedicalInfo> medicalInfos = new HashSet<>();
