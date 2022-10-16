@@ -3,10 +3,7 @@ name: Measure coverage
 on:
   pull_request:  
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+permissions: write-all
 
 jobs:
   build:
