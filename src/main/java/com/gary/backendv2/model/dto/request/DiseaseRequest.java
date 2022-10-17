@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -19,6 +20,6 @@ public class DiseaseRequest {
 	@NotBlank
 	private String description;
 
-	@NotBlank
-	private boolean shareWithBand;
+	@NotNull
+	private Boolean shareWithBand;
 }

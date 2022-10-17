@@ -8,6 +8,7 @@ import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
@@ -27,13 +28,13 @@ public class DiseaseController {
 	}
 
 	@PostMapping("")
-	public ResponseEntity<?> addDisease(@RequestBody DiseaseRequest diseaseRequest){
+	public ResponseEntity<?> addDisease(@RequestBody @Valid DiseaseRequest diseaseRequest){
 		diseaseService.addDisease(diseaseRequest);
 		return ResponseEntity.ok("Disease added successfully");
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateDisease(@PathVariable Integer id, @RequestBody DiseaseRequest diseaseRequest){
+	public ResponseEntity<?> updateDisease(@PathVariable Integer id, @RequestBody @Valid DiseaseRequest diseaseRequest){
 		diseaseService.updateDisease(id, diseaseRequest);
 		return ResponseEntity.ok("Disease updated");
 	}

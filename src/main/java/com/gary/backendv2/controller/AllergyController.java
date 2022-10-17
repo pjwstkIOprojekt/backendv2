@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.http.HttpResponse;
 import java.util.List;
 
@@ -26,12 +27,12 @@ public class AllergyController {
 	public ResponseEntity<?> getAllergyById(@PathVariable Integer id){return ResponseEntity.ok(allergyService.getById(id));}
 
 	@PostMapping("")
-	public ResponseEntity<?> addAllergy(@RequestBody AllergyRequest allergyRequest){
+	public ResponseEntity<?> addAllergy(@RequestBody @Valid AllergyRequest allergyRequest){
 		allergyService.addAllergy(allergyRequest);
 		return ResponseEntity.ok("Allergy added successfully");
 	}
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateAllergy(@PathVariable Integer id, @RequestBody AllergyRequest allergyRequest){
+	public ResponseEntity<?> updateAllergy(@PathVariable Integer id, @RequestBody @Valid AllergyRequest allergyRequest){
 		allergyService.updateAllergy(id, allergyRequest);
 		return ResponseEntity.ok("Allergy updated successfully");
 	}
