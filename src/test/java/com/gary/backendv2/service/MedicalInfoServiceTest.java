@@ -10,6 +10,7 @@ import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -28,8 +29,13 @@ public class MedicalInfoServiceTest {
         Integer id = 1337;
         MedicalInfo medicalInfo = new MedicalInfo();
         medicalInfo.setMedicalInfoId(33);
+        User user = new User();
+        user.setEmail("test@test.pl");
         medicalInfo.setBloodType(BloodType.A);
         medicalInfo.setRhType(RhType.MINUS);
+
+        user.setMedicalInfo(medicalInfo);
+        medicalInfo.setUser(user);
 
         when(medicalInfoRepository.findByMedicalInfoId(id)).thenReturn(Optional.of(medicalInfo));
 
@@ -38,11 +44,11 @@ public class MedicalInfoServiceTest {
         BloodRequest expected = new BloodRequest();
         expected.setBloodType(BloodType.A);
         expected.setRhType(RhType.MINUS);
-        expected.setMedicalInfoId(33);
+        expected.setUserEmail("test@test.pl");
 
         assertEquals(expected.getBloodType(), actual.getBloodType());
         assertEquals(expected.getRhType(), actual.getRhType());
-        assertEquals(expected.getMedicalInfoId(), actual.getMedicalInfoId());
+        assertEquals(expected.getUserEmail(), actual.getUserEmail());
     }
 
     @Test
@@ -66,61 +72,25 @@ public class MedicalInfoServiceTest {
     }
 
     @Test
-    void addBloodMedicalInfoIdNull() {
+    void addBloodMedicalInfo() {
         BloodRequest bloodRequest = new BloodRequest();
-        bloodRequest.setUserId(1337);
-        bloodRequest.setMedicalInfoId(null);
+        bloodRequest.setUserEmail("test@test.pl");
         bloodRequest.setBloodType(BloodType.B);
         bloodRequest.setRhType(RhType.MINUS);
 
         User user = new User();
+        MedicalInfo mi = new MedicalInfo();
+        mi.setAllergies(new HashSet<>());
+        user.setEmail("test@test.pl");
+        user.setMedicalInfo(mi);
 
-        when(userRepository.getByUserId(bloodRequest.getUserId())).thenReturn(user);
-
-        medicalInfoService.addBlood(bloodRequest);
-
-        verify(medicalInfoRepository, times(1)).save(any(MedicalInfo.class));
-    }
-
-    @Test
-    void addBloodMedicalInfoIdNonNull() {
-        BloodRequest bloodRequest = new BloodRequest();
-        bloodRequest.setUserId(1337);
-        bloodRequest.setMedicalInfoId(33);
-        bloodRequest.setBloodType(BloodType.B);
-        bloodRequest.setRhType(RhType.MINUS);
-
-        MedicalInfo medicalInfo = new MedicalInfo();
-
-        when(medicalInfoRepository.findByMedicalInfoId(bloodRequest.getMedicalInfoId())).thenReturn(Optional.of(medicalInfo));
+        when(userRepository.findByEmail(bloodRequest.getUserEmail())).thenReturn(Optional.of(user));
 
         medicalInfoService.addBlood(bloodRequest);
 
         verify(medicalInfoRepository, times(1)).save(any(MedicalInfo.class));
     }
 
-    @Test
-    void addBloodMedicalInfoNotFound() {
-        BloodRequest bloodRequest = new BloodRequest();
-        bloodRequest.setUserId(1337);
-        bloodRequest.setMedicalInfoId(33);
-        bloodRequest.setBloodType(BloodType.B);
-        bloodRequest.setRhType(RhType.MINUS);
-
-        when(medicalInfoRepository.findByMedicalInfoId(bloodRequest.getMedicalInfoId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(HttpException.class, () -> {
-            medicalInfoService.addBlood(bloodRequest);
-
-        });
-
-        String expected = String.format("404 Cannot find medical info with id %s", bloodRequest.getMedicalInfoId());
-        String actual = exception.getMessage();
-
-        assertEquals(expected, actual);
-
-        verify(medicalInfoRepository, times(0)).save(any(MedicalInfo.class));
-    }
 
     @Test
     void removeBloodMedicalInfoFound() {
