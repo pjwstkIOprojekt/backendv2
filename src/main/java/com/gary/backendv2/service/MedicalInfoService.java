@@ -1,6 +1,7 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.BloodRequest;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +19,31 @@ import java.util.Optional;
 public class MedicalInfoService {
 	private final MedicalInfoRepository medicalInfoRepository;
 	private final UserRepository userRepository;
+
+	public List<MedicalInfo> getAll(){
+		return medicalInfoRepository.findAll();
+	}
+
+	public MedicalInfo getByMedicalId(Integer id){
+		return medicalInfoRepository.findByMedicalInfoId(id)
+				.orElseThrow(()->new HttpException(HttpStatus.NOT_FOUND,  String.format("Cannot find medical info with id %s", id)));
+	}
+
+	public MedicalInfo getByUserEmail(String email){
+		Optional<User> userOptional = userRepository.findByEmail(email);
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
+		}
+		return userOptional.get().getMedicalInfo();
+	}
+
+	public void removeMedicalInfo(Integer id){
+		medicalInfoRepository.delete(
+				medicalInfoRepository
+						.findByMedicalInfoId(id)
+						.orElseThrow(()->new HttpException(HttpStatus.NOT_FOUND,  String.format("Cannot find medical info with id %s", id)))
+		);
+	}
 
 	public BloodRequest getBloodByMedicalId(Integer id){
 		Optional<MedicalInfo> medicalInfoOptional = medicalInfoRepository.findByMedicalInfoId(id);
@@ -28,33 +55,20 @@ public class MedicalInfoService {
 		BloodRequest bloodRequest = new BloodRequest();
 		bloodRequest.setBloodType(medicalInfo.getBloodType());
 		bloodRequest.setRhType(medicalInfo.getRhType());
-		bloodRequest.setMedicalInfoId(medicalInfo.getMedicalInfoId());
+		bloodRequest.setUserEmail(medicalInfo.getUser().getEmail());
 		return bloodRequest;
 	}
 
 	public void addBlood(BloodRequest bloodRequest) {
-		Optional<MedicalInfo> medicalInfo;
-		if (bloodRequest.getMedicalInfoId() == null) {
-			User user = userRepository.getByUserId(bloodRequest.getUserId());
-			MedicalInfo mf = MedicalInfo
-					.builder()
-					.user(user)
-					.build();
-
-			user.setMedicalInfo(mf);
-
-			medicalInfo = Optional.of(mf);
-			userRepository.save(user);
-		} else {
-			medicalInfo = medicalInfoRepository.findByMedicalInfoId(bloodRequest.getMedicalInfoId());
+		Optional<User> userOptional = userRepository.findByEmail(bloodRequest.getUserEmail());
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", bloodRequest.getUserEmail()));
 		}
-		if (medicalInfo.isEmpty()) {
-			throw new HttpException(HttpStatus.NOT_FOUND,  String.format("Cannot find medical info with id %s", bloodRequest.getMedicalInfoId()));
-		}
+		MedicalInfo userMedialInfo = userOptional.get().getMedicalInfo();
 
-		medicalInfo.get().setBloodType(bloodRequest.getBloodType());
-		medicalInfo.get().setRhType(bloodRequest.getRhType());
-		medicalInfoRepository.save(medicalInfo.get());
+		userMedialInfo.setBloodType(bloodRequest.getBloodType());
+		userMedialInfo.setRhType(bloodRequest.getRhType());
+		medicalInfoRepository.save(userMedialInfo);
 	}
 
 	public void removeBlood(Integer id){
