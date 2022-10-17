@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @RestController()
@@ -21,7 +23,7 @@ public class MedicalInfoController {
 	}
 
 	@GetMapping("/user/{email}")
-	public MedicalInfo getByUserEmail(@PathVariable String email){
+	public MedicalInfo getByUserEmail(@PathVariable @Email String email){
 		return medicalInfoService.getByUserEmail(email);
 	}
 
@@ -42,13 +44,13 @@ public class MedicalInfoController {
 	}
 
 	@PostMapping("/blood")
-	public ResponseEntity<?> addBlood(@RequestBody BloodRequest bloodRequest){
+	public ResponseEntity<?> addBlood(@RequestBody @Valid BloodRequest bloodRequest){
 		medicalInfoService.addBlood(bloodRequest);
 		return ResponseEntity.ok("Added blood");
 	}
 
 	@PutMapping("/blood/{id}")
-	public ResponseEntity<?> updateBlood(@PathVariable Integer id, @RequestBody BloodRequest bloodRequest){
+	public ResponseEntity<?> updateBlood(@PathVariable Integer id, @RequestBody @Valid BloodRequest bloodRequest){
 		medicalInfoService.updateBlood(id, bloodRequest);
 		return ResponseEntity.ok("Blood updated");
 	}
