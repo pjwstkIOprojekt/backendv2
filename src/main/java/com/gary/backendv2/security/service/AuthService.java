@@ -1,6 +1,7 @@
 package com.gary.backendv2.security.service;
 
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.model.security.UserPrincipal;
@@ -8,6 +9,7 @@ import com.gary.backendv2.model.dto.request.LoginRequest;
 import com.gary.backendv2.model.dto.request.SignupRequest;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.enums.RoleName;
+import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.RoleRepository;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.utils.JwtUtils;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private MedicalInfoRepository medicalInfoRepository;
 
     private PasswordEncoder passwordEncoder;
     private AuthenticationManager authenticationManager;
@@ -64,6 +67,9 @@ public class AuthService {
             throw new HttpException(HttpStatus.BAD_REQUEST, "Email already in use!");
         }
 
+        MedicalInfo mi = new MedicalInfo();
+        mi = medicalInfoRepository.save(mi);
+
         User user = User.builder()
                 .firstName(signupRequest.getFirstName())
                 .lastName(signupRequest.getLastName())
@@ -72,6 +78,7 @@ public class AuthService {
                 .phoneNumber(signupRequest.getPhoneNumber())
                 .email(signupRequest.getEmail())
                 .userId(null)
+                .medicalInfo(mi)
                 .build();
 
 

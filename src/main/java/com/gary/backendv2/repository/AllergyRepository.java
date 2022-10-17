@@ -11,9 +11,12 @@ import java.util.Optional;
 @Repository
 public interface AllergyRepository extends JpaRepository<Allergy, Integer> {
 	Optional<Allergy> findByAllergyId(Integer id);
+	Optional<Allergy> findByAllergyName(String name);
+
+	Allergy getByAllergyName(String name);
+
 	boolean existsByAllergyType(AllergyType allergyType);
 	boolean existsByAllergyName(String allergyName);
 	boolean existsByOther(String other);
-	Allergy findByAllergyNameAndAllergyTypeAndOther(String allergyName, AllergyType allergyType, String other);
 }
 
