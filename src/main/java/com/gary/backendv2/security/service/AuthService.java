@@ -52,6 +52,7 @@ public class AuthService {
 
         return JwtResponse
                 .builder()
+                .userId(userRepository.getByEmail(userPrincipal.getUsername()).getUserId())
                 .email(userPrincipal.getUsername())
                 .token(jwt)
                 .roles(roles)
@@ -71,7 +72,6 @@ public class AuthService {
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .phoneNumber(signupRequest.getPhoneNumber())
                 .email(signupRequest.getEmail())
-                .userId(null)
                 .build();
 
 

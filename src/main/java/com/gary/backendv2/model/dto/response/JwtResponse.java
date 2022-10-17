@@ -10,6 +10,7 @@ import java.util.Collection;
 @Setter
 @Builder
 public class JwtResponse {
+    Integer userId;
     String token;
     String email;
     String type;
