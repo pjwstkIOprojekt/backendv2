@@ -31,4 +31,7 @@ public class MedicalInfo {
 
 	@ManyToMany(mappedBy = "medicalInfos", fetch = FetchType.EAGER)
 	private Set<Allergy> allergies = new LinkedHashSet<>();
+
+	@ManyToMany(mappedBy = "medicalInfos", fetch = FetchType.EAGER)
+	private Set<Disease> diseases = new LinkedHashSet<>();
 }
