@@ -19,12 +19,12 @@ public class AllergyController {
 	private final AllergyService allergyService;
 
 	@GetMapping("")
-	public List<Allergy> getAllAllergies(){
-		return allergyService.getAll();
+	public ResponseEntity<?> getAllAllergies(){
+		return ResponseEntity.ok(allergyService.getAll());
 	}
 
 	@GetMapping("/{id}")
-	public Allergy getAllergyById(@PathVariable Integer id){return allergyService.getById(id);}
+	public ResponseEntity<?> getAllergyById(@PathVariable Integer id){return ResponseEntity.ok(allergyService.getById(id));}
 
 	@PostMapping("")
 	public ResponseEntity<?> addAllergy(@RequestBody @Valid AllergyRequest allergyRequest){
