@@ -1,10 +1,12 @@
 package com.gary.backendv2.service;
 
+import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.exception.NotFoundException;
 import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.AllergyRequest;
+import com.gary.backendv2.model.dto.response.AllergyResponse;
 import com.gary.backendv2.model.enums.AllergyType;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
@@ -46,7 +48,7 @@ class AllergyServiceTest {
 
        when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.of(expected));
 
-       Allergy result = allergyService.getById(1);
+       AllergyResponse result = allergyService.getById(1);
 
        assertNotNull(result);
        assertEquals(expected.getAllergyId(), result.getAllergyId());
@@ -56,18 +58,15 @@ class AllergyServiceTest {
 
     @Test
     void getByIdShouldNotFind() {
-        int id = 1;
-        Allergy expected = new Allergy();
-        expected.setAllergyId(1);
-        expected.setAllergyName("test");
+        int id = 120;
 
         when(allergyRepository.findByAllergyId(id)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(NotFoundException.class, () -> {
+        Exception exception = assertThrows(HttpException.class, () -> {
             allergyService.getById(id);
         });
 
-        String expectedMessage = "No record with that ID";
+        String expectedMessage = String.format("Cannot find allergy with %s", id);
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

@@ -6,6 +6,7 @@ import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.AllergyRequest;
+import com.gary.backendv2.model.dto.response.AllergyResponse;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
@@ -13,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +23,32 @@ public class AllergyService {
 	private final MedicalInfoRepository medicalInfoRepository;
 	private final UserRepository userRepository;
 
-	public List<Allergy> getAll(){
-		return allergyRepository.findAll();
+	public List<AllergyResponse> getAll(){
+		List<Allergy> allergies = allergyRepository.findAll();
+		List <AllergyResponse> allergyResponses = new ArrayList<>();
+		for (Allergy a : allergies) {
+			allergyResponses.add(AllergyResponse.builder()
+					.allergyId(a.getAllergyId())
+					.allergyType(a.getAllergyType())
+					.allergyName(a.getAllergyName())
+					.other(a.getOther())
+					.build());
+		}
+		return allergyResponses;
 	}
 
-	public Allergy getById(Integer id){
-		return allergyRepository.findByAllergyId(id).orElseThrow(()-> new NotFoundException("No record with that ID"));
+	public AllergyResponse getById(Integer id){
+		Optional<Allergy> allergyOptional = allergyRepository.findByAllergyId(id);
+		if (allergyOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find allergy with %s", id));
+		}
+		Allergy allergy = allergyOptional.get();
+		return AllergyResponse.builder()
+				.allergyId(allergy.getAllergyId())
+				.allergyName(allergy.getAllergyName())
+				.allergyType(allergy.getAllergyType())
+				.other(allergy.getOther())
+				.build();
 	}
 
 	public void addAllergy(AllergyRequest allergyRequest){
