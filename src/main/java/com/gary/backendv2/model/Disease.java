@@ -18,6 +18,7 @@ public class Disease {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer diseaseId;
 
+	@Column(nullable = false, unique = true)
 	private String diseaseName;
 
 	private String description;
