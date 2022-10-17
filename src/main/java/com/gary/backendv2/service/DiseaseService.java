@@ -53,7 +53,7 @@ public class DiseaseService {
 		if (userMedialInfo.getDiseases().stream()
 				.map(Disease::getDiseaseName)
 				.anyMatch(x -> x.equals(diseaseRequest.getDiseaseName()))) {
-			throw new HttpException(HttpStatus.BAD_REQUEST, String.format("%s already have %s allergy", diseaseRequest.getUserEmail(), diseaseRequest.getDiseaseName()));
+			throw new HttpException(HttpStatus.BAD_REQUEST, String.format("%s user have %s disease", diseaseRequest.getUserEmail(), diseaseRequest.getDiseaseName()));
 		}
 		Disease disease = Disease.builder()
 				.medicalInfos(new HashSet<>())
