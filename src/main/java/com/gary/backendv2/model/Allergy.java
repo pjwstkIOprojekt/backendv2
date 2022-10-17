@@ -22,6 +22,7 @@ public class Allergy {
 	@Enumerated(EnumType.STRING)
 	private AllergyType allergyType;
 
+	@Column(nullable = false, unique = true)
 	private String allergyName;
 
 	private String other;

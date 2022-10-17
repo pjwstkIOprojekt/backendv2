@@ -76,8 +76,7 @@ class AllergyServiceTest {
     @Test
     void addAllergyNoMedialInfoShouldCreateAllergy() {
         AllergyRequest allergyRequest = new AllergyRequest();
-        allergyRequest.setUserId(1);
-        allergyRequest.setMedicalInfoId(null);
+        allergyRequest.setUserEmail("test@test.pl");
         allergyRequest.setAllergyName("test");
         allergyRequest.setAllergyType(AllergyType.INJECTION);
 
@@ -86,7 +85,7 @@ class AllergyServiceTest {
         mi.setAllergies(new HashSet<>());
         user.setMedicalInfo(mi);
 
-        when(userRepository.getByUserId(allergyRequest.getUserId())).thenReturn(user);
+        when(userRepository.findByEmail(allergyRequest.getUserEmail())).thenReturn(Optional.of(user));
         when(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())).thenReturn(false);
         when(allergyRepository.existsByAllergyType(allergyRequest.getAllergyType())).thenReturn(false);
         when(allergyRepository.existsByOther(allergyRequest.getOther())).thenReturn(false);
@@ -100,22 +99,23 @@ class AllergyServiceTest {
     @Test
     void addAllergyAllergyAndMedicalInfoFound() {
         AllergyRequest allergyRequest = new AllergyRequest();
-        allergyRequest.setUserId(1);
-        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setUserEmail("test@test.pl");
         allergyRequest.setAllergyName("test");
         allergyRequest.setAllergyType(AllergyType.INJECTION);
 
         MedicalInfo medicalInfo = new MedicalInfo();
+        User user = new User();
+        user.setMedicalInfo(medicalInfo);
         medicalInfo.setAllergies(new HashSet<>());
         Allergy allergy = new Allergy();
+        allergy.setMedicalInfos(new HashSet<>());
 
-        when(medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId())).thenReturn(Optional.of(medicalInfo));
+        when(userRepository.findByEmail(allergyRequest.getUserEmail())).thenReturn(Optional.of(user));
         when(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())).thenReturn(true);
         when(allergyRepository.existsByAllergyType(allergyRequest.getAllergyType())).thenReturn(true);
         when(allergyRepository.existsByOther(allergyRequest.getOther())).thenReturn(true);
-        when(allergyRepository.findByAllergyNameAndAllergyTypeAndOther(
-                allergyRequest.getAllergyName(), allergyRequest.getAllergyType(), allergyRequest.getOther()
-        )).thenReturn(allergy);
+        when(allergyRepository.findByAllergyName(allergyRequest.getAllergyName())).thenReturn(Optional.of(allergy));
+        when(allergyRepository.getByAllergyName(allergyRequest.getAllergyName())).thenReturn(allergy);
 
         allergyService.addAllergy(allergyRequest);
 
@@ -127,8 +127,7 @@ class AllergyServiceTest {
     void updateAllergyShouldUpdate() {
         Integer id = 1337;
         AllergyRequest allergyRequest = new AllergyRequest();
-        allergyRequest.setUserId(1);
-        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setUserEmail("test@test.pl");
         allergyRequest.setAllergyName("test");
         allergyRequest.setAllergyType(AllergyType.INJECTION);
 
@@ -145,8 +144,7 @@ class AllergyServiceTest {
     void updateAllergyShouldFail() {
         Integer id = 1337;
         AllergyRequest allergyRequest = new AllergyRequest();
-        allergyRequest.setUserId(1);
-        allergyRequest.setMedicalInfoId(1);
+        allergyRequest.setUserEmail("test@test.pl");
         allergyRequest.setAllergyName("test");
         allergyRequest.setAllergyType(AllergyType.INJECTION);
 

@@ -1,13 +1,16 @@
 package com.gary.backendv2.service;
 
+import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.exception.NotFoundException;
 import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.MedicalInfo;
+import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.AllergyRequest;
 import com.gary.backendv2.repository.AllergyRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -31,36 +34,36 @@ public class AllergyService {
 	}
 
 	public void addAllergy(AllergyRequest allergyRequest){
-		MedicalInfo medicalInfo;
-		if(allergyRequest.getMedicalInfoId() != null) {
-			medicalInfo = medicalInfoRepository.findByMedicalInfoId(allergyRequest.getMedicalInfoId()).orElseThrow(() -> new NotFoundException("No record with that ID"));
-		}else{
-			medicalInfo = MedicalInfo
-					.builder()
-					.user(userRepository.getByUserId(allergyRequest.getUserId()))
-					.allergies(new HashSet<>())
-					.diseases(new HashSet<>())
-					.build();
+		Optional<User> userOptional = userRepository.findByEmail(allergyRequest.getUserEmail());
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", allergyRequest.getUserEmail()));
 		}
-		if(!(allergyRepository.existsByAllergyName(allergyRequest.getAllergyName())||allergyRepository.existsByAllergyType(allergyRequest.getAllergyType()) || allergyRepository.existsByOther(allergyRequest.getOther()))){
-			Set<MedicalInfo> medicalInfos = new HashSet<>();
-			medicalInfos.add(medicalInfo);
-			Allergy allergy =Allergy.builder()
-					.allergyType(allergyRequest.getAllergyType())
-					.allergyName(allergyRequest.getAllergyName())
-					.other(allergyRequest.getOther())
-					.medicalInfos(medicalInfos).build();
-			allergyRepository.save(allergy);
-			medicalInfo.getAllergies().add(allergy);
-		}else{
-			Allergy a = allergyRepository
-					.findByAllergyNameAndAllergyTypeAndOther(allergyRequest.getAllergyName(), allergyRequest.getAllergyType(),
-							allergyRequest.getOther());
-			medicalInfo.getAllergies().add(a);
-			a.getMedicalInfos().add(medicalInfo);
-			allergyRepository.save(a);
+		MedicalInfo userMedialInfo = userOptional.get().getMedicalInfo();
+		if (userMedialInfo.getAllergies().stream()
+				.map(Allergy::getAllergyName)
+				.anyMatch(x -> x.equals(allergyRequest.getAllergyName()))) {
+			throw new HttpException(HttpStatus.BAD_REQUEST, String.format("%s already have %s allergy", allergyRequest.getUserEmail(), allergyRequest.getAllergyName()));
 		}
-		medicalInfoRepository.save(medicalInfo);
+
+		Optional<Allergy> allergyOptional = allergyRepository.findByAllergyName(allergyRequest.getAllergyName());
+		Allergy allergy;
+		if (allergyOptional.isEmpty()) {
+			allergy = new Allergy();
+			allergy.setAllergyType(allergyRequest.getAllergyType());
+			allergy.setAllergyName(allergyRequest.getAllergyName());
+			allergy.setOther(allergyRequest.getOther());
+		} else allergy = allergyRepository.getByAllergyName(allergyRequest.getAllergyName());
+
+		userMedialInfo.getAllergies().add(allergy);
+		if (allergy.getMedicalInfos()
+				.stream()
+				.map(MedicalInfo::getMedicalInfoId)
+				.noneMatch(x -> x.equals(userMedialInfo.getMedicalInfoId()))) {
+			allergy.getMedicalInfos().add(userMedialInfo);
+		}
+
+		allergyRepository.save(allergy);
+		medicalInfoRepository.save(userMedialInfo);
 	}
 	public void updateAllergy(Integer id, AllergyRequest allergyRequest){
 		Allergy allergy = allergyRepository.findByAllergyId(id).orElseThrow();
