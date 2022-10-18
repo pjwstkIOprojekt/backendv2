@@ -6,6 +6,8 @@ import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.BloodRequest;
 import com.gary.backendv2.model.enums.BloodType;
 import com.gary.backendv2.model.enums.RhType;
+import com.gary.backendv2.repository.AllergyRepository;
+import com.gary.backendv2.repository.DiseaseRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -21,8 +23,11 @@ public class MedicalInfoServiceTest {
 
     private final MedicalInfoRepository medicalInfoRepository = mock(MedicalInfoRepository.class);
     private final UserRepository userRepository = mock(UserRepository.class);
-
-    private final MedicalInfoService medicalInfoService = new MedicalInfoService(medicalInfoRepository, userRepository);
+    private final AllergyRepository allergyRepository = mock(AllergyRepository.class);
+    private final DiseaseRepository diseaseRepository = mock(DiseaseRepository.class);
+    private final DiseaseService diseaseService = new DiseaseService(diseaseRepository, medicalInfoRepository, userRepository);
+    private final AllergyService allergyService = new AllergyService(allergyRepository, medicalInfoRepository, userRepository);
+    private final MedicalInfoService medicalInfoService = new MedicalInfoService(medicalInfoRepository, userRepository,allergyService, diseaseService);
 
     @Test
     void getBloodByMedicalShouldFind() {
