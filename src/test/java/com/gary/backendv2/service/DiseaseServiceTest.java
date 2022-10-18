@@ -41,7 +41,7 @@ public class DiseaseServiceTest {
 		expected.setDiseaseId(1);
 		expected.setDiseaseName("test");
 
-		when(diseaseRepository.findByDiseaseId(id)).thenReturn(expected);
+		when(diseaseRepository.findByDiseaseId(id)).thenReturn(Optional.of(expected));
 
 		DiseaseResponse result = diseaseService.getAllById(1);
 

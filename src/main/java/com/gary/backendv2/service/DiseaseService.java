@@ -45,7 +45,11 @@ public class DiseaseService {
 	}
 
 	public DiseaseResponse getAllById(Integer id){
-		Disease disease = diseaseRepository.findByDiseaseId(id);
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
 		return DiseaseResponse.builder()
 				.diseaseId(disease.getDiseaseId())
 				.diseaseName(disease.getDiseaseName())
@@ -55,11 +59,20 @@ public class DiseaseService {
 	}
 
 	public void removeDisease(Integer id){
-		diseaseRepository.delete(diseaseRepository.findByDiseaseId(id));
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
+		diseaseRepository.delete(disease);
 	}
 
 	public void updateDisease(Integer id, DiseaseRequest diseaseRequest){
-		Disease disease = diseaseRepository.findByDiseaseId(id);
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
 		disease.setDiseaseName(diseaseRequest.getDiseaseName());
 		disease.setDescription(diseaseRequest.getDescription());
 		diseaseRepository.save(disease);
