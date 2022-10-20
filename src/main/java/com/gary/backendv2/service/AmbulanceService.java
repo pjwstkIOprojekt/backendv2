@@ -97,10 +97,12 @@ public class AmbulanceService {
         ambulanceHistory.getAmbulanceStates().add(state);
         ambulanceHistoryRepository.save(ambulanceHistory);
 
+        ambulance.setAmbulanceState(state);
+        ambulanceRepository.save(ambulance);
+
         AmbulanceStateResponse stateResponse = new AmbulanceStateResponse();
         stateResponse.setType(state.getStateType());
         stateResponse.setTimeWindow(getStringLocalDateTimeMap(state));
-
         return  stateResponse;
     }
 
