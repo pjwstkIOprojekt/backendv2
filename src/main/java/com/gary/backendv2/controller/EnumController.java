@@ -1,8 +1,6 @@
 package com.gary.backendv2.controller;
 
-import com.gary.backendv2.model.enums.AllergyType;
-import com.gary.backendv2.model.enums.BloodType;
-import com.gary.backendv2.model.enums.RhType;
+import com.gary.backendv2.model.enums.*;
 import com.gary.backendv2.utils.EnumUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,4 +29,13 @@ public class EnumController {
 	public List<String> getBloodTypeList(){
 		return EnumUtils.getEnumValues(BloodType.class);
 	}
+
+	@GetMapping("/ambulance_states")
+	public List<String> getAmbulanceStatesList() {return EnumUtils.getEnumValues(AmbulanceStateType.class);}
+
+	@GetMapping("/ambulance_classes")
+	public List<String> getAmbulanceClasses() {return EnumUtils.getEnumValues(AmbulanceClass.class);}
+
+	@GetMapping("/ambulance_types")
+	public List<String> getAmbulanceTypes() {return EnumUtils.getEnumValues(AmbulanceType.class);}
 }

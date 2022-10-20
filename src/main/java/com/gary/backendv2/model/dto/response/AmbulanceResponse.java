@@ -16,11 +16,13 @@ public class AmbulanceResponse {
     private AmbulanceStateType ambulanceStateType;
 
     public static AmbulanceResponse of(Ambulance ambulance) {
+        ambulance.setCurrentState(ambulance.getAmbulanceHistory().getAmbulanceStates().get(ambulance.getAmbulanceHistory().getAmbulanceStates().size() - 1));
+
         AmbulanceResponse ambulanceResponse = new AmbulanceResponse();
         ambulanceResponse.setAmbulanceClass(ambulance.getAmbulanceClass());
         ambulanceResponse.setAmbulanceType(ambulance.getAmbulanceType());
         ambulanceResponse.setLicensePlate(ambulance.getLicensePlate());
-        ambulanceResponse.setAmbulanceStateType(ambulance.getAmbulanceState().getStateType());
+        ambulanceResponse.setAmbulanceStateType(ambulance.getCurrentState().getStateType());
 
         return ambulanceResponse;
     }

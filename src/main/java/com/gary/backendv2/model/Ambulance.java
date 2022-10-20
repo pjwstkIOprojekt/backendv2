@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -32,13 +30,12 @@ public class Ambulance {
     @Embedded
     private Location location ;
 
-    @OneToOne(optional = false, orphanRemoval = true)
-    @JoinColumn(name = "state_id", nullable = false)
-    private AmbulanceState ambulanceState;
-
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "history_id")
     private AmbulanceHistory ambulanceHistory;
+
+    @Transient
+    private AmbulanceState currentState;
 
     @Embeddable
     @Getter

@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,6 +16,6 @@ public class AmbulanceHistory {
     private Integer historyId;
 
     @OneToMany(orphanRemoval = true)
-    private Set<AmbulanceState> ambulanceStates = new LinkedHashSet<>();
+    private List<AmbulanceState> ambulanceStates = new ArrayList<>();
 
 }

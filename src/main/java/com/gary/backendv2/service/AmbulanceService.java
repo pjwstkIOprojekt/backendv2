@@ -63,7 +63,8 @@ public class AmbulanceService {
         if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
 
         Ambulance ambulance = ambulanceOptional.get();
-        AmbulanceState currentState = ambulance.getAmbulanceState();
+        ambulance.setCurrentState(ambulance.getAmbulanceHistory().getAmbulanceStates().get(ambulance.getAmbulanceHistory().getAmbulanceStates().size() - 1));
+        AmbulanceState currentState = ambulance.getCurrentState();
 
         AmbulanceStateResponse ambulanceStateResponse = new AmbulanceStateResponse();
         ambulanceStateResponse.setType(currentState.getStateType());
@@ -87,18 +88,19 @@ public class AmbulanceService {
 
         Ambulance ambulance = ambulanceOptional.get();
         AmbulanceHistory ambulanceHistory = ambulance.getAmbulanceHistory();
-        AmbulanceState state = new AmbulanceState();
 
+        AmbulanceState state = new AmbulanceState();
         state.setStateType(newState.getStateType());
         AmbulanceState.TimeWindow timeWindow = AmbulanceState.TimeWindow.fixed(newState.getStart(), newState.getEnd());
         state.setStateTimeWindow(timeWindow);
 
         state = ambulanceStateRepository.save(state);
+
+        ambulance.setCurrentState(state);
+        ambulanceRepository.save(ambulance);
+
         ambulanceHistory.getAmbulanceStates().add(state);
         ambulanceHistoryRepository.save(ambulanceHistory);
-
-        ambulance.setAmbulanceState(state);
-        ambulanceRepository.save(ambulance);
 
         AmbulanceStateResponse stateResponse = new AmbulanceStateResponse();
         stateResponse.setType(state.getStateType());
@@ -174,7 +176,7 @@ public class AmbulanceService {
         ambulance.setLicensePlate(addRequest.getLicensePlate());
         var locationAnyNull = Stream.of(addRequest.getLatitude(), addRequest.getLongitude()).anyMatch(Objects::isNull);
         ambulance.setLocation(locationAnyNull ? Ambulance.Location.undefined() : Ambulance.Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
-        ambulance.setAmbulanceState(ambulanceState);
+        ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
 
         return ambulance;
