@@ -7,6 +7,7 @@ import com.gary.backendv2.model.Disease;
 import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.DiseaseRequest;
+import com.gary.backendv2.model.dto.response.DiseaseResponse;
 import com.gary.backendv2.repository.DiseaseRepository;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -25,20 +27,52 @@ public class DiseaseService {
 	private final MedicalInfoRepository medicalInfoRepository;
 	private final UserRepository userRepository;
 
-	public List<Disease> getAll(){
-		return diseaseRepository.findAll();
+	public List<DiseaseResponse> getAll(){
+		List<Disease> diseases = diseaseRepository.findAll();
+		List<DiseaseResponse> diseaseResponses = new ArrayList<>();
+		for (Disease d : diseases) {
+			diseaseResponses.add(
+					DiseaseResponse
+							.builder()
+							.diseaseId(d.getDiseaseId())
+							.diseaseName(d.getDiseaseName())
+							.description(d.getDescription())
+							.shareWithBand(d.isShareWithBand())
+							.build()
+			);
+		}
+		return diseaseResponses;
 	}
 
-	public Disease getAllById(Integer id){
-		return diseaseRepository.findByDiseaseId(id);
+	public DiseaseResponse getAllById(Integer id){
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
+		return DiseaseResponse.builder()
+				.diseaseId(disease.getDiseaseId())
+				.diseaseName(disease.getDiseaseName())
+				.description(disease.getDescription())
+				.shareWithBand(disease.isShareWithBand())
+				.build();
 	}
 
 	public void removeDisease(Integer id){
-		diseaseRepository.delete(diseaseRepository.findByDiseaseId(id));
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
+		diseaseRepository.delete(disease);
 	}
 
 	public void updateDisease(Integer id, DiseaseRequest diseaseRequest){
-		Disease disease = diseaseRepository.findByDiseaseId(id);
+		Optional<Disease> optionalDisease = diseaseRepository.findByDiseaseId(id);
+		if (optionalDisease.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
+		}
+		Disease disease = optionalDisease.get();
 		disease.setDiseaseName(diseaseRequest.getDiseaseName());
 		disease.setDescription(diseaseRequest.getDescription());
 		diseaseRepository.save(disease);

@@ -1,6 +1,5 @@
 package com.gary.backendv2.controller;
 
-import com.gary.backendv2.model.Disease;
 import com.gary.backendv2.model.dto.request.DiseaseRequest;
 import com.gary.backendv2.service.DiseaseService;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +17,13 @@ public class DiseaseController {
 	private final DiseaseService diseaseService;
 
 	@GetMapping("")
-	public List<Disease> getAll(){
-		return diseaseService.getAll();
+	public ResponseEntity<?> getAll(){
+		return ResponseEntity.ok(diseaseService.getAll());
 	}
 
 	@GetMapping("/{id}")
-	public Disease getById(@PathVariable Integer id){
-		return diseaseService.getAllById(id);
+	public ResponseEntity<?> getById(@PathVariable Integer id){
+		return ResponseEntity.ok(diseaseService.getAllById(id));
 	}
 
 	@PostMapping("")
