@@ -17,19 +17,9 @@ import java.util.List;
 public class MedicalInfoController {
 	private final MedicalInfoService medicalInfoService;
 
-	@GetMapping("")
-	public List<MedicalInfo> getAll(){
-		return medicalInfoService.getAll();
-	}
-
 	@GetMapping("/user/{email}")
-	public MedicalInfo getByUserEmail(@PathVariable @Email String email){
-		return medicalInfoService.getByUserEmail(email);
-	}
-
-	@GetMapping("/{id}")
-	public MedicalInfo getById(@PathVariable Integer id){
-		return medicalInfoService.getByMedicalId(id);
+	public ResponseEntity<?> getByUserEmail(@PathVariable @Email String email){
+		return ResponseEntity.ok(medicalInfoService.getByUserEmail(email));
 	}
 
 	@DeleteMapping("/{id}")

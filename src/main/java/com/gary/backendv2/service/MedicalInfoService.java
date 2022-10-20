@@ -2,15 +2,20 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Allergy;
+import com.gary.backendv2.model.Disease;
 import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.BloodRequest;
+import com.gary.backendv2.model.dto.response.AllergyResponse;
+import com.gary.backendv2.model.dto.response.DiseaseResponse;
+import com.gary.backendv2.model.dto.response.MedicalInfoResponse;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +24,8 @@ import java.util.Optional;
 public class MedicalInfoService {
 	private final MedicalInfoRepository medicalInfoRepository;
 	private final UserRepository userRepository;
+	private final AllergyService allergyService;
+	private final DiseaseService diseaseService;
 
 	public List<MedicalInfo> getAll(){
 		return medicalInfoRepository.findAll();
@@ -29,12 +36,28 @@ public class MedicalInfoService {
 				.orElseThrow(()->new HttpException(HttpStatus.NOT_FOUND,  String.format("Cannot find medical info with id %s", id)));
 	}
 
-	public MedicalInfo getByUserEmail(String email){
+	public MedicalInfoResponse getByUserEmail(String email){
 		Optional<User> userOptional = userRepository.findByEmail(email);
 		if (userOptional.isEmpty()) {
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
 		}
-		return userOptional.get().getMedicalInfo();
+		MedicalInfo medicalInfo = userOptional.get().getMedicalInfo();
+		List<AllergyResponse> allergies = new ArrayList<>();
+		List<DiseaseResponse> diseases = new ArrayList<>();
+		for (Allergy a : medicalInfo.getAllergies()) {
+			allergies.add(allergyService.getById(a.getAllergyId()));
+		}
+		for (Disease d : medicalInfo.getDiseases()){
+			diseases.add(diseaseService.getAllById(d.getDiseaseId()));
+		}
+		return MedicalInfoResponse
+				.builder()
+				.medicalInfoId(medicalInfo.getMedicalInfoId())
+				.allergies(allergies)
+				.diseases(diseases)
+				.bloodType(medicalInfo.getBloodType())
+				.rhType(medicalInfo.getRhType())
+				.build();
 	}
 
 	public void removeMedicalInfo(Integer id){
