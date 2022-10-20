@@ -14,13 +14,16 @@ import com.gary.backendv2.repository.AmbulanceHistoryRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.AmbulanceStateRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AmbulanceService {
@@ -63,7 +66,7 @@ public class AmbulanceService {
         if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
 
         Ambulance ambulance = ambulanceOptional.get();
-        ambulance.setCurrentState(ambulance.getAmbulanceHistory().getAmbulanceStates().get(ambulance.getAmbulanceHistory().getAmbulanceStates().size() - 1));
+        ambulance.findCurrentState();
         AmbulanceState currentState = ambulance.getCurrentState();
 
         AmbulanceStateResponse ambulanceStateResponse = new AmbulanceStateResponse();
@@ -145,6 +148,26 @@ public class AmbulanceService {
         }
 
         return responseSet;
+    }
+    @Scheduled(fixedDelay = 60000 )
+    public void checkForStateExpiration() {
+        List<Ambulance> ambulances = ambulanceRepository.findAll();
+
+        LocalDateTime now = LocalDateTime.now();
+        for (Ambulance ambulance : ambulances) {
+            AmbulanceState currentState = ambulance.findCurrentState();
+            AmbulanceHistory history = ambulance.getAmbulanceHistory();
+
+            if (currentState.getStateTimeWindow().getEndTime() != null && currentState.getStateTimeWindow().getEndTime().isBefore(now)) {
+                AmbulanceState newState = new AmbulanceState();
+                newState.setStateType(AmbulanceStateType.AVAILABLE);
+                newState.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(now));
+                newState = ambulanceStateRepository.save(newState);
+
+                history.getAmbulanceStates().add(newState);
+                ambulanceHistoryRepository.save(history);
+            }
+        }
     }
 
     private Map<String, LocalDateTime> getStringLocalDateTimeMap(AmbulanceState state) {

@@ -37,6 +37,12 @@ public class Ambulance {
     @Transient
     private AmbulanceState currentState;
 
+    public AmbulanceState findCurrentState() {
+        currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
+        return currentState;
+    }
+
+
     @Embeddable
     @Getter
     @Setter

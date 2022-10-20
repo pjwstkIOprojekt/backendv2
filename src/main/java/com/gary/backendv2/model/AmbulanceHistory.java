@@ -15,7 +15,7 @@ public class AmbulanceHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer historyId;
 
-    @OneToMany(orphanRemoval = true)
+    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
     private List<AmbulanceState> ambulanceStates = new ArrayList<>();
 
 }
