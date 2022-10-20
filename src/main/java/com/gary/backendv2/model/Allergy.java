@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 public class Allergy {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer allergyId;
 
 	@Enumerated(EnumType.STRING)

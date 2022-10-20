@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 public class MedicalInfo {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer medicalInfoId;
 
 	@Enumerated(EnumType.STRING)

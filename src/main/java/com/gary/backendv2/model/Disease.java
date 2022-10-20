@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 public class Disease {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer diseaseId;
 
 	@Column(nullable = false, unique = true)
