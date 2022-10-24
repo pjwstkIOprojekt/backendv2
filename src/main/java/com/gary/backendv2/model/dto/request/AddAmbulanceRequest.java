@@ -21,7 +21,7 @@ public class AddAmbulanceRequest {
     private Integer seats;
 
     @NotBlank
-    private double longitude;
+    private Double longitude;
     @NotBlank
     private double latitude;
 }
