@@ -49,9 +49,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     private void createAdminAccount() throws AdminAccountExistsException {
         Optional<User> adminUser = Optional.ofNullable(userRepository.getByEmail("admin@gary.com"));
         if (adminUser.isEmpty()) {
-            Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN));
+            Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN.getPrefixedName()));
             if (adminRole.isEmpty()) {
-                log.error("ADMIN ROLE DOESN'T EXISTS!!! SHUTTING DOWN APPLICATION IMMEDIATELY!");
+                log.error("ADMIN ROLE DOESN'T EXISTS!!!");
                 SpringApplication.exit(applicationContext, () -> -1);
                 return;
             }
