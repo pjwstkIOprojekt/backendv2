@@ -15,8 +15,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 public class DiseaseServiceTest {
 	private final DiseaseRepository diseaseRepository = mock(DiseaseRepository.class);
@@ -79,5 +80,16 @@ public class DiseaseServiceTest {
 		String actualMessage = exception.getMessage();
 
 		assertTrue(actualMessage.contains(expectedMessage));
+	}
+
+	@Test
+	void deleteShouldWork(){
+		int id = 2137;
+		Disease disease = new Disease();
+		when(diseaseRepository.findByDiseaseId(id)).thenReturn(Optional.of(disease));
+
+		diseaseService.removeDisease(id);
+
+		verify(diseaseRepository, times(1)).delete(any(Disease.class));
 	}
 }
