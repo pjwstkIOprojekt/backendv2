@@ -68,4 +68,16 @@ public class DiseaseServiceTest {
 		assertTrue(actualMessage.contains(expectedMessage));
 	}
 
+	@Test
+	void deleteShouldFail() {
+		int id = 2137;
+		when(diseaseRepository.findByDiseaseId(id)).thenReturn(Optional.empty());
+		Exception exception = assertThrows(HttpException.class, () -> {
+			diseaseService.getAllById(id);
+		});
+		String expectedMessage = String.format("Cannot find disease with %s", id);
+		String actualMessage = exception.getMessage();
+
+		assertTrue(actualMessage.contains(expectedMessage));
+	}
 }
