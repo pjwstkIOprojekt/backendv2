@@ -1,7 +1,9 @@
 package com.gary.backendv2.model;
 
 import com.gary.backendv2.model.enums.EmergencyType;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
 public class AccidentReport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +32,8 @@ public class AccidentReport {
 
 	@ManyToOne
 	private User user;
+
+	private boolean consciousness;
+
+	private boolean breathing;
 }
