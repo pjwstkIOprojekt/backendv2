@@ -117,6 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/hello/user/**").hasRole("USER")
                 .antMatchers("/hello/admin/**").hasRole("ADMIN")
+                .antMatchers("/hello/dispatch/create").permitAll()
                 .antMatchers("/allergy").permitAll()
                 .antMatchers("/allergy/**").permitAll()
                 .antMatchers("/trusted/**").permitAll()
@@ -124,6 +125,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/medical_info/**").permitAll()
                 .antMatchers("/ambulance/**").permitAll()
                 .antMatchers("/disease/**").permitAll()
+                .antMatchers("/dispatch/**").hasRole("USER")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
