@@ -9,18 +9,24 @@ import com.gary.backendv2.security.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
 public class AuthController {
     AuthService authService;
+
+    @Resource(name="roleHierarchy")
+    private RoleHierarchy roleHierarchy;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -38,5 +44,27 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(new ServerResponse("User registered successfully!", HttpStatus.OK));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<Object> printAuthentication(Authentication authentication) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (authentication == null) {
+            return ResponseEntity.ok("Unauthenticated");
+        }
+
+        Collection<? extends GrantedAuthority> authorities = roleHierarchy.getReachableGrantedAuthorities(authentication.getAuthorities());
+        List<String> reachableRoles = authorities.stream().map(GrantedAuthority::getAuthority).toList();
+        String topLevelRole = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().get(0);
+
+        map.put("name", authentication.getName());
+        map.put("details", authentication.getDetails());
+        map.put("top_level_role", topLevelRole);
+        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().size() == reachableRoles.size()) {
+            map.put("inherited_roles", Collections.emptyList());
+        } else map.put("inherited_roles", reachableRoles);
+
+
+        return ResponseEntity.ok(map);
     }
 }
