@@ -39,6 +39,23 @@ public class AccidentReportService {
 		}
 		return accidentReportResponses;
 	}
+
+	public AccidentReportResponse getById(Integer id){
+		Optional<AccidentReport> accidentReportOptional = accidentReportRepository.findByAccidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
+		AccidentReport accidentReport = accidentReportOptional.get();
+		return AccidentReportResponse
+				.builder()
+				.date(accidentReport.getDate())
+				.accidentId(accidentReport.getAccidentId())
+				.victimCount(accidentReport.getVictimCount())
+				.location(accidentReport.getLocation())
+				.emergencyType(accidentReport.getEmergencyType())
+				.breathing(accidentReport.isBreathing())
+				.consciousness(accidentReport.isConsciousness())
+				.bandCode(accidentReport.getBandCode())
+				.build();
+	}
 	
 	public void add(AccidentReportRequest accidentReportRequest){
 		accidentReportRepository.save(

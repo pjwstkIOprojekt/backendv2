@@ -20,6 +20,11 @@ public class AccidentReportController {
 		return ResponseEntity.ok(accidentReportService.getAll());
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getById(@PathVariable Integer id){
+		return ResponseEntity.ok(accidentReportService.getById(id));
+	}
+
 	@PostMapping
 	public ResponseEntity<?> addAccidentReport(@RequestBody @Valid AccidentReportRequest accidentReportRequest){
 		accidentReportService.add(accidentReportRequest);
