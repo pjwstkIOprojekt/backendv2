@@ -35,4 +35,7 @@ public class User {
 
     @OneToOne(fetch = FetchType.EAGER)
     private MedicalInfo medicalInfo;
+
+    @OneToOne(mappedBy = "user")
+    private TrustedPerson trustedPerson;
 }

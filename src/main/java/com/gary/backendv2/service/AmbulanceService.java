@@ -4,6 +4,7 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.AmbulanceHistory;
 import com.gary.backendv2.model.AmbulanceState;
+import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceHistoryResponse;
@@ -198,7 +199,7 @@ public class AmbulanceService {
         ambulance.setSeats(addRequest.getSeats());
         ambulance.setLicensePlate(addRequest.getLicensePlate());
         var locationAnyNull = Stream.of(addRequest.getLatitude(), addRequest.getLongitude()).anyMatch(Objects::isNull);
-        ambulance.setLocation(locationAnyNull ? Ambulance.Location.undefined() : Ambulance.Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
+        ambulance.setLocation(locationAnyNull ? Location.undefined() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
         ambulance.setEquipmentInAmbulances(new HashSet<>());

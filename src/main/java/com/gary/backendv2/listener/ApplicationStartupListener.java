@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -40,18 +41,44 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
        try {
+           createRoles();
+       } catch (RuntimeException e) {
+           log.info(e.getMessage());
+           log.error("Failed to creating roles! Shutting down gracefully");
+           SpringApplication.exit(applicationContext, () -> -1);
+       }
+
+        try {
            createAdminAccount();
        } catch (AdminAccountExistsException e) {
            log.info(e.getMessage());
        }
     }
 
+    private void createRoles() throws RuntimeException {
+        for (RoleName role : RoleName.values()) {
+            createRole(role);
+        }
+    }
+
+    private void createRole(RoleName name) {
+        Role role = new Role();
+        role.setId(UUID.randomUUID());
+        role.setName(name.getPrefixedName());
+
+        try {
+            Role r = roleRepository.save(role);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
     private void createAdminAccount() throws AdminAccountExistsException {
         Optional<User> adminUser = Optional.ofNullable(userRepository.getByEmail("admin@gary.com"));
         if (adminUser.isEmpty()) {
-            Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN));
+            Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN.getPrefixedName()));
             if (adminRole.isEmpty()) {
-                log.error("ADMIN ROLE DOESN'T EXISTS!!! SHUTTING DOWN APPLICATION IMMEDIATELY!");
+                log.error("ADMIN ROLE DOESN'T EXISTS!!!");
                 SpringApplication.exit(applicationContext, () -> -1);
                 return;
             }

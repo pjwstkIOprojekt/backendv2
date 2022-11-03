@@ -43,29 +43,6 @@ public class Ambulance {
     public AmbulanceState findCurrentState() {
         currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
         return currentState;
-    }
-
-
-    @Embeddable
-    @Getter
-    @Setter
-    public static class Location {
-        String longitude;
-        String latitude;
-
-        protected Location() {}
-
-        private Location(String longitude, String latitude) {
-            this.longitude = longitude;
-            this.latitude = latitude;
-        }
-
-        public static Location of(String longitude, String latitude) {
-            return new Location(longitude, latitude);
-        }
-
-        public static Location undefined() {
-            return new Location("0", "0");
-        }
-    }
+    } 
 }
+

@@ -75,6 +75,7 @@ public class DiseaseService {
 		Disease disease = optionalDisease.get();
 		disease.setDiseaseName(diseaseRequest.getDiseaseName());
 		disease.setDescription(diseaseRequest.getDescription());
+		disease.setShareWithBand(diseaseRequest.getShareWithBand());
 		diseaseRepository.save(disease);
 	}
 
