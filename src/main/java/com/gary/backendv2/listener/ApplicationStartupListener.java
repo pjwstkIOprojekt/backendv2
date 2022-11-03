@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -40,10 +41,38 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
        try {
+           createRoles();
+       } catch (RuntimeException e) {
+           log.info(e.getMessage());
+           log.error("Failed to creating roles! Shutting down gracefully");
+           SpringApplication.exit(applicationContext, () -> -1);
+       }
+
+        try {
            createAdminAccount();
        } catch (AdminAccountExistsException e) {
            log.info(e.getMessage());
        }
+    }
+
+    private void createRoles() throws RuntimeException {
+        createRole("ROLE_USER");
+        createRole("ROLE_ADMIN");
+        createRole("ROLE_PARAMEDIC");
+        createRole("ROLE_DISPATCHER");
+        createRole("ROLE_AMBULANCE_MANAGER");
+    }
+
+    private void createRole(String name) {
+        Role role = new Role();
+        role.setId(UUID.randomUUID());
+        role.setName(name);
+
+        try {
+            Role r = roleRepository.save(role);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
     }
 
     private void createAdminAccount() throws AdminAccountExistsException {

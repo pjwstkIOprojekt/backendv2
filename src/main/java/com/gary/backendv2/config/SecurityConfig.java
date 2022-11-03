@@ -1,21 +1,23 @@
 package com.gary.backendv2.config;
 
-import com.gary.backendv2.exception.AdminAccountExistsException;
+import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.security.jwt.AuthEntryPointJwt;
 import com.gary.backendv2.security.jwt.AuthTokenFilter;
 import com.gary.backendv2.security.service.UserDetailsService;
+import com.gary.backendv2.security.RoleOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,6 +32,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(
         prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    ApplicationContext applicationContext;
+
     @Autowired
     UserDetailsService userDetailsService;
     @Autowired
@@ -74,13 +79,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        // TODO: define hierarchy in separate json / yaml / toml / whatever file and write a parser to parse it into Hierarchy Syntax
-        String hierarchy =
-                        "ROLE_ADMIN > ROLE_AMBULANCE_MANAGER \n" +
-                        "ROLE_ADMIN > ROLE_DISPATCHER \n" +
-                        "ROLE_AMBULANCE_MANAGER > ROLE_PARAMEDIC \n" +
-                        "ROLE_PARAMEDIC > ROLE_USER \n" +
-                        "ROLE_DISPATCHER > ROLE_USER";
+
+        RoleOrder roleOrder = new RoleOrder();
+        try {
+            roleOrder.addRule(RoleName.ADMIN, RoleName.AMBULANCE_MANAGER);
+            roleOrder.addRule(RoleName.ADMIN, RoleName.DISPATCHER);
+            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.PARAMEDIC);
+            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.USER);
+            roleOrder.addRule(RoleName.DISPATCHER, RoleName.USER);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+
+            System.exit(SpringApplication.exit(applicationContext, () -> -1));
+        }
+
+        String hierarchy = roleOrder.getRoleHierarchyOrder();
 
         roleHierarchy.setHierarchy(hierarchy);
 
