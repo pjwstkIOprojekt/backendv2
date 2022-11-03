@@ -1,5 +1,6 @@
 package com.gary.backendv2.controller;
 
+import com.gary.backendv2.model.dto.request.AccidentReportRequest;
 import com.gary.backendv2.model.dto.request.AccidentReportUpdateRequest;
 import com.gary.backendv2.service.AccidentReportService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,17 @@ import javax.validation.Valid;
 @RequestMapping(path = "/accident_report")
 public class AccidentReportController {
 	private final AccidentReportService accidentReportService;
+
+	@GetMapping
+	public ResponseEntity<?> getAll(){
+		return ResponseEntity.ok(accidentReportService.getAll());
+	}
+
+	@PostMapping
+	public ResponseEntity<?> addAccidentReport(@RequestBody @Valid AccidentReportRequest accidentReportRequest){
+		accidentReportService.add(accidentReportRequest);
+		return ResponseEntity.ok("Accident Report added successfully");
+	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateById(@PathVariable Integer id, @RequestBody @Valid AccidentReportUpdateRequest accidentReportUpdateRequest){
