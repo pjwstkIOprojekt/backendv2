@@ -18,8 +18,7 @@ public class Role implements GrantedAuthority {
     @GeneratedValue
     private UUID id;
 
-    @Enumerated(EnumType.STRING)
-    private RoleName name;
+    private String name;
 
     @Override
     public String getAuthority() {
