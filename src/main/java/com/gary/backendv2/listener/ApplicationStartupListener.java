@@ -56,17 +56,15 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     }
 
     private void createRoles() throws RuntimeException {
-        createRole("ROLE_USER");
-        createRole("ROLE_ADMIN");
-        createRole("ROLE_PARAMEDIC");
-        createRole("ROLE_DISPATCHER");
-        createRole("ROLE_AMBULANCE_MANAGER");
+        for (RoleName role : RoleName.values()) {
+            createRole(role);
+        }
     }
 
-    private void createRole(String name) {
+    private void createRole(RoleName name) {
         Role role = new Role();
         role.setId(UUID.randomUUID());
-        role.setName(name);
+        role.setName(name.getPrefixedName());
 
         try {
             Role r = roleRepository.save(role);
