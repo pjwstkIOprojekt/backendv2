@@ -2,10 +2,10 @@ package com.gary.backendv2.model;
 
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,6 +37,9 @@ public class Ambulance {
     @Transient
     private AmbulanceState currentState;
 
+    @OneToMany(mappedBy = "ambulance")
+    private Set<EquipmentInAmbulance> equipmentInAmbulances;
+
     public AmbulanceState findCurrentState() {
         currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
         return currentState;
@@ -66,5 +69,3 @@ public class Ambulance {
         }
     }
 }
-
-
