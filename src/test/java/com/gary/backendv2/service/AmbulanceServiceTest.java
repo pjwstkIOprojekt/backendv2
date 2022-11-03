@@ -6,13 +6,16 @@ import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.Ambulance;
 
 import com.gary.backendv2.model.AmbulanceHistory;
+import com.gary.backendv2.model.AmbulanceState;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.enums.AmbulanceClass;
+import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.AmbulanceType;
 import com.gary.backendv2.repository.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,7 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AmbulanceServiceTest {
+class AmbulanceServiceTest {
     private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
     private final AmbulanceStateRepository ambulanceStateRepository = mock(AmbulanceStateRepository.class);
     private final AmbulanceHistoryRepository ambulanceHistoryRepository = mock(AmbulanceHistoryRepository.class);
@@ -46,8 +49,14 @@ public class AmbulanceServiceTest {
 
         String licensePlate = "WPI208";
         Ambulance expected = new Ambulance();
-        expected.setAmbulanceHistory(new AmbulanceHistory());
-        expected.setLicensePlate("WPI208");
+        expected.setLicensePlate(licensePlate);
+        AmbulanceHistory ah = new AmbulanceHistory();
+        AmbulanceState st = new AmbulanceState();
+        st.setStateId(1);
+        st.setStateType(AmbulanceStateType.AVAILABLE);
+        st.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
+        ah.setAmbulanceStates(List.of(st));
+        expected.setAmbulanceHistory(ah);
 
         when(ambulanceRepository.findByLicensePlate(licensePlate)).thenReturn(Optional.of(expected));
 
@@ -69,7 +78,7 @@ public class AmbulanceServiceTest {
                     ambulanceService.getAmbulanceByLicensePlate(licensePlate);
                 });
 
-        String expectedMess = String.format("Cannot find ambulance with license plate" + licensePlate);
+        String expectedMess = String.format("404 Ambulance %s not found", licensePlate);
         String actualMess = exc.getMessage();
 
         assertTrue(actualMess.contains(expectedMess));
@@ -85,6 +94,17 @@ public class AmbulanceServiceTest {
         ambulanceRequest.setSeats(3);
         ambulanceRequest.setLongitude(2.0);
         ambulanceRequest.setLatitude(3.0);
+
+        Ambulance expected = new Ambulance();
+        AmbulanceHistory ah = new AmbulanceHistory();
+        AmbulanceState st = new AmbulanceState();
+        st.setStateId(1);
+        st.setStateType(AmbulanceStateType.AVAILABLE);
+        st.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
+        ah.setAmbulanceStates(List.of(st));
+        expected.setAmbulanceHistory(ah);
+
+        when(ambulanceRepository.save(any(Ambulance.class))).thenReturn(expected);
 
         ambulanceService.addAmbulance(ambulanceRequest);
 
@@ -111,19 +131,21 @@ public class AmbulanceServiceTest {
 
     @Test
     void updateAmbulanceShouldFail() {
+        String plates = "WPI208";
+
         AddAmbulanceRequest ambulanceRequest = new AddAmbulanceRequest();
         ambulanceRequest.setAmbulanceType(AmbulanceType.A);
-        ambulanceRequest.setLicensePlate("WPI208");
+        ambulanceRequest.setLicensePlate(plates);
         ambulanceRequest.setAmbulanceClass(AmbulanceClass.BASIC);
         ambulanceRequest.setSeats(3);
         ambulanceRequest.setLongitude(2.0);
         ambulanceRequest.setLatitude(3.0);
 
-        Exception exc = assertThrows(NoSuchElementException.class, () -> {
+        Exception exc = assertThrows(HttpException.class, () -> {
             ambulanceService.updateAmbulance(ambulanceRequest);
         });
 
-        String expected = "No value present";
+        String expected = String.format("404 Ambulance %s not found", plates);
         String actual = exc.getMessage();
 
         assertEquals(expected, actual);
