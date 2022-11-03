@@ -25,6 +25,11 @@ public class AccidentReportController {
 		return ResponseEntity.ok(accidentReportService.getById(id));
 	}
 
+	@GetMapping("/user/{email}")
+	public ResponseEntity<?> getAllByUser(@PathVariable String email){
+		return ResponseEntity.ok(accidentReportService.getAllByUser(email));
+	}
+
 	@PostMapping
 	public ResponseEntity<?> addAccidentReport(@RequestBody @Valid AccidentReportRequest accidentReportRequest){
 		accidentReportService.add(accidentReportRequest);

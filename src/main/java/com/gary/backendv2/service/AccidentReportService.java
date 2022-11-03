@@ -2,10 +2,12 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.AccidentReport;
+import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.*;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.dto.response.AccidentReportResponse;
 import com.gary.backendv2.repository.AccidentReportRepository;
+import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,35 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccidentReportService {
 	private final AccidentReportRepository accidentReportRepository;
+	private final UserRepository userRepository;
 
 	public List<AccidentReportResponse> getAll(){
 		List<AccidentReportResponse> accidentReportResponses = new ArrayList<>();
 		for (AccidentReport accidentReport:accidentReportRepository.findAll()) {
+			accidentReportResponses.add(
+					AccidentReportResponse
+							.builder()
+							.bandCode(accidentReport.getBandCode())
+							.consciousness(accidentReport.isConsciousness())
+							.breathing(accidentReport.isBreathing())
+							.emergencyType(accidentReport.getEmergencyType())
+							.accidentId(accidentReport.getAccidentId())
+							.location(accidentReport.getLocation())
+							.victimCount(accidentReport.getVictimCount())
+							.date(accidentReport.getDate())
+							.build()
+			);
+		}
+		return accidentReportResponses;
+	}
+
+	public List<AccidentReportResponse> getAllByUser(String email){
+		List<AccidentReportResponse> accidentReportResponses = new ArrayList<>();
+		Optional<User> userOptional = userRepository.findByEmail(email);
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
+		}
+		for (AccidentReport accidentReport : userOptional.get().getAccidentReports()) {
 			accidentReportResponses.add(
 					AccidentReportResponse
 							.builder()
