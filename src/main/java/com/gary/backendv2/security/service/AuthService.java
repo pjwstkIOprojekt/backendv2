@@ -82,7 +82,7 @@ public class AuthService {
                 .build();
 
 
-        Role userRole = Optional.ofNullable(roleRepository.findByName(RoleName.USER)).orElseThrow(() -> new RuntimeException("Role " + RoleName.USER + " not found!"));
+        Role userRole = Optional.ofNullable(roleRepository.findByName(RoleName.USER.getPrefixedName())).orElseThrow(() -> new RuntimeException("Role " + RoleName.USER + " not found!"));
 
         user.setRoles(Set.of(userRole));
         userRepository.save(user);
