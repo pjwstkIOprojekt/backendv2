@@ -1,10 +1,7 @@
 package com.gary.backendv2.model;
 
-import com.gary.backendv2.model.enums.EmergencyType;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.gary.backendv2.model.enums.*;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -14,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class AccidentReport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
