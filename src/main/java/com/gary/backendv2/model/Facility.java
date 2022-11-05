@@ -16,6 +16,8 @@ public class Facility {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer facilityId;
 
+	private String name;
+
 	@Embedded
 	private Location location;
 
