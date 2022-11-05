@@ -44,4 +44,7 @@ public class EnumController {
 
 	@GetMapping("/facility_type")
 	public List<String> getFacilityType() { return EnumUtils.getEnumValues(FacilityType.class);}
+
+	@GetMapping("/roles")
+	public List<String> getRoles() {return EnumUtils.getEnumValues(RoleName.class);}
 }
