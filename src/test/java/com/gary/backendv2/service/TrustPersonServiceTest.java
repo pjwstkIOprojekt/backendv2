@@ -40,7 +40,7 @@ public class TrustPersonServiceTest {
 	@Test
 	void getTrustedPersonByEmailShouldFind(){
 		TrustedPersonRequest trustedPersonRequest = new TrustedPersonRequest();
-		trustedPersonRequest.setUserEmail("hej@hej.pl");
+		trustedPersonRequest.setUserEmail("tom@pjatk.pl");
 		trustedPersonRequest.setFirstName("Tomasz");
 		trustedPersonRequest.setLastName("Kowalski");
 		trustedPersonRequest.setPhone("123456789");
@@ -49,7 +49,7 @@ public class TrustPersonServiceTest {
 		when(userRepository.findByEmail(trustedPersonRequest.getUserEmail())).thenReturn(Optional.of(user));
 		trustedPersonService.addTrustedPerson(trustedPersonRequest);
 
-		TrustedPersonResponse result = trustedPersonService.getByEmail("hej@hej.pl");
+		TrustedPersonResponse result = trustedPersonService.getByEmail("tom@pjatk.pl");
 
 
 		assertNotNull(result);
