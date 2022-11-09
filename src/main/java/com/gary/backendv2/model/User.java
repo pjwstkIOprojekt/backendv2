@@ -38,4 +38,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private TrustedPerson trustedPerson;
+
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "user")
+    private Set<AccidentReport> accidentReports;
 }

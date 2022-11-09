@@ -126,6 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/ambulance/**").permitAll()
                 .antMatchers("/disease/**").permitAll()
                 .antMatchers("/dispatch/**").hasRole("USER")
+                .antMatchers("/accident_report/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
