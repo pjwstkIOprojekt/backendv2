@@ -1,0 +1,79 @@
+package com.gary.backendv2.model;
+
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Getter
+public class MappedSchedule {
+    private final Map<DayOfWeek, Pair<LocalTime, LocalTime>> workSchedule;
+
+    private MappedSchedule(Map<DayOfWeek, Pair<LocalTime, LocalTime>> workSchedule) {
+        this.workSchedule = workSchedule;
+    }
+
+    @SneakyThrows
+    public static MappedSchedule fromJson(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        if (!validJson(json)) {
+            throw new JSONException("Invalid JSON of work-schedule definition");
+        }
+
+        JsonNode parent = mapper.readTree(json);
+
+        Map<DayOfWeek, Pair<LocalTime, LocalTime>> workSchedule = new LinkedHashMap<>();
+        int i = 0;
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+            JsonNode node = parent.get(i);
+            if (node != null) {
+                JsonNode dayHoursNode = node.get(dayOfWeek.toString());
+                if (dayHoursNode == null) {
+                    throw new JSONException("Invalid JSON of work-schedule definition");
+                }
+
+                JsonNode startNode = dayHoursNode.get("start");
+                JsonNode endNode = dayHoursNode.get("end");
+                if (startNode == null || endNode == null) {
+                    throw new JSONException("Invalid JSON of work-schedule definition");
+                }
+
+                String[] start = startNode.toString().replace("\"", "").split(":");
+                String[] end = endNode.toString().replace("\"", "").split(":");
+                if (start.length != 2 || end.length != 2) {
+                    throw new JSONException("Invalid JSON of work-schedule definition");
+                }
+
+                LocalTime startTime = LocalTime.of(Integer.parseInt(start[0]), Integer.parseInt(start[1]));
+                LocalTime endTime = LocalTime.of(Integer.parseInt(end[0]), Integer.parseInt(end[1]));
+
+                Pair<LocalTime, LocalTime> workingHours = Pair.of(startTime, endTime);
+
+                workSchedule.put(dayOfWeek, workingHours);
+            }
+            i++;
+        }
+
+        return new MappedSchedule(workSchedule);
+    }
+
+    private static boolean validJson(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            mapper.readTree(json);
+        } catch (JacksonException e) {
+            return false;
+        }
+
+        return true;
+    }
+}
