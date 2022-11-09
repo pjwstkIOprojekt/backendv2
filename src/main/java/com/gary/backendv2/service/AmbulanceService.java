@@ -198,8 +198,8 @@ public class AmbulanceService {
         ambulance.setAmbulanceType(addRequest.getAmbulanceType());
         ambulance.setSeats(addRequest.getSeats());
         ambulance.setLicensePlate(addRequest.getLicensePlate());
-        var locationAnyNull = Stream.of(addRequest.getLatitude(), addRequest.getLongitude()).anyMatch(Objects::isNull);
-        ambulance.setLocation(locationAnyNull ? Location.undefined() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
+        boolean locationAnyNull = Stream.of(addRequest.getLatitude(), addRequest.getLongitude()).anyMatch(Objects::isNull);
+        ambulance.setLocation(locationAnyNull ? Location.defaultLocation() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
 
