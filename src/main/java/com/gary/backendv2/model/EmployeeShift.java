@@ -1,5 +1,6 @@
 package com.gary.backendv2.model;
 
+import com.vladmihalcea.hibernate.type.array.LocalDateArrayType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,7 @@ public class EmployeeShift {
     private long startTimeDelta;
 
     private LocalDateTime actualStartTime;
+    private LocalDateTime expectedEndTime;
     private LocalDateTime actualEndTime;
 
     @ManyToOne

@@ -1,44 +1,28 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.AbstractEmployee;
-import com.gary.backendv2.model.MappedSchedule;
 import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.WorkSchedule;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.repository.WorkScheduleRepository;
-import com.gary.backendv2.service.DispatchService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/dispatch")
 public class DispatchController {
-
-    private final DispatchService dispatchService;
     private final WorkScheduleRepository workScheduleRepository;
     private final UserRepository userRepository;
 
-    @GetMapping("/start")
-    public ResponseEntity<?> startShift() {
-        dispatchService.startShift();
-
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/test")
     public void testJson() throws IOException {

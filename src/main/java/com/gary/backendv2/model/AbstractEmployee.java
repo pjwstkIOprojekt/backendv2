@@ -22,4 +22,8 @@ public abstract class AbstractEmployee extends User {
     @OneToMany(mappedBy = "employee", orphanRemoval = true)
     private List<EmployeeShift> shifts = new ArrayList<>();
 
+
+    public EmployeeShift getCurrentShift() {
+        return shifts.get(shifts.size() - 1);
+    }
 }
