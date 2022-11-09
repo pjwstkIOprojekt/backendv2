@@ -15,10 +15,14 @@ import java.util.Map;
 
 @Getter
 public class MappedSchedule {
-    private final Map<DayOfWeek, Pair<LocalTime, LocalTime>> workSchedule;
+    private final Map<DayOfWeek, Pair<LocalTime, LocalTime>> timeTable;
 
     private MappedSchedule(Map<DayOfWeek, Pair<LocalTime, LocalTime>> workSchedule) {
-        this.workSchedule = workSchedule;
+        this.timeTable = workSchedule;
+    }
+
+    public Pair<LocalTime, LocalTime> getWorkingHours(DayOfWeek dayOfWeek) {
+        return this.timeTable.get(dayOfWeek);
     }
 
     @SneakyThrows

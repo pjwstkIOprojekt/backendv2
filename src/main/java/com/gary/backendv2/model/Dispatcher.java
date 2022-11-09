@@ -13,10 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class Dispatcher extends AbstractEmployee {
-
-    @OneToMany(mappedBy = "employee", orphanRemoval = true)
-    private List<EmployeeShift> shifts = new ArrayList<>();
 
 }

@@ -15,11 +15,12 @@ public class EmployeeShift {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer shiftId;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime scheduledStartTime;
+    private LocalDateTime scheduledEndTime;
 
     private long startTimeDelta;
 
+    private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
 
     @ManyToOne

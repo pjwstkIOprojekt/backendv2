@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,5 +18,8 @@ public abstract class AbstractEmployee extends User {
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "schedule_id")
     protected WorkSchedule workSchedule;
+
+    @OneToMany(mappedBy = "employee", orphanRemoval = true)
+    private List<EmployeeShift> shifts = new ArrayList<>();
 
 }
