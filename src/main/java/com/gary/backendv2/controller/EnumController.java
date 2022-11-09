@@ -38,4 +38,7 @@ public class EnumController {
 
 	@GetMapping("/ambulance_types")
 	public List<String> getAmbulanceTypes() {return EnumUtils.getEnumValues(AmbulanceType.class);}
+
+	@GetMapping("/emergency_type")
+	public List<String> getEmergencyTypes() { return EnumUtils.getEnumValues(EmergencyType.class);}
 }
