@@ -17,8 +17,3 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-
-  pg_web:
-    image: sosedoff/pgweb
-    ports: 
-      - "8081:8087"
