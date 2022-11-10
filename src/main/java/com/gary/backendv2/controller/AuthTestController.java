@@ -26,10 +26,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/hello")
 public class AuthTestController {
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-
     @GetMapping("/admin")
     @Operation(summary = "Endpoint for testing authentication flow", security = @SecurityRequirement(name = "bearerAuth"))
     public String helloAdmin() {
@@ -42,21 +38,5 @@ public class AuthTestController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         authentication.getAuthorities().forEach(x -> System.out.println(x.getAuthority()));
         return "Hello user";
-    }
-
-    @GetMapping("/dispatch/create")
-    public void createDispatchTestUser() {
-        Optional<Role> dispatchRole = Optional.ofNullable(roleRepository.findByName(RoleName.DISPATCHER.getPrefixedName()));
-
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setPassword(passwordEncoder.encode("test"));
-        dispatcher.setEmail("dispatch@test.pl");
-        dispatcher.setLastName("test");
-        dispatcher.setFirstName("test");
-        dispatcher.setBirthDate(LocalDate.of(2000, 01, 01));
-        dispatcher.setMedicalInfo(null);
-        dispatcher.setRoles(Set.of(dispatchRole.get()));
-
-        userRepository.save(dispatcher);
     }
 }
