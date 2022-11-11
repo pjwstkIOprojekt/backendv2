@@ -4,11 +4,13 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Facility;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.dto.request.FacilityRequest;
+import com.gary.backendv2.model.dto.response.FacilityResponse;
 import com.gary.backendv2.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,16 +19,33 @@ import java.util.Optional;
 public class FacilityService {
 	private final FacilityRepository facilityRepository;
 
-	public List<Facility> getAll(){
-		return facilityRepository.findAll();
+	public List<FacilityResponse> getAll() {
+		List<FacilityResponse> facilities = new ArrayList<>();
+		for (Facility facility:facilityRepository.findAll()) {
+			facilities.add(FacilityResponse
+					.builder()
+					.facilityId(facility.getFacilityId())
+					.name(facility.getName())
+					.facilityType(facility.getFacilityType())
+					.location(facility.getLocation())
+					.build());
+		}
+		return facilities;
 	}
 
-	public Facility getById(Integer id){
-		Optional<Facility> facilityOptional = facilityRepository.getByFacilityId(id);
+	public FacilityResponse getById(Integer id){
+		Optional<Facility> facilityOptional = facilityRepository.findByFacilityId(id);
 		if(facilityOptional.isEmpty()){
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find facility with %s", id));
 		}
-		return facilityOptional.get();
+		Facility facility = facilityOptional.get();
+		return FacilityResponse
+				.builder()
+				.facilityId(facility.getFacilityId())
+				.name(facility.getName())
+				.facilityType(facility.getFacilityType())
+				.location(facility.getLocation())
+				.build();
 	}
 
 	public void add(FacilityRequest facilityRequest){
@@ -41,7 +60,7 @@ public class FacilityService {
 	}
 
 	public void update(Integer id, FacilityRequest facilityRequest){
-		Optional<Facility> facilityOptional = facilityRepository.getByFacilityId(id);
+		Optional<Facility> facilityOptional = facilityRepository.findByFacilityId(id);
 		if(facilityOptional.isEmpty()){
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find facility with %s", id));
 		}
@@ -53,7 +72,7 @@ public class FacilityService {
 	}
 
 	public void delete(Integer id){
-		Optional<Facility> facilityOptional = facilityRepository.getByFacilityId(id);
+		Optional<Facility> facilityOptional = facilityRepository.findByFacilityId(id);
 		if(facilityOptional.isEmpty()){
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find facility with %s", id));
 		}

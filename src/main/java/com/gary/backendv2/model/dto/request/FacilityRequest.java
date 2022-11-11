@@ -16,6 +16,6 @@ public class FacilityRequest {
 	private Double latitude;
 	@NotBlank
 	private String name;
-	@NotBlank
+	@NotNull
 	private FacilityType facilityType;
 }
