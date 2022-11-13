@@ -20,12 +20,12 @@ public class AccidentReportUpdateRequest {
 	@Min(1)
 	@NotNull
 	private int victimCount;
-	@NotBlank
+	@NotNull
 	private Double longitude;
-	@NotBlank
+	@NotNull
 	private Double latitude;
-	@NotBlank
+	@NotNull
 	private boolean consciousness;
-	@NotBlank
+	@NotNull
 	private boolean breathing;
 }
