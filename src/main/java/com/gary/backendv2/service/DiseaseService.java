@@ -93,7 +93,8 @@ public class DiseaseService {
 		Disease disease = Disease.builder()
 				.medicalInfos(new HashSet<>())
 				.diseaseName(diseaseRequest.getDiseaseName())
-				.description(diseaseRequest.getDescription()).build();
+				.description(diseaseRequest.getDescription())
+				.shareWithBand(diseaseRequest.getShareWithBand()).build();
 
 		userMedialInfo.getDiseases().add(disease);
 		if (disease.getMedicalInfos()

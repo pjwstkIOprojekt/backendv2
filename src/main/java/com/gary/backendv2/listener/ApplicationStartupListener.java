@@ -2,10 +2,12 @@ package com.gary.backendv2.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
 import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.dto.request.SignupRequest;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.RoleRepository;
 import com.gary.backendv2.repository.UserRepository;
+import com.gary.backendv2.security.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +19,8 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -33,6 +34,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Autowired
     ApplicationContext applicationContext;
 
+    @Autowired
+    AuthService authService;
+
     @Value("${gary.app.admin.credentials.email}")
     private String adminEmail;
     @Value("${gary.app.admin.credentials.password}")
@@ -44,13 +48,14 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
            createRoles();
        } catch (RuntimeException e) {
            log.info(e.getMessage());
-           log.error("Failed to creating roles! Shutting down gracefully");
+           log.error("Failed creating roles! Shutting down gracefully");
            SpringApplication.exit(applicationContext, () -> -1);
        }
 
         try {
            createAdminAccount();
-       } catch (AdminAccountExistsException e) {
+           createSampleUsers();
+       } catch (Exception e) {
            log.info(e.getMessage());
        }
     }
@@ -71,6 +76,35 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         } catch (Exception e) {
             throw new RuntimeException();
         }
+    }
+
+    private void createSampleUsers() {
+        SignupRequest s1 = new SignupRequest();
+        s1.setEmail("test@test.pl");
+        s1.setPassword(passwordEncoder.encode("test123"));
+        s1.setBirthDate(LocalDate.of(2000, 1, 1));
+        s1.setFirstName("Test");
+        s1.setLastName("Testowski");
+        s1.setPhoneNumber("123456789");
+
+        SignupRequest s2 = new SignupRequest();
+        s2.setEmail("test2@test.pl");
+        s2.setPassword(passwordEncoder.encode("test123"));
+        s2.setBirthDate(LocalDate.of(1984, 12, 7));
+        s2.setFirstName("Robert");
+        s2.setLastName("Kubica");
+        s2.setPhoneNumber("9876543231");
+
+        SignupRequest s3 = new SignupRequest();
+        s3.setEmail("test3@test.pl");
+        s3.setPassword(passwordEncoder.encode("test123"));
+        s3.setBirthDate(LocalDate.of(1977, 12, 3));
+        s3.setFirstName("Adam");
+        s3.setLastName("Małysz");
+        s3.setPhoneNumber("111222333");
+
+        List<SignupRequest> regular = List.of(s1, s2, s3);
+        regular.forEach(x -> authService.registerUser(x));
     }
 
     private void createAdminAccount() throws AdminAccountExistsException {
