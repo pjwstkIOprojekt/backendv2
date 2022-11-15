@@ -1,3 +1,8 @@
+
+logging:
+  file:
+    name: ${HOME}/spring.log
+
 spring:
   jpa:
     hibernate:
