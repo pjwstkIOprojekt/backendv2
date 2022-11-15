@@ -39,7 +39,7 @@ class AmbulanceServiceTest {
         when(ambulanceRepository.findAll()).thenReturn(expected);
 
 
-        var result = ambulanceRepository.findAll();
+        var result = ambulanceService.getAllAmbulances();
 
         assertEquals(expected.size(), result.size());
     }
