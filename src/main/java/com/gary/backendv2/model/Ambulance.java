@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -33,6 +35,12 @@ public class Ambulance {
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "history_id")
     private AmbulanceHistory ambulanceHistory;
+
+    @ManyToMany
+    @JoinTable(name = "ambulances_incidents",
+            joinColumns = @JoinColumn(name = "ambulance"),
+            inverseJoinColumns = @JoinColumn(name = "disease"))
+    private Set<Incident> incidents = new LinkedHashSet<>();
 
     @Transient
     private AmbulanceState currentState;

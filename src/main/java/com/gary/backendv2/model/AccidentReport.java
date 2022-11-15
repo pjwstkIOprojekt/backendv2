@@ -35,4 +35,7 @@ public class AccidentReport {
 	private boolean conscious;
 
 	private boolean breathing;
+
+	@OneToOne
+	private Incident incident;
 }
