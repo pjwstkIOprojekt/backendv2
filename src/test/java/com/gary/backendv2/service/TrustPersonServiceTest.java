@@ -71,11 +71,17 @@ public class TrustPersonServiceTest {
 
     @Test
     void deleteTrustedPersonByEmail() {
-        String email = "tom@pjatk.pl";
-        TrustedPerson trustedPerson = new TrustedPerson();
-        when(trustedPersonRepository.findByEmail(email)).thenReturn(Optional.of(trustedPerson));
+        TrustedPersonRequest trustedPersonRequest = new TrustedPersonRequest();
+        trustedPersonRequest.setUserEmail("tom@pjatk.pl");
+        trustedPersonRequest.setFirstName("Tomasz");
+        trustedPersonRequest.setLastName("Kowalski");
+        trustedPersonRequest.setPhone("123456789");
 
-        trustedPersonService.deleteByEmail(email);
+        User user = new User();
+        when(userRepository.findByEmail(trustedPersonRequest.getUserEmail())).thenReturn(Optional.of(user));
+        trustedPersonService.addTrustedPerson(trustedPersonRequest);
+
+        trustedPersonService.deleteByEmail("tom@pjatk.pl");
 
         verify(trustedPersonRepository, times(1)).delete(any(TrustedPerson.class));
     }
