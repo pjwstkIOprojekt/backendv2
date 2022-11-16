@@ -1,17 +1,17 @@
 package com.gary.backendv2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gary.backendv2.model.enums.EquipmentType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
-@Data
+@EqualsAndHashCode
+@Getter
+@Setter
 @Table(name = "equipment")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +19,8 @@ import java.util.Set;
 public class Equipment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "equipment_id")
     private Integer equipmentId;
 
     @Enumerated(EnumType.STRING)
@@ -29,7 +30,10 @@ public class Equipment {
 
     private LocalDate date;
 
+    private boolean isEquipped;
+
     @OneToMany(mappedBy = "equipment")
+    @JsonIgnore
     private Set<EquipmentInAmbulance> equipmentInAmbulances;
 
 }

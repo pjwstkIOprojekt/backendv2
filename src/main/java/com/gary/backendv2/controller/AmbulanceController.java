@@ -1,12 +1,10 @@
 package com.gary.backendv2.controller;
 
-import com.gary.backendv2.model.EquipmentInAmbulance;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
+import com.gary.backendv2.model.dto.request.EquipmentInAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
-import com.gary.backendv2.repository.EquipmentRepository;
 import com.gary.backendv2.service.AmbulanceService;
 import com.gary.backendv2.service.EquipmentService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,7 +64,16 @@ public class AmbulanceController {
     }
 
     @PostMapping("/{licencePlate}/{equipmentId}")
-    public void addEquipmentToAmbulance(@PathVariable String licencePlate,@PathVariable Integer equipmentId, @RequestBody EquipmentInAmbulance equipmentInAmbulance) {
-        equipmentService.addEquipmentToAmbulance(licencePlate, equipmentId, equipmentInAmbulance);
+    public void addEquipmentToAmbulance(@PathVariable String licencePlate,@PathVariable Integer equipmentId, @RequestBody EquipmentInAmbulanceRequest equipmentInAmbulanceRequest) {
+        equipmentService.addEquipmentToAmbulance(licencePlate, equipmentId, equipmentInAmbulanceRequest);
     }
+
+    @DeleteMapping("/{licencePlate}/{equipmentId}")
+    public void deleteEquipmentFromAmbulance(@PathVariable String licencePlate,@PathVariable Integer equipmentId) {
+        equipmentService.deleteEquipmentFromAmbulance(licencePlate,equipmentId);
+    }
+
+
+
+
 }

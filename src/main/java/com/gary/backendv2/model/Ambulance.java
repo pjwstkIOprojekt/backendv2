@@ -1,5 +1,6 @@
 package com.gary.backendv2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceType;
 import lombok.*;
@@ -10,9 +11,11 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "ambulance")
 public class Ambulance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ambulance_id")
     private Integer ambulanceId;
 
     @Enumerated(EnumType.STRING)
@@ -37,7 +40,8 @@ public class Ambulance {
     @Transient
     private AmbulanceState currentState;
 
-    @OneToMany(mappedBy = "ambulance")
+    @OneToMany(mappedBy = "ambulance",cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<EquipmentInAmbulance> equipmentInAmbulances;
 
     public AmbulanceState findCurrentState() {

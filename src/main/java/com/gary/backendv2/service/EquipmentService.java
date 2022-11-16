@@ -4,6 +4,7 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.Equipment;
 import com.gary.backendv2.model.EquipmentInAmbulance;
+import com.gary.backendv2.model.dto.request.EquipmentInAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.EquipmentRequest;
 import com.gary.backendv2.model.dto.response.EquipmentResponse;
 import com.gary.backendv2.repository.AmbulanceRepository;
@@ -12,7 +13,6 @@ import com.gary.backendv2.repository.EquipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,8 @@ public class EquipmentService {
     private final AmbulanceRepository ambulanceRepository;
 
     private final EquipmentInAmbulanceRepository equipmentInAmbulanceRepository;
+
+
 
     public List<EquipmentResponse> getAllEquipment() {
         List<Equipment> equipment = equipmentRepository.findAll();
@@ -87,6 +89,7 @@ public class EquipmentService {
                 .equipmentType(equipmentRequest.getEquipmentType())
                 .name(equipmentRequest.getName())
                 .date(equipmentRequest.getDate())
+                .isEquipped(false)
                 .build();
         equipmentRepository.save(equipment);
     }
@@ -101,30 +104,76 @@ public class EquipmentService {
     }
 
 
-    public void addEquipmentToAmbulance(String licencePlate, Integer equipmentId, EquipmentInAmbulance equipmentInAmbulance) {
+    public void addEquipmentToAmbulance(String licencePlate, Integer equipmentId, EquipmentInAmbulanceRequest equipmentInAmbulanceRequest) {
+
+        Optional<Equipment> optionalEquipment = equipmentRepository.findById(equipmentId);
+        if (optionalEquipment.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find equipment with %s", equipmentId));
+        }
+        Equipment equipment = optionalEquipment.get();
+
+        if (equipment.isEquipped()){
+            throw new HttpException(HttpStatus.FORBIDDEN, String.format("Equipment is already assigned to ambulance"));
+        }
+
+        equipment.setEquipped(true);
+
         Optional<Ambulance> optionalAmbulance = ambulanceRepository.findByLicensePlate(licencePlate);
         if (optionalAmbulance.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find ambulance with %s", licencePlate));
         }
         Ambulance ambulance = optionalAmbulance.get();
 
-        Optional<Equipment> optionalEquipment = equipmentRepository.findById(equipmentId);
-        if (optionalEquipment.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", equipmentId));
-        }
-        Equipment equipment = optionalEquipment.get();
-
         EquipmentInAmbulance eq = EquipmentInAmbulance
                 .builder()
                 .equipment(equipment)
                 .ambulance(ambulance)
-                .date(equipmentInAmbulance.getDate())
-                .amount(equipmentInAmbulance.getAmount())
-                .usage(equipmentInAmbulance.getUsage())
-                .waste(equipmentInAmbulance.getWaste())
-                .unitsOfMeasure(equipmentInAmbulance.getUnitsOfMeasure())
-                .comments(equipmentInAmbulance.getComments())
+                .date(LocalDateTime.now())
+                .amount(equipmentInAmbulanceRequest.getAmount())
+                .usage(equipmentInAmbulanceRequest.getUsage())
+                .waste(equipmentInAmbulanceRequest.getWaste())
+                .unitsOfMeasure(equipmentInAmbulanceRequest.getUnitsOfMeasure())
+                .comments(equipmentInAmbulanceRequest.getComments())
                 .build();
-        equipmentInAmbulanceRepository.save(eq);
+
+        ambulance.getEquipmentInAmbulances().add(eq);
+        equipment.getEquipmentInAmbulances().add(eq);
+
+        ambulanceRepository.save(ambulance);
+        equipmentRepository.save(equipment);
+
     }
+
+    public void deleteEquipmentFromAmbulance(String licencePlate, Integer equipmentId){
+        Optional<Equipment> optionalEquipment = equipmentRepository.findById(equipmentId);
+        if (optionalEquipment.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find equipment with %s", equipmentId));
+        }
+        Equipment equipment = optionalEquipment.get();
+
+        Optional<Ambulance> optionalAmbulance = ambulanceRepository.findByLicensePlate(licencePlate);
+        if (optionalAmbulance.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find ambulance with %s", licencePlate));
+        }
+        Ambulance ambulance = optionalAmbulance.get();
+
+        Optional<EquipmentInAmbulance> equipmentInAmbulance = ambulance.getEquipmentInAmbulances()
+                .stream().filter(e -> e.getEquipment().getEquipmentId().equals(equipmentId)).findAny();
+
+        if (equipmentInAmbulance.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find equipmentInAmbulance %s"));
+        }
+        EquipmentInAmbulance eq = equipmentInAmbulance.get();
+
+        ambulance.getEquipmentInAmbulances().remove(eq);
+        equipment.getEquipmentInAmbulances().remove(eq);
+
+        equipment.setEquipped(false);
+        ambulanceRepository.save(ambulance);
+        equipmentRepository.save(equipment);
+
+        equipmentInAmbulanceRepository.delete(eq);
+
+    }
+
 }

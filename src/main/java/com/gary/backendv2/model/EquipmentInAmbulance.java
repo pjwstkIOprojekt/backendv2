@@ -1,32 +1,31 @@
 package com.gary.backendv2.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
-@Data
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "equipment_in_ambulance")
 public class EquipmentInAmbulance {
 
-    @EmbeddedId
-    EquipmentInAmbulanceKey id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
     @ManyToOne
-    @MapsId("equipmentId")
-    @JoinColumn(name = "equipmentId")
+    @JoinColumn(name = "equipment_id")
     Equipment equipment;
 
     @ManyToOne
-    @MapsId("ambulanceId")
-    @JoinColumn(name = "ambulanceId")
+    @JoinColumn(name = "ambulance_id")
     Ambulance ambulance;
 
     private LocalDateTime date;
@@ -41,4 +40,16 @@ public class EquipmentInAmbulance {
 
     private String comments;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        EquipmentInAmbulance that = (EquipmentInAmbulance) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
