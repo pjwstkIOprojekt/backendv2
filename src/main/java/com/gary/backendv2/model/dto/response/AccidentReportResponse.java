@@ -24,4 +24,5 @@ public class AccidentReportResponse {
 	private int victimCount;
 	private boolean consciousness;
 	private boolean breathing;
+	private String description;
 }

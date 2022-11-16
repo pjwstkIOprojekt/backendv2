@@ -28,4 +28,5 @@ public class AccidentReportUpdateRequest {
 	private boolean consciousness;
 	@NotNull
 	private boolean breathing;
+	private String description;
 }

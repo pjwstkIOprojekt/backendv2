@@ -35,4 +35,6 @@ public class AccidentReport {
 	private boolean conscious;
 
 	private boolean breathing;
+
+	private String description;
 }
