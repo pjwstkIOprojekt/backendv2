@@ -33,4 +33,5 @@ public class AccidentReportRequest {
 	private Boolean concious;
 	@NotNull
 	private Boolean breathing;
+	private String description;
 }

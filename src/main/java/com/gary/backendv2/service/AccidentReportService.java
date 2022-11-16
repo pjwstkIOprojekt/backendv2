@@ -40,6 +40,7 @@ public class AccidentReportService {
 							.location(accidentReport.getLocation())
 							.victimCount(accidentReport.getVictimCount())
 							.date(accidentReport.getDate())
+							.description(accidentReport.getDescription())
 							.build()
 			);
 		}
@@ -64,6 +65,7 @@ public class AccidentReportService {
 							.location(accidentReport.getLocation())
 							.victimCount(accidentReport.getVictimCount())
 							.date(accidentReport.getDate())
+							.description(accidentReport.getDescription())
 							.build()
 			);
 		}
@@ -84,6 +86,7 @@ public class AccidentReportService {
 				.breathing(accidentReport.isBreathing())
 				.consciousness(accidentReport.isConscious())
 				.bandCode(accidentReport.getBandCode())
+				.description(accidentReport.getDescription())
 				.build();
 	}
 	
@@ -102,6 +105,7 @@ public class AccidentReportService {
 				.breathing(accidentReportRequest.getBreathing())
 				.conscious(accidentReportRequest.getConcious())
 				.date(LocalDateTime.now())
+        .description(accidentReportRequest.getDescription())
 				.emergencyType(accidentReportRequest.getEmergencyType())
 				.victimCount(accidentReportRequest.getVictimCount())
 				.location(Location.of(accidentReportRequest.getLongitude(), accidentReportRequest.getLatitude()))
@@ -110,6 +114,7 @@ public class AccidentReportService {
 		accidentReportRepository.save(accidentReport);
 
 		incidentService.addFromReport(accidentReport);
+
 	}
 
 	public void updateById(Integer id, AccidentReportUpdateRequest accidentReportUpdateRequest){
@@ -117,6 +122,7 @@ public class AccidentReportService {
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
 		AccidentReport accidentReport = accidentReportOptional.get();
 		accidentReport.setBreathing(accidentReportUpdateRequest.isBreathing());
+		accidentReport.setDescription(accidentReportUpdateRequest.getDescription());
 		accidentReport.setBandCode(accidentReportUpdateRequest.getBandCode());
 		accidentReport.setConscious(accidentReportUpdateRequest.isConsciousness());
 		accidentReport.setEmergencyType(accidentReportUpdateRequest.getEmergencyType());

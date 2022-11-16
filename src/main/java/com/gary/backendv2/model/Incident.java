@@ -1,10 +1,7 @@
 package com.gary.backendv2.model;
 
 import com.gary.backendv2.model.enums.IncidentStateType;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -14,6 +11,7 @@ import java.util.Set;
 @Entity
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Incident {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
