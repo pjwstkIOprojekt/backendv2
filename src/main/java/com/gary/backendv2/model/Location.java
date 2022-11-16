@@ -26,4 +26,8 @@ public class Location {
 	public static Location undefined() {
 		return new Location(0, 0);
 	}
+
+	public static Location defaultLocation() {
+		return new Location(52.21934563858324, 20.977728377285462);
+	}
 }
