@@ -128,6 +128,7 @@ public class AuthService {
         dispatcher.setEmail(signupRequest.getEmail());
         dispatcher.setPhoneNumber(signupRequest.getPhoneNumber());
         dispatcher.setWorkSchedule(workSchedule);
+        dispatcher.setBirthDate(signupRequest.getBirthDate());
         dispatcher.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
 
 
