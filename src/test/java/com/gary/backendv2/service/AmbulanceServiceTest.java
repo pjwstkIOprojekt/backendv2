@@ -29,7 +29,9 @@ class AmbulanceServiceTest {
     private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
     private final AmbulanceStateRepository ambulanceStateRepository = mock(AmbulanceStateRepository.class);
     private final AmbulanceHistoryRepository ambulanceHistoryRepository = mock(AmbulanceHistoryRepository.class);
-    private final AmbulanceService ambulanceService = new AmbulanceService(ambulanceRepository, ambulanceStateRepository, ambulanceHistoryRepository);
+
+    private final AmbulanceLocationRepository ambulanceLocationRepository = mock(AmbulanceLocationRepository.class);
+    private final AmbulanceService ambulanceService = new AmbulanceService(ambulanceRepository, ambulanceStateRepository, ambulanceHistoryRepository, ambulanceLocationRepository);
 
 
     @Test
@@ -54,7 +56,7 @@ class AmbulanceServiceTest {
         AmbulanceState st = new AmbulanceState();
         st.setStateId(1);
         st.setStateType(AmbulanceStateType.AVAILABLE);
-        st.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
+        st.setTimestamp(LocalDateTime.now());
         ah.setAmbulanceStates(List.of(st));
         expected.setAmbulanceHistory(ah);
 
@@ -100,7 +102,7 @@ class AmbulanceServiceTest {
         AmbulanceState st = new AmbulanceState();
         st.setStateId(1);
         st.setStateType(AmbulanceStateType.AVAILABLE);
-        st.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
+        st.setTimestamp(LocalDateTime.now());
         ah.setAmbulanceStates(List.of(st));
         expected.setAmbulanceHistory(ah);
 

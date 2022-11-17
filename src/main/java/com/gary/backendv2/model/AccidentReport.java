@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class AccidentReport {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer accidentId;
 
-	private LocalDate date;
+	private LocalDateTime date;
 
 	@Embedded
 	private Location location;
@@ -29,9 +30,11 @@ public class AccidentReport {
 	private int victimCount;
 
 	@ManyToOne
-	private User user;
+	private User reporter;
 
-	private boolean consciousness;
+	private boolean conscious;
 
 	private boolean breathing;
+
+	private String description;
 }
