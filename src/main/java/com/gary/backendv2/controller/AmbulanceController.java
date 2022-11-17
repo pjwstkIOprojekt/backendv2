@@ -55,4 +55,10 @@ public class AmbulanceController {
     public void deleteAmbulance(@PathVariable String licensePlate) {
         ambulanceService.deleteAmbulance(licensePlate);
     }
+
+    @GetMapping("/{licensePlate}/inventory")
+    public ResponseEntity<?> getInventory(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getInventory(licensePlate));
+    }
+
 }

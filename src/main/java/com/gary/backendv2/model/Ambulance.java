@@ -26,7 +26,6 @@ public class Ambulance {
 
     private Integer seats;
 
-
     @Embedded
     private Location location ;
 
@@ -36,6 +35,10 @@ public class Ambulance {
 
     @Transient
     private AmbulanceState currentState;
+
+    @OneToOne(optional = false, orphanRemoval = true)
+    @JoinColumn(name = "inventory_id", nullable = false)
+    private Inventory inventory;
 
     public AmbulanceState findCurrentState() {
         currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);

@@ -1,19 +1,18 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.Ambulance;
-import com.gary.backendv2.model.AmbulanceHistory;
-import com.gary.backendv2.model.AmbulanceState;
-import com.gary.backendv2.model.Location;
+import com.gary.backendv2.model.*;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceHistoryResponse;
+import com.gary.backendv2.model.dto.response.AmbulanceInventoryResponse;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.AmbulanceStateResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
-import com.gary.backendv2.repository.AmbulanceHistoryRepository;
-import com.gary.backendv2.repository.AmbulanceRepository;
-import com.gary.backendv2.repository.AmbulanceStateRepository;
+import com.gary.backendv2.model.enums.ItemCountUnit;
+import com.gary.backendv2.model.enums.ItemType;
+import com.gary.backendv2.repository.*;
+import com.gary.backendv2.utils.ItemFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -133,6 +132,53 @@ public class AmbulanceService {
         ambulanceRepository.delete(ambulanceOptional.get());
     }
 
+    public AmbulanceInventoryResponse getInventory(String licensePlate) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND);
+        }
+        Ambulance ambulance = ambulanceOptional.get();
+        Inventory inventory = ambulance.getInventory();
+        Map<ItemType, ItemGroup> inventoryItemMapping = inventory.getItemMapping();
+
+        AmbulanceInventoryResponse inventoryResponse = new AmbulanceInventoryResponse();
+        inventoryResponse.setLicensePlate(licensePlate);
+
+        Map<ItemType, AmbulanceInventoryResponse.ItemGroupResponse> inv = new HashMap<>();
+        for (var kv : inventoryItemMapping.entrySet()) {
+            AmbulanceInventoryResponse.ItemGroupResponse groupResponse = new AmbulanceInventoryResponse.ItemGroupResponse();
+            groupResponse.setItemsInGroup(kv.getValue().getItems().size());
+            for (Item item : kv.getValue().getItems()) {
+                AmbulanceInventoryResponse.ItemResponse itemResponse = new AmbulanceInventoryResponse.ItemResponse();
+
+                switch (kv.getKey()) {
+                    case CONSUMABLE -> {
+                        ConsumableItem consumableItem = (ConsumableItem) item;
+
+                        itemResponse.setAmount(consumableItem.getAmount());
+                        itemResponse.setName(consumableItem.getName());
+                        itemResponse.setUnit(consumableItem.getUnit());
+                    }
+                    case SINGLE_USE -> {
+                        SingleUseItem singleUseItem = (SingleUseItem) item;
+
+                        itemResponse.setName(singleUseItem.getName());
+                        itemResponse.setAmount(1);
+                        itemResponse.setUnit(singleUseItem.getUnit());
+                    }
+                }
+
+                groupResponse.getItems().add(itemResponse);
+            }
+
+            inv.put(kv.getKey(), groupResponse);
+
+        }
+        inventoryResponse.setInventory(inv);
+
+        return inventoryResponse;
+    }
+
     private Set<AmbulanceStateResponse> populateStateResponseSet(Ambulance ambulance) {
         Set<AmbulanceStateResponse> responseSet = new HashSet<>();
 
@@ -184,14 +230,9 @@ public class AmbulanceService {
 
     private Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
         AmbulanceHistory ambulanceHistory = new AmbulanceHistory();
-
         AmbulanceState ambulanceState = new AmbulanceState();
-        ambulanceState.setStateType(AmbulanceStateType.AVAILABLE);
-        ambulanceState.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
-        ambulanceState = ambulanceStateRepository.save(ambulanceState);
 
-        ambulanceHistory.getAmbulanceStates().add(ambulanceState);
-        ambulanceHistory = ambulanceHistoryRepository.save(ambulanceHistory);
+        prepareDefaultAmbulanceState(ambulanceHistory, ambulanceState);
 
         Ambulance ambulance = new Ambulance();
         ambulance.setAmbulanceClass(addRequest.getAmbulanceClass());
@@ -202,7 +243,68 @@ public class AmbulanceService {
         ambulance.setLocation(locationAnyNull ? Location.defaultLocation() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
+        ambulance.setInventory(prepareInventoryForAmbulance());
 
         return ambulance;
+    }
+
+    private void prepareDefaultAmbulanceState(AmbulanceHistory ambulanceHistory, AmbulanceState ambulanceState) {
+        ambulanceState.setStateType(AmbulanceStateType.AVAILABLE);
+        ambulanceState.setStateTimeWindow(AmbulanceState.TimeWindow.startingFrom(LocalDateTime.now()));
+        ambulanceState = ambulanceStateRepository.save(ambulanceState);
+
+        ambulanceHistory.getAmbulanceStates().add(ambulanceState);
+        ambulanceHistory = ambulanceHistoryRepository.save(ambulanceHistory);
+    }
+
+    private final ItemFactory itemFactory;
+    private final ItemGroupRepository itemGroupRepository;
+    private final ItemRepository itemRepository;
+    private final InventoryRepository inventoryRepository;
+    private Inventory prepareInventoryForAmbulance() {
+        Inventory inventory = inventoryRepository.save(new Inventory());
+
+        // create example items
+        SingleUseItem bandage = (SingleUseItem) itemFactory.createItem(ItemType.SINGLE_USE);
+        bandage.setName("Bandage");
+
+        ConsumableItem painkillers = (ConsumableItem) itemFactory.createItem(ItemType.CONSUMABLE);
+        painkillers.setName("Painkillers");
+        painkillers.setAmount(20);
+        painkillers.setUnit(ItemCountUnit.COUNT);
+
+        ConsumableItem otherConsumable = (ConsumableItem) itemFactory.createItem(ItemType.CONSUMABLE);
+        otherConsumable.setName("IDK no idea what else can be consumable (TM)");
+        otherConsumable.setAmount(5);
+        otherConsumable.setUnit(ItemCountUnit.PACK);
+
+        bandage = itemRepository.save(bandage);
+        painkillers = itemRepository.save(painkillers);
+        otherConsumable = itemRepository.save(otherConsumable);
+
+        // prepare item groups
+        for (ItemType itemType : ItemType.values()) {
+            ItemGroup itemGroup = new ItemGroup(inventory);
+            switch (itemType) {
+                case CONSUMABLE -> {
+                    painkillers.setItemGroup(itemGroup);
+                    otherConsumable.setItemGroup(itemGroup);
+
+                    itemGroup.getItems().add(painkillers);
+                    itemGroup.getItems().add(otherConsumable);
+                }
+                case SINGLE_USE -> {
+                    bandage.setItemGroup(itemGroup);
+                    itemGroup.getItems().add(bandage);
+                }
+            }
+
+            itemGroup = itemGroupRepository.save(itemGroup);
+
+            inventory.getItemMapping().put(itemType, itemGroup);
+        }
+
+        return inventoryRepository.save(inventory);
+
     }
 }
