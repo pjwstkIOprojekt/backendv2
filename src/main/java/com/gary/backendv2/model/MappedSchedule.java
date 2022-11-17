@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.json.JsonParseException;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -33,7 +33,7 @@ public class MappedSchedule {
         try {
             ObjectMapper mapper = new ObjectMapper();
             if (!validJson(json)) {
-                throw new JSONException("Invalid JSON of work-schedule definition");
+                throw new JsonParseException(new Throwable("Invalid JSON of work-schedule definition"));
             }
 
             JsonNode parent = mapper.readTree(json);
@@ -45,19 +45,19 @@ public class MappedSchedule {
                 if (node != null) {
                     JsonNode dayHoursNode = node.get(dayOfWeek.toString());
                     if (dayHoursNode == null) {
-                        throw new JSONException("Invalid JSON of work-schedule definition");
+                        throw new JsonParseException(new Throwable("Invalid JSON of work-schedule definition"));
                     }
 
                     JsonNode startNode = dayHoursNode.get("start");
                     JsonNode endNode = dayHoursNode.get("end");
                     if (startNode == null || endNode == null) {
-                        throw new JSONException("Invalid JSON of work-schedule definition");
+                        throw new JsonParseException(new Throwable("Invalid JSON of work-schedule definition"));
                     }
 
                     String[] start = startNode.toString().replace("\"", "").split(":");
                     String[] end = endNode.toString().replace("\"", "").split(":");
                     if (start.length != 2 || end.length != 2) {
-                        throw new JSONException("Invalid JSON of work-schedule definition");
+                        throw new JsonParseException(new Throwable("Invalid JSON of work-schedule definition"));
                     }
 
                     LocalTime startTime = LocalTime.of(Integer.parseInt(start[0]), Integer.parseInt(start[1]));
@@ -71,7 +71,7 @@ public class MappedSchedule {
             }
 
             return new MappedSchedule(workSchedule);
-        } catch (JSONException | JsonProcessingException e) {
+        } catch (Exception e) {
             log.error(e.getCause().getMessage(), e);
         }
 
