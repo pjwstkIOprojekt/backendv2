@@ -18,6 +18,7 @@ public class Role implements GrantedAuthority {
     @GeneratedValue
     private UUID id;
 
+    @Column(unique = true)
     private String name;
 
     @Override
