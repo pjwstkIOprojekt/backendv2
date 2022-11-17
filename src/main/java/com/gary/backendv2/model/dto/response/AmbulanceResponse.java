@@ -1,5 +1,6 @@
 package com.gary.backendv2.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
@@ -9,11 +10,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AmbulanceResponse {
     private String licensePlate;
     private AmbulanceClass ambulanceClass;
     private AmbulanceType ambulanceType;
     private AmbulanceStateType ambulanceStateType;
+    private Integer ambulanceId;
 
     public static AmbulanceResponse of(Ambulance ambulance) {
         ambulance.setCurrentState(ambulance.getAmbulanceHistory().getAmbulanceStates().get(ambulance.getAmbulanceHistory().getAmbulanceStates().size() - 1));

@@ -44,6 +44,10 @@ public class Ambulance {
     @JsonIgnore
     private Set<EquipmentInAmbulance> equipmentInAmbulances;
 
+    public AmbulanceState getCurrentState() {
+        return ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
+    }
+
     public AmbulanceState findCurrentState() {
         currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
         return currentState;
