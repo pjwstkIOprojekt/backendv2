@@ -83,7 +83,8 @@ tasks.create(name: "testCoverage", type: JacocoReport, dependsOn: "test") {
             '**/listener/**',
             '**/repository/**',
             '**/config/**',
-            '**/security/**'
+            '**/security/**',
+            '**/controller/**'
     ]
 
     def javaClasses = fileTree(dir: "${buildDir}/classes/java/main", excludes: excludes)

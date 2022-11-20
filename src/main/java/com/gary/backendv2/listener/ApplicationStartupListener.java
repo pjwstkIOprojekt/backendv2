@@ -48,8 +48,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
            createRoles();
        } catch (RuntimeException e) {
            log.info(e.getMessage());
-           log.error("Failed creating roles! Shutting down gracefully");
-           SpringApplication.exit(applicationContext, () -> -1);
        }
 
         try {
@@ -112,7 +110,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         if (adminUser.isEmpty()) {
             Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN.getPrefixedName()));
             if (adminRole.isEmpty()) {
-                log.error("ADMIN ROLE DOESN'T EXISTS!!!");
+                log.error("ADMIN ROLE DOESN'T EXISTS");
                 SpringApplication.exit(applicationContext, () -> -1);
                 return;
             }
