@@ -1,18 +1,59 @@
 package com.gary.backendv2.service;
 
+import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.AccidentReport;
 import com.gary.backendv2.model.Incident;
+import com.gary.backendv2.model.dto.request.IncidentRequest;
+import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.IncidentStateType;
 import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class IncidentService {
 	private final IncidentRepository incidentRepository;
 	private final AccidentReportRepository accidentReportRepository;
+	private final AccidentReportService accidentReportService;
+
+	public List<IncidentResponse> getAll(){
+		List<IncidentResponse> incidentResponses = new ArrayList<>();
+		for (Incident incident:incidentRepository.findAll()) {
+			incidentResponses.add(
+				IncidentResponse
+						.builder()
+						.incidentId(incident.getIncidentId())
+						.incidentStateType(incident.getIncidentStateType())
+						.dangerScale(incident.getDangerScale())
+						.reactionJustification(incident.getReactionJustification())
+						.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
+						.build()
+			);
+		}
+		return incidentResponses;
+	}
+
+	public IncidentResponse getById(Integer id){
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		Incident incident = accidentReportOptional.get();
+
+		return IncidentResponse
+				.builder()
+				.incidentId(incident.getIncidentId())
+				.incidentStateType(incident.getIncidentStateType())
+				.dangerScale(incident.getDangerScale())
+				.reactionJustification(incident.getReactionJustification())
+				.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
+				.build();
+	}
 
 	public void addFromReport(AccidentReport accidentReport){
 		Incident incident = Incident
@@ -23,5 +64,22 @@ public class IncidentService {
 		incidentRepository.save(incident);
 		accidentReport.setIncident(incident);
 		accidentReportRepository.save(accidentReport);
+	}
+
+	public void update (Integer id, IncidentRequest incidentRequest){
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		Incident incident = accidentReportOptional.get();
+
+		incident.setIncidentStateType(incidentRequest.getIncidentStateType());
+		incident.setDangerScale(incidentRequest.getDangerScale());
+		incident.setReactionJustification(incidentRequest.getReactionJustification());
+		incidentRepository.save(incident);
+	}
+
+	public void delete(Integer id){
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		incidentRepository.delete(accidentReportOptional.get());
 	}
 }
