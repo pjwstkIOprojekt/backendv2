@@ -20,8 +20,6 @@ public class AddAmbulanceRequest {
     @Max(Integer.MAX_VALUE)
     private Integer seats;
 
-    @NotNull
     private Double longitude;
-    @NotNull
     private Double latitude;
 }
