@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,5 +35,11 @@ public class IncidentController {
 	public ResponseEntity<?> delete(@PathVariable Integer id){
 		incidentService.delete(id);
 		return ResponseEntity.ok("Incident deleted successfully");
+	}
+
+	@PutMapping("/{id}/ambulance")
+	public ResponseEntity<?> addAmbulances(@PathVariable Integer id, @RequestBody List<String> licencePlates){
+		incidentService.addAmbulances(id, licencePlates);
+		return ResponseEntity.ok("Ambulances assigned successfully to incident");
 	}
 }

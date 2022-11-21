@@ -2,11 +2,15 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.AccidentReport;
+import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
+import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
+import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStateType;
 import com.gary.backendv2.repository.AccidentReportRepository;
+import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,8 @@ public class IncidentService {
 	private final IncidentRepository incidentRepository;
 	private final AccidentReportRepository accidentReportRepository;
 	private final AccidentReportService accidentReportService;
+	private final AmbulanceRepository ambulanceRepository;
+	private final AmbulanceService ambulanceService;
 
 	public List<IncidentResponse> getAll(){
 		List<IncidentResponse> incidentResponses = new ArrayList<>();
@@ -81,5 +87,23 @@ public class IncidentService {
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		incidentRepository.delete(accidentReportOptional.get());
+	}
+
+	public void addAmbulances(Integer id, List<String> ambulancesLicencePlates){
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		Incident incident = accidentReportOptional.get();
+		for (String s:ambulancesLicencePlates) {
+			Optional<Ambulance> ambulance = ambulanceRepository.findByLicensePlate(s);
+			if (ambulance.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", s));
+			else {
+				Ambulance a = ambulance.get();
+				a.getIncidents().add(incident);
+				incident.getAmbulances().add(a);
+				ambulanceService.changeAmbulanceState(s, AmbulanceStateType.ON_ACTION);
+				ambulanceRepository.save(a);
+			}
+		}
+		incidentRepository.save(incident);
 	}
 }
