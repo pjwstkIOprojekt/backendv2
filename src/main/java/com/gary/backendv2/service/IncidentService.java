@@ -5,7 +5,6 @@ import com.gary.backendv2.model.AccidentReport;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
-import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStateType;
