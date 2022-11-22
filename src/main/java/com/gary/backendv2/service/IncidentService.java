@@ -92,16 +92,13 @@ public class IncidentService {
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
-		for (String s:ambulancesLicencePlates) {
-			Optional<Ambulance> ambulance = ambulanceRepository.findByLicensePlate(s);
-			if (ambulance.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", s));
-			else {
-				Ambulance a = ambulance.get();
-				a.getIncidents().add(incident);
-				incident.getAmbulances().add(a);
-				ambulanceService.changeAmbulanceState(s, AmbulanceStateType.ON_ACTION);
-				ambulanceRepository.save(a);
-			}
+		List<Ambulance> selectedAmbulances = ambulanceRepository.getAmbulancesByLicensePlateIsIn(ambulancesLicencePlates);
+
+		for (Ambulance a:selectedAmbulances) {
+			a.getIncidents().add(incident);
+			incident.getAmbulances().add(a);
+			ambulanceService.changeAmbulanceState(a.getLicensePlate(), AmbulanceStateType.ON_ACTION);
+			ambulanceRepository.save(a);
 		}
 		incidentRepository.save(incident);
 	}
