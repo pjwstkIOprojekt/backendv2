@@ -1,6 +1,6 @@
 package com.gary.backendv2.model.dto.request;
 
-import com.gary.backendv2.model.enums.IncidentStateType;
+import com.gary.backendv2.model.enums.IncidentStatusType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class IncidentRequest {
 	@Max(10)
 	private Integer dangerScale;
 	@NotNull
-	private IncidentStateType incidentStateType;
+	private IncidentStatusType incidentStatusType;
 	@NotBlank
 	private String reactionJustification;
 }

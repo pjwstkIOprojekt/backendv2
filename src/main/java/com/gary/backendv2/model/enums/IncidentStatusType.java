@@ -1,5 +1,5 @@
 package com.gary.backendv2.model.enums;
 
-public enum IncidentStateType {
+public enum IncidentStatusType {
 	NEW, ASSIGNED, REJECTED, CLOSED
 }

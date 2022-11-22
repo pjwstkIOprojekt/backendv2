@@ -7,7 +7,7 @@ import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
-import com.gary.backendv2.model.enums.IncidentStateType;
+import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.IncidentRepository;
@@ -35,7 +35,7 @@ public class IncidentService {
 				IncidentResponse
 						.builder()
 						.incidentId(incident.getIncidentId())
-						.incidentStateType(incident.getIncidentStateType())
+						.incidentStatusType(incident.getIncidentStatusType())
 						.dangerScale(incident.getDangerScale())
 						.reactionJustification(incident.getReactionJustification())
 						.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
@@ -53,7 +53,7 @@ public class IncidentService {
 		return IncidentResponse
 				.builder()
 				.incidentId(incident.getIncidentId())
-				.incidentStateType(incident.getIncidentStateType())
+				.incidentStatusType(incident.getIncidentStatusType())
 				.dangerScale(incident.getDangerScale())
 				.reactionJustification(incident.getReactionJustification())
 				.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
@@ -64,7 +64,7 @@ public class IncidentService {
 		Incident incident = Incident
 				.builder()
 				.accidentReport(accidentReport)
-				.incidentStateType(IncidentStateType.NEW)
+				.incidentStatusType(IncidentStatusType.NEW)
 				.build();
 		incidentRepository.save(incident);
 		accidentReport.setIncident(incident);
@@ -76,7 +76,7 @@ public class IncidentService {
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
 
-		incident.setIncidentStateType(incidentRequest.getIncidentStateType());
+		incident.setIncidentStatusType(incidentRequest.getIncidentStatusType());
 		incident.setDangerScale(incidentRequest.getDangerScale());
 		incident.setReactionJustification(incidentRequest.getReactionJustification());
 		incidentRepository.save(incident);

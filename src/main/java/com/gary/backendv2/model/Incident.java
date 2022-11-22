@@ -1,6 +1,6 @@
 package com.gary.backendv2.model;
 
-import com.gary.backendv2.model.enums.IncidentStateType;
+import com.gary.backendv2.model.enums.IncidentStatusType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,7 +18,7 @@ public class Incident {
 	private Integer incidentId;
 	private Integer dangerScale;
 	@Enumerated(EnumType.STRING)
-	private IncidentStateType incidentStateType;
+	private IncidentStatusType incidentStatusType;
 	private String reactionJustification;
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "incident")
 	private AccidentReport accidentReport;
