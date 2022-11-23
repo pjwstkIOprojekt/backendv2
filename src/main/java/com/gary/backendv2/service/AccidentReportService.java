@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.Optional;
 public class AccidentReportService {
 	private final AccidentReportRepository accidentReportRepository;
 	private final UserRepository userRepository;
+	private final IncidentService incidentService;
 
 	public List<AccidentReportResponse> getAll(){
 		List<AccidentReportResponse> accidentReportResponses = new ArrayList<>();
@@ -98,20 +98,23 @@ public class AccidentReportService {
 			reporter = userRepository.getByEmail(loggedPrincipal.getUsername());
 		}
 
-		accidentReportRepository.save(
-				AccidentReport
-						.builder()
-						.reporter(reporter)
-						.bandCode(accidentReportRequest.getBandCode())
-						.breathing(accidentReportRequest.getBreathing())
-						.conscious(accidentReportRequest.getConcious())
-						.date(LocalDateTime.now())
-						.description(accidentReportRequest.getDescription())
-						.emergencyType(accidentReportRequest.getEmergencyType())
-						.victimCount(accidentReportRequest.getVictimCount())
-						.location(Location.of(accidentReportRequest.getLongitude(), accidentReportRequest.getLatitude()))
-						.build()
-		);
+		AccidentReport accidentReport = AccidentReport
+				.builder()
+				.reporter(reporter)
+				.bandCode(accidentReportRequest.getBandCode())
+				.breathing(accidentReportRequest.getBreathing())
+				.conscious(accidentReportRequest.getConcious())
+				.date(LocalDateTime.now())
+        .description(accidentReportRequest.getDescription())
+				.emergencyType(accidentReportRequest.getEmergencyType())
+				.victimCount(accidentReportRequest.getVictimCount())
+				.location(Location.of(accidentReportRequest.getLongitude(), accidentReportRequest.getLatitude()))
+				.build();
+
+		accidentReportRepository.save(accidentReport);
+
+		incidentService.addFromReport(accidentReport);
+
 	}
 
 	public void updateById(Integer id, AccidentReportUpdateRequest accidentReportUpdateRequest){

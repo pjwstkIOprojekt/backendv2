@@ -132,6 +132,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/disease/**").permitAll()
                 .antMatchers("/dispatch/**").hasRole("DISPATCHER")
                 .antMatchers("/employee/**").hasRole("EMPLOYEE")
+                .antMatchers("/incident/**").hasRole("EMPLOYEE")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/accident_report/**").permitAll()
                 .anyRequest().authenticated();
