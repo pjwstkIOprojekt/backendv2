@@ -6,12 +6,13 @@ services:
     restart: on-failure
     environment:
       POSTGRES_PASSWORD: postgres
-      MAPTILER_API_KEY: ${MAPTILER_API_KEY}
     ports:
       - "5432:5432"
     volumes:
       - ${HOME}/gary_data:/var/lib/postgresql/data
   app:
+    environment:
+      MAPTILER_API_KEY: ${MAPTILER_API_KEY}
     build:
       context: .
       dockerfile: Dockerfile
