@@ -32,18 +32,7 @@ public class AccidentReportService {
 		List<AccidentReportResponse> accidentReportResponses = new ArrayList<>();
 		for (AccidentReport accidentReport:accidentReportRepository.findAll()) {
 			accidentReportResponses.add(
-					AccidentReportResponse
-							.builder()
-							.bandCode(accidentReport.getBandCode())
-							.consciousness(accidentReport.isConscious())
-							.breathing(accidentReport.isBreathing())
-							.emergencyType(accidentReport.getEmergencyType())
-							.accidentId(accidentReport.getAccidentId())
-							.location(accidentReport.getLocation())
-							.victimCount(accidentReport.getVictimCount())
-							.date(accidentReport.getDate())
-							.description(accidentReport.getDescription())
-							.build()
+					AccidentReportResponse.of(accidentReport)
 			);
 		}
 		return accidentReportResponses;
@@ -57,18 +46,7 @@ public class AccidentReportService {
 		}
 		for (AccidentReport accidentReport : userOptional.get().getAccidentReports()) {
 			accidentReportResponses.add(
-					AccidentReportResponse
-							.builder()
-							.bandCode(accidentReport.getBandCode())
-							.consciousness(accidentReport.isConscious())
-							.breathing(accidentReport.isBreathing())
-							.emergencyType(accidentReport.getEmergencyType())
-							.accidentId(accidentReport.getAccidentId())
-							.location(accidentReport.getLocation())
-							.victimCount(accidentReport.getVictimCount())
-							.date(accidentReport.getDate())
-							.description(accidentReport.getDescription())
-							.build()
+					AccidentReportResponse.of(accidentReport)
 			);
 		}
 		return accidentReportResponses;
@@ -78,18 +56,8 @@ public class AccidentReportService {
 		Optional<AccidentReport> accidentReportOptional = accidentReportRepository.findByAccidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
 		AccidentReport accidentReport = accidentReportOptional.get();
-		return AccidentReportResponse
-				.builder()
-				.date(accidentReport.getDate())
-				.accidentId(accidentReport.getAccidentId())
-				.victimCount(accidentReport.getVictimCount())
-				.location(accidentReport.getLocation())
-				.emergencyType(accidentReport.getEmergencyType())
-				.breathing(accidentReport.isBreathing())
-				.consciousness(accidentReport.isConscious())
-				.bandCode(accidentReport.getBandCode())
-				.description(accidentReport.getDescription())
-				.build();
+
+		return AccidentReportResponse.of(accidentReport);
 	}
 	
 	public void add(AccidentReportRequest accidentReportRequest) {
@@ -110,7 +78,7 @@ public class AccidentReportService {
 				.conscious(accidentReportRequest.getConcious())
 				.address(geoResponse.getFeatures().size() > 0 ? geoResponse.getFeatures().get(0).getPlaceName() : "UNKNOWN")
 				.date(LocalDateTime.now())
-        .description(accidentReportRequest.getDescription())
+        		.description(accidentReportRequest.getDescription())
 				.emergencyType(accidentReportRequest.getEmergencyType())
 				.victimCount(accidentReportRequest.getVictimCount())
 				.location(Location.of(accidentReportRequest.getLongitude(), accidentReportRequest.getLatitude()))

@@ -20,6 +20,7 @@ public class AccidentReportResponse {
 	private Integer accidentId;
 	private LocalDateTime date;
 	private Location location;
+	private String address;
 	private String bandCode;
 	private EmergencyType emergencyType;
 	private int victimCount;
@@ -39,6 +40,7 @@ public class AccidentReportResponse {
 				.consciousness(accidentReport.isConscious())
 				.bandCode(accidentReport.getBandCode())
 				.description(accidentReport.getDescription())
+				.address(accidentReport.getAddress())
 				.build();
 	}
 }
