@@ -5,6 +5,7 @@ import com.gary.backendv2.model.AccidentReport;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
+import com.gary.backendv2.model.dto.response.AccidentReportResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
@@ -12,25 +13,27 @@ import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class IncidentService {
 	private final IncidentRepository incidentRepository;
 	private final AccidentReportRepository accidentReportRepository;
-	private final AccidentReportService accidentReportService;
 	private final AmbulanceRepository ambulanceRepository;
 	private final AmbulanceService ambulanceService;
 
 	public List<IncidentResponse> getAll(){
 		List<IncidentResponse> incidentResponses = new ArrayList<>();
-		for (Incident incident:incidentRepository.findAll()) {
+		List<Incident> incidents = incidentRepository.findAll();
+
+		Map<Integer, Incident> incidentMap = populateIncidentMap(incidents);
+
+		for (Incident incident : incidents) {
 			incidentResponses.add(
 				IncidentResponse
 						.builder()
@@ -38,7 +41,7 @@ public class IncidentService {
 						.incidentStatusType(incident.getIncidentStatusType())
 						.dangerScale(incident.getDangerScale())
 						.reactionJustification(incident.getReactionJustification())
-						.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
+						.accidentReport(AccidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getAccidentReport()))
 						.build()
 			);
 		}
@@ -56,7 +59,7 @@ public class IncidentService {
 				.incidentStatusType(incident.getIncidentStatusType())
 				.dangerScale(incident.getDangerScale())
 				.reactionJustification(incident.getReactionJustification())
-				.accidentReport(accidentReportService.getById(incident.getAccidentReport().getAccidentId()))
+				.accidentReport(AccidentReportResponse.of(incident.getAccidentReport()))
 				.build();
 	}
 
@@ -101,5 +104,15 @@ public class IncidentService {
 			ambulanceRepository.save(a);
 		}
 		incidentRepository.save(incident);
+	}
+
+	private Map<Integer, Incident> populateIncidentMap(List<Incident> incidents) {
+		Map<Integer, Incident> map = new HashMap<>();
+
+		for (Incident incident : incidents) {
+			map.put(incident.getIncidentId(), incident);
+		}
+
+		return map;
 	}
 }

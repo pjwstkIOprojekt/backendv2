@@ -5,6 +5,7 @@ import com.gary.backendv2.security.jwt.AuthEntryPointJwt;
 import com.gary.backendv2.security.jwt.AuthTokenFilter;
 import com.gary.backendv2.security.service.UserDetailsService;
 import com.gary.backendv2.security.RoleOrder;
+import com.gary.backendv2.utils.MaptilerConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -110,6 +111,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
         return expressionHandler;
+    }
+
+    @Bean
+    public MaptilerConstants maptilerConstants() {
+        return new MaptilerConstants();
     }
 
     @Override
