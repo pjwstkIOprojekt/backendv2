@@ -6,6 +6,7 @@ import com.gary.backendv2.model.Equipment;
 import com.gary.backendv2.model.EquipmentInAmbulance;
 import com.gary.backendv2.model.dto.request.EquipmentInAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.EquipmentRequest;
+import com.gary.backendv2.model.dto.response.EquipmentInAmbulanceResponse;
 import com.gary.backendv2.model.dto.response.EquipmentResponse;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.EquipmentInAmbulanceRepository;
@@ -14,10 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,9 +99,23 @@ public class EquipmentService {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find ambulance with %s", licancePlate));
         }
         Ambulance ambulance = optionalAmbulance.get();
+        Set<EquipmentInAmbulance> equipmentInAmbulanceList = ambulance.getEquipmentInAmbulances().stream().filter(eq -> eq.getAmbulance().getLicensePlate().equals(licancePlate)).collect(Collectors.toSet());
+
+        Set<EquipmentInAmbulanceResponse> equipmentInAmbulanceResponse = new HashSet<>();
+        for (EquipmentInAmbulance e: equipmentInAmbulanceList) {
+            equipmentInAmbulanceResponse.add((
+                    EquipmentInAmbulanceResponse
+                            .builder()
+                            .amount(e.getAmount())
+                            .comments(e.getComments())
+                            .usage(e.getUsage())
+                            .waste(e.getWaste())
+                            .unitsOfMeasure(e.getUnitsOfMeasure())
+                            .build()
+                    ) );
+        }
         return ambulance.getEquipmentInAmbulances();
     }
-
 
     public void addEquipmentToAmbulance(String licencePlate, Integer equipmentId, EquipmentInAmbulanceRequest equipmentInAmbulanceRequest) {
 

@@ -1,5 +1,6 @@
 package com.gary.backendv2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gary.backendv2.model.security.Role;
 import lombok.*;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     Integer userId;
 
     @Column(nullable = false, unique = true)
@@ -38,4 +40,8 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private TrustedPerson trustedPerson;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<Review> reviewSet;
 }
