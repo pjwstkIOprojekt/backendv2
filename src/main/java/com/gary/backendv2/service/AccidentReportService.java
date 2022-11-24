@@ -6,6 +6,7 @@ import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.*;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.dto.response.AccidentReportResponse;
+import com.gary.backendv2.model.dto.response.geocoding.MaptilerResponse;
 import com.gary.backendv2.model.security.UserPrincipal;
 import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.UserRepository;
@@ -25,6 +26,7 @@ public class AccidentReportService {
 	private final AccidentReportRepository accidentReportRepository;
 	private final UserRepository userRepository;
 	private final IncidentService incidentService;
+	private final GeocodingService geocodingService;
 
 	public List<AccidentReportResponse> getAll(){
 		List<AccidentReportResponse> accidentReportResponses = new ArrayList<>();
@@ -98,12 +100,15 @@ public class AccidentReportService {
 			reporter = userRepository.getByEmail(loggedPrincipal.getUsername());
 		}
 
+		MaptilerResponse geoResponse = geocodingService.getAddressFromCoordinates(Location.of(accidentReportRequest.getLongitude(), accidentReportRequest.getLatitude()));
+
 		AccidentReport accidentReport = AccidentReport
 				.builder()
 				.reporter(reporter)
 				.bandCode(accidentReportRequest.getBandCode())
 				.breathing(accidentReportRequest.getBreathing())
 				.conscious(accidentReportRequest.getConcious())
+				.address(geoResponse.getFeatures().size() > 0 ? geoResponse.getFeatures().get(0).getPlaceName() : "UNKNOWN")
 				.date(LocalDateTime.now())
         .description(accidentReportRequest.getDescription())
 				.emergencyType(accidentReportRequest.getEmergencyType())

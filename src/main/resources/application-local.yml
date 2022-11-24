@@ -13,6 +13,9 @@ spring:
   sql:
     init:
       mode: always
+maptiler:
+  api:
+    key: ${MAPTILER_API_KEY}
 gary:
   app:
     jwt:

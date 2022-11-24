@@ -23,6 +23,8 @@ public class AccidentReport {
 	@Embedded
 	private Location location;
 
+	private String address;
+
 	private String bandCode;
 
 	private EmergencyType emergencyType;
