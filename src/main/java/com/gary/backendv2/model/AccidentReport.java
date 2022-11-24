@@ -36,5 +36,10 @@ public class AccidentReport {
 
 	private boolean breathing;
 
+
+	@OneToOne
+	private Incident incident;
+
 	private String description;
+
 }

@@ -19,12 +19,12 @@ public class FacilityController {
 		return ResponseEntity.ok(facilityService.getAll());
 	}
 
-	@GetMapping("/id")
+	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Integer id){
 		return ResponseEntity.ok(facilityService.getById(id));
 	}
 
-	@DeleteMapping("/id")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable Integer id){
 		facilityService.delete(id);
 		return ResponseEntity.ok("Facility successfully deleted");
@@ -36,7 +36,7 @@ public class FacilityController {
 		return ResponseEntity.ok("Facility successfully added");
 	}
 
-	@PutMapping("/id")
+	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid FacilityRequest facilityRequest){
 		facilityService.update(id,facilityRequest);
 		return ResponseEntity.ok("Facility updated successfully");

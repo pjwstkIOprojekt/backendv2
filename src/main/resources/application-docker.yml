@@ -1,7 +1,7 @@
 
 logging:
   file:
-    name: ${HOME}/spring.log
+    name: ${HOME}/gary_logs/spring.log
 
 spring:
   jpa:
