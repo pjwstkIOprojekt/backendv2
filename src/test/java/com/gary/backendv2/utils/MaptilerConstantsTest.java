@@ -21,7 +21,7 @@ public class MaptilerConstantsTest {
         MaptilerConstants maptiler = new MaptilerConstants();
         maptiler.setApiKey("API_KEY");
 
-        String expectedUrl = "https://api.maptiler.com/geocoding/52.0,14.0.json?key=API_KEY&language=en";
+        String expectedUrl = "https://api.maptiler.com/geocoding/15.0,52.0.json?key=API_KEY&language=en";
 
         String url = maptiler.createGeoCodingURL(52., 14.);
 
@@ -34,7 +34,7 @@ public class MaptilerConstantsTest {
         MaptilerConstants maptiler = new MaptilerConstants();
         maptiler.setApiKey("API_KEY");
 
-        String expectedUrl = "https://api.maptiler.com/geocoding/52.0,14.0.json?key=API_KEY&language=" + language.getLanguageCode();
+        String expectedUrl = "https://api.maptiler.com/geocoding/14.0,52.0.json?key=API_KEY&language=" + language.getLanguageCode();
 
         String url = maptiler.createGeoCodingURL(52., 14., language);
 
