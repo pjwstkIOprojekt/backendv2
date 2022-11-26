@@ -16,10 +16,9 @@ import static org.mockito.Mockito.when;
 public class IncidentServiceTest {
 	private final IncidentRepository incidentRepository = mock(IncidentRepository.class);
 	private final AccidentReportRepository accidentReportRepository = mock(AccidentReportRepository.class);
-	private final AccidentReportService accidentReportService = mock(AccidentReportService.class);
 	private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
 	private final AmbulanceService ambulanceService = mock(AmbulanceService.class);
-	private final IncidentService incidentService = new IncidentService(incidentRepository, accidentReportRepository,accidentReportService,ambulanceRepository,ambulanceService);
+	private final IncidentService incidentService = new IncidentService(incidentRepository, accidentReportRepository,ambulanceRepository,ambulanceService);
 
 	@Test
 	void getAll(){

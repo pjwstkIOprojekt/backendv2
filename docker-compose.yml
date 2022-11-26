@@ -11,6 +11,8 @@ services:
     volumes:
       - ${HOME}/gary_data:/var/lib/postgresql/data
   app:
+    environment:
+      MAPTILER_API_KEY: ${MAPTILER_API_KEY}
     build:
       context: .
       dockerfile: Dockerfile
