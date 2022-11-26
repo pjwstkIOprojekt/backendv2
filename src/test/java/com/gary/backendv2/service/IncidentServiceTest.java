@@ -4,6 +4,7 @@ import com.gary.backendv2.model.AccidentReport;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
+import com.gary.backendv2.repository.DispatcherRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,8 @@ public class IncidentServiceTest {
 	private final AccidentReportRepository accidentReportRepository = mock(AccidentReportRepository.class);
 	private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
 	private final AmbulanceService ambulanceService = mock(AmbulanceService.class);
-	private final IncidentService incidentService = new IncidentService(incidentRepository, accidentReportRepository,ambulanceRepository,ambulanceService);
+	private final DispatcherRepository dispatcherRepository = mock(DispatcherRepository.class);
+	private final IncidentService incidentService = new IncidentService(incidentRepository, accidentReportRepository,ambulanceRepository,ambulanceService, dispatcherRepository);
 
 	@Test
 	void getAll(){

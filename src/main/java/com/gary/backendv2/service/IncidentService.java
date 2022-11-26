@@ -3,6 +3,7 @@ package com.gary.backendv2.service;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.AccidentReport;
 import com.gary.backendv2.model.Ambulance;
+import com.gary.backendv2.model.Dispatcher;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
 import com.gary.backendv2.model.dto.response.AccidentReportResponse;
@@ -11,6 +12,7 @@ import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.repository.AccidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
+import com.gary.backendv2.repository.DispatcherRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.relational.core.sql.In;
@@ -26,6 +28,7 @@ public class IncidentService {
 	private final AccidentReportRepository accidentReportRepository;
 	private final AmbulanceRepository ambulanceRepository;
 	private final AmbulanceService ambulanceService;
+	private final DispatcherRepository dispatcherRepository;
 
 	public List<IncidentResponse> getAll(){
 		List<IncidentResponse> incidentResponses = new ArrayList<>();
@@ -69,6 +72,7 @@ public class IncidentService {
 				.accidentReport(accidentReport)
 				.incidentStatusType(IncidentStatusType.NEW)
 				.build();
+		assignDispatcher(incident);
 		incidentRepository.save(incident);
 		accidentReport.setIncident(incident);
 		accidentReportRepository.save(accidentReport);
@@ -114,5 +118,27 @@ public class IncidentService {
 		}
 
 		return map;
+	}
+
+	private void assignDispatcher(Incident incident){
+		List<Dispatcher> dispatchers = dispatcherRepository.getAllByWorking(true);
+		if(dispatchers.size() == 0){
+			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "There is no dispatcher on duty");
+		}
+		List<Dispatcher> possibleAssigments = new ArrayList<>();
+		int activeIncidents = Integer.MAX_VALUE;
+		for (Dispatcher dispatcher:dispatchers) {
+			if(dispatcher.getOpenIncidents()<activeIncidents){
+				possibleAssigments.clear();
+				activeIncidents = dispatcher.getOpenIncidents();
+			}
+			if(dispatcher.getOpenIncidents() == activeIncidents){
+				possibleAssigments.add(dispatcher);
+			}
+		}
+		Dispatcher dispatcher = possibleAssigments.get((int)Math.random()*possibleAssigments.size());
+		dispatcher.setOpenIncidents(dispatcher.getOpenIncidents()+1);
+		dispatcher.getIncidents().add(incident);
+		dispatcherRepository.save(dispatcher);
 	}
 }
