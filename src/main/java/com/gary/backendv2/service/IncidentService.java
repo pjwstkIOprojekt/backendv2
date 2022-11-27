@@ -110,6 +110,37 @@ public class IncidentService {
 		incidentRepository.save(incident);
 	}
 
+	public void changeIncidentStatus(Integer id, IncidentStatusType incidentStatusType){
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		Incident incident = accidentReportOptional.get();
+		switch (incidentStatusType){
+			case NEW -> throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as new");
+			case CLOSED -> {
+				if (incident.getIncidentStatusType() != IncidentStatusType.ACCEPTED) {
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as closed");
+				}
+			}
+			case ASSIGNED -> {
+				if (incident.getIncidentStatusType() != IncidentStatusType.NEW){
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as assigned");
+				}
+			}
+			case REJECTED -> {
+				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as rejected");
+				}
+			}
+			case ACCEPTED -> {
+				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as accepted");
+				}
+			}
+		}
+		incident.setIncidentStatusType(incidentStatusType);
+		incidentRepository.save(incident);
+	}
+
 	private Map<Integer, Incident> populateIncidentMap(List<Incident> incidents) {
 		Map<Integer, Incident> map = new HashMap<>();
 
@@ -139,6 +170,8 @@ public class IncidentService {
 		Dispatcher dispatcher = possibleAssigments.get((int)Math.random()*possibleAssigments.size());
 		dispatcher.setOpenIncidents(dispatcher.getOpenIncidents()+1);
 		dispatcher.getIncidents().add(incident);
+		changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
+		incidentRepository.save(incident);
 		dispatcherRepository.save(dispatcher);
 	}
 }
