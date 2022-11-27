@@ -44,6 +44,16 @@ public class AmbulanceController {
         return ResponseEntity.ok(ambulanceService.getAmbulancePath(licensePlate));
     }
 
+    @GetMapping("/{licensePlate}/equipment")
+    public ResponseEntity<?> getItems(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getItems(licensePlate));
+    }
+
+    @PostMapping("/{licensePlate}/add/{itemId}")
+    public void addItem(@PathVariable String licensePlate, @PathVariable Integer itemId) {
+        ambulanceService.addItem(licensePlate, itemId);
+    }
+
     @PostMapping("/{licensePlate}/state/{state}")
     public ResponseEntity<?> changeAmbulanceState(@PathVariable String licensePlate, @PathVariable AmbulanceStateType state) {
         return ResponseEntity.ok(ambulanceService.changeAmbulanceState(licensePlate, state));

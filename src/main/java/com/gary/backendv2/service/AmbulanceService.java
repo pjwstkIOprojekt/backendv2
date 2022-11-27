@@ -10,11 +10,15 @@ import com.gary.backendv2.model.dto.response.AmbulanceHistoryResponse;
 import com.gary.backendv2.model.dto.response.AmbulancePathResponse;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.AmbulanceStateResponse;
+import com.gary.backendv2.model.dto.response.items.ItemResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
-import com.gary.backendv2.repository.AmbulanceHistoryRepository;
-import com.gary.backendv2.repository.AmbulanceLocationRepository;
-import com.gary.backendv2.repository.AmbulanceRepository;
-import com.gary.backendv2.repository.AmbulanceStateRepository;
+import com.gary.backendv2.model.inventory.Inventory;
+import com.gary.backendv2.model.inventory.ItemContainer;
+import com.gary.backendv2.model.inventory.items.Item;
+import com.gary.backendv2.model.inventory.items.MedicineItem;
+import com.gary.backendv2.model.inventory.items.SingleUseItem;
+import com.gary.backendv2.repository.*;
+import com.gary.backendv2.utils.ItemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,10 +35,16 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class AmbulanceService {
+    private final ItemService itemService;
+
     private final AmbulanceRepository ambulanceRepository;
     private final AmbulanceStateRepository ambulanceStateRepository;
     private final AmbulanceHistoryRepository ambulanceHistoryRepository;
     private final AmbulanceLocationRepository ambulanceLocationRepository;
+
+    private final ItemRepository itemRepository;
+    private final ItemContainerRepository itemContainerRepository;
+    private final InventoryRepository inventoryRepository;
 
     public List<AmbulanceResponse> getAllAmbulances() {
         List<Ambulance> all = ambulanceRepository.findAll();
@@ -159,6 +169,84 @@ public class AmbulanceService {
         }
     }
 
+    public void addItem(String licensePlate, Integer itemId) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND);
+        }
+
+        Ambulance ambulance = ambulanceOptional.get();
+        Inventory inventory = ambulance.getInventory();
+
+        Map<Integer, ItemContainer> itemsInInventory = inventory.getItems();
+        Item item = itemService.getById(itemId);
+
+        ItemContainer container;
+        if (itemsInInventory.containsKey(item.getItemId())) {
+            container = itemsInInventory.get(item.getItemId());
+            container.incrementCount();
+        } else {
+            ItemUtils itemUtils = ItemUtils.getInstance();
+
+            container = new ItemContainer();
+            container.setUnit(itemUtils.itemMeasuringUnitsLookup.get(item.getClass()));
+            container.incrementCount();
+
+            itemsInInventory.put(item.getItemId(), container);
+        }
+
+        System.out.println(itemsInInventory.get(1).getCount());
+
+        itemContainerRepository.save(container);
+        inventoryRepository.save(inventory);
+    }
+
+    public List<ItemResponse> getItems(String licensePlate) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND);
+        }
+
+        Ambulance ambulance = ambulanceOptional.get();
+        List<Integer> itemIds = new ArrayList<>(ambulance.getInventory().getItems().keySet());
+
+        List<ItemResponse> itemResponses = new ArrayList<>();
+        List<Item> items = itemRepository.getItemsByItemIdIn(itemIds);
+        if (!items.isEmpty()) {
+            for (Item item : items) {
+                ItemResponse itemResponse = new ItemResponse();
+
+                // TODO: CONVERT TO RESPONSE FACTORY
+                switch (item.getDiscriminatorValue()) {
+                    case SINGLE_USE -> {
+                        SingleUseItem s = (SingleUseItem) item;
+
+                        itemResponse.setItemId(s.getItemId());
+                        itemResponse.setName(s.getName());
+                        itemResponse.setDescription(s.getDescription());
+                        itemResponse.setType(s.getDiscriminatorValue());
+                    }
+
+                    case MEDICINES -> {
+                        MedicineItem m = (MedicineItem) item;
+
+                        itemResponse.setItemId(m.getItemId());
+                        itemResponse.setManufacturer(m.getManufacturer());
+                        itemResponse.setType(m.getDiscriminatorValue());
+                        itemResponse.setDescription(m.getDescription());
+                        itemResponse.setName(m.getName());
+                    }
+                }
+
+                itemResponses.add(itemResponse);
+            }
+
+            return itemResponses;
+        }
+
+        return Collections.emptyList();
+    }
+
     public AmbulancePathResponse getAmbulancePath(String licensePlate) {
         Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
         if (ambulanceOptional.isEmpty()) {
@@ -195,6 +283,9 @@ public class AmbulanceService {
     }
 
     private Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
+        Inventory inventory = inventoryRepository.save(new Inventory());
+
+
         AmbulanceHistory ambulanceHistory = new AmbulanceHistory();
 
         AmbulanceState ambulanceState = new AmbulanceState();
@@ -214,6 +305,7 @@ public class AmbulanceService {
         ambulance.setLocation(locationAnyNull ? Location.defaultLocation() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
+        ambulance.setInventory(inventory);
 
         return ambulance;
     }
