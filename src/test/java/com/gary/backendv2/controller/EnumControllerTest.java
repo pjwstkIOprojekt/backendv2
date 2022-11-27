@@ -39,7 +39,7 @@ class EnumControllerTest {
 
 	@Test
 	void getRoles() {assertEquals(enumController.getRoles(), EnumUtils.getEnumValues(RoleName.class));}
-	
+
 	@Test
 	void getIncidentStatuses() {assertEquals(enumController.getIncidentStatuses(), EnumUtils.getEnumValues(IncidentStatusType.class));}
 }
