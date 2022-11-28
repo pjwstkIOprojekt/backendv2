@@ -15,11 +15,11 @@ import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.DispatcherRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +64,27 @@ public class IncidentService {
 				.reactionJustification(incident.getReactionJustification())
 				.accidentReport(AccidentReportResponse.of(incident.getAccidentReport()))
 				.build();
+	}
+
+	public List<IncidentResponse> getByStatus(IncidentStatusType statusType){
+		List<IncidentResponse> incidentResponses = new ArrayList<>();
+		List<Incident> incidents = incidentRepository.findAllByIncidentStatusType(statusType);
+
+		Map<Integer, Incident> incidentMap = populateIncidentMap(incidents);
+
+		for (Incident incident : incidents) {
+			incidentResponses.add(
+					IncidentResponse
+							.builder()
+							.incidentId(incident.getIncidentId())
+							.incidentStatusType(incident.getIncidentStatusType())
+							.dangerScale(incident.getDangerScale())
+							.reactionJustification(incident.getReactionJustification())
+							.accidentReport(AccidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getAccidentReport()))
+							.build()
+			);
+		}
+		return incidentResponses;
 	}
 
 	public void addFromReport(AccidentReport accidentReport){
@@ -115,25 +136,25 @@ public class IncidentService {
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
 		switch (incidentStatusType){
-			case NEW -> throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as new");
+			case NEW -> throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.NEW.toString().toLowerCase());
 			case CLOSED -> {
 				if (incident.getIncidentStatusType() != IncidentStatusType.ACCEPTED) {
-					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as closed");
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.CLOSED.toString().toLowerCase());
 				}
 			}
 			case ASSIGNED -> {
 				if (incident.getIncidentStatusType() != IncidentStatusType.NEW){
-					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as assigned");
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.ASSIGNED.toString().toLowerCase());
 				}
 			}
 			case REJECTED -> {
 				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
-					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as rejected");
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.REJECTED.toString().toLowerCase());
 				}
 			}
 			case ACCEPTED -> {
 				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
-					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as accepted");
+					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.ACCEPTED.toString().toLowerCase());
 				}
 			}
 		}
@@ -167,7 +188,7 @@ public class IncidentService {
 				possibleAssigments.add(dispatcher);
 			}
 		}
-		Dispatcher dispatcher = possibleAssigments.get((int)Math.random()*possibleAssigments.size());
+		Dispatcher dispatcher = possibleAssigments.get(ThreadLocalRandom.current().nextInt(0, possibleAssigments.size()-1));
 		dispatcher.setOpenIncidents(dispatcher.getOpenIncidents()+1);
 		dispatcher.getIncidents().add(incident);
 		changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);

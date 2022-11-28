@@ -26,6 +26,11 @@ public class IncidentController {
 		return ResponseEntity.ok(incidentService.getById(id));
 	}
 
+	@GetMapping("/status/{status}")
+	public ResponseEntity<?> getByStatus (@PathVariable IncidentStatusType status){
+		return ResponseEntity.ok(incidentService.getByStatus(status));
+	}
+
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid IncidentRequest incidentRequest){
 		incidentService.update(id, incidentRequest);
@@ -44,9 +49,9 @@ public class IncidentController {
 		return ResponseEntity.ok("Ambulances assigned successfully to incident");
 	}
 
-	@PutMapping("/{id}/status")
-	public ResponseEntity<?> changeStatus(@PathVariable Integer id, @RequestBody IncidentStatusType incidentStatusType){
-		incidentService.changeIncidentStatus(id, incidentStatusType);
+	@PostMapping("/{id}/status/{status}")
+	public ResponseEntity<?> changeStatus(@PathVariable Integer id, @PathVariable IncidentStatusType status){
+		incidentService.changeIncidentStatus(id, status);
 		return ResponseEntity.ok("Status successfully changed");
 	}
 }

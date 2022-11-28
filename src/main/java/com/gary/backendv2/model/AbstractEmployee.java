@@ -25,14 +25,16 @@ public abstract class AbstractEmployee extends User {
 
 
     public EmployeeShift getCurrentShift() {
-        return shifts.get(shifts.size() - 1);
+        EmployeeShift shift = shifts.get(shifts.size() - 1);
+        for(EmployeeShift e: shifts){
+            if(e.getActualStartTime().isBefore(LocalDateTime.now()) && shift.getActualStartTime().isBefore(e.getActualStartTime())){
+                shift = e;
+            }
+        }
+        return shift;
     }
 
     public Boolean getWorking(){
-        if(shifts.get(shifts.size() - 1).getActualStartTime().isAfter(LocalDateTime.now()) && shifts.get(shifts.size() - 1).getActualEndTime() == null){
-            return true;
-        }else{
-            return false;
-        }
+        return getCurrentShift().getActualStartTime().isBefore(LocalDateTime.now()) && getCurrentShift().getActualEndTime() == null ;
     }
 }
