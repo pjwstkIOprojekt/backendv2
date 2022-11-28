@@ -37,8 +37,26 @@ public class ItemContainer {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void addMultiple(int count) {
+        this.count += count;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public void decrementCount() {
         this.count--;
+        if (this.count < 0) {
+            this.count = 0;
+        }
+
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void removeMultiple(Integer count) {
+        this.count -= count;
+        if (this.count < 0) {
+            this.count = 0;
+        }
+
         this.updatedAt = LocalDateTime.now();
     }
 }

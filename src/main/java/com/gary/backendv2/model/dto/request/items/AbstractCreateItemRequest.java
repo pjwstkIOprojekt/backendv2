@@ -12,7 +12,7 @@ import lombok.Setter;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CreateSingleUseItemRequest.class, name = "SINGLE_USE"),
-        @JsonSubTypes.Type(value = CreateMedicineItemRequest.class, name = "MEDICINES")
+        @JsonSubTypes.Type(value = CreateMedicineItemRequest.class, name = "MEDICAL")
 })
 @NoArgsConstructor
 public abstract class AbstractCreateItemRequest {

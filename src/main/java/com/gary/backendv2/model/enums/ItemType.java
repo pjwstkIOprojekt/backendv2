@@ -5,11 +5,11 @@ import com.gary.backendv2.model.inventory.items.SingleUseItem;
 
 public enum ItemType {
     SINGLE_USE(SingleUseItem.class),
-    MEDICINES(MedicineItem.class),
-    MULTI_USE(Object.class),
-    AMBULANCE_EQUIPMENT(Object.class);
+    MEDICAL(MedicineItem.class),
+    MULTI_USE(Object.class), // NOT IMPLEMENTED YET
+    AMBULANCE_EQUIPMENT(Object.class); // NOT IMPLEMENTED YEY
 
-    private Class<?> mappedClass;
+    private final Class<?> mappedClass;
 
     ItemType(Class<?> clazz) {
         this.mappedClass = clazz;

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -12,4 +13,5 @@ public class MedicineItem extends Item {
     private String name;
     private String manufacturer;
     private String description;
+    private LocalDate expirationDate;
 }

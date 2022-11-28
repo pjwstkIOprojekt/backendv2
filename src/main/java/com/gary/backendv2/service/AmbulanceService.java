@@ -1,16 +1,14 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.factories.ItemResponseFactoryProvider;
+import com.gary.backendv2.factories.asbtract.ItemResponseAbstractFactory;
 import com.gary.backendv2.model.*;
 import com.gary.backendv2.model.dto.PathElement;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
-import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
-import com.gary.backendv2.model.dto.response.AmbulanceHistoryResponse;
-import com.gary.backendv2.model.dto.response.AmbulancePathResponse;
-import com.gary.backendv2.model.dto.response.AmbulanceResponse;
-import com.gary.backendv2.model.dto.response.AmbulanceStateResponse;
-import com.gary.backendv2.model.dto.response.items.ItemResponse;
+import com.gary.backendv2.model.dto.response.*;
+import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
@@ -22,13 +20,10 @@ import com.gary.backendv2.utils.ItemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -195,53 +190,66 @@ public class AmbulanceService {
             itemsInInventory.put(item.getItemId(), container);
         }
 
-        System.out.println(itemsInInventory.get(1).getCount());
-
         itemContainerRepository.save(container);
         inventoryRepository.save(inventory);
     }
 
-    public List<ItemResponse> getItems(String licensePlate) {
+    public void addItems(String licensePlate, Integer itemId, Integer count) {
         Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
         if (ambulanceOptional.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND);
         }
 
         Ambulance ambulance = ambulanceOptional.get();
-        List<Integer> itemIds = new ArrayList<>(ambulance.getInventory().getItems().keySet());
+        Inventory inventory = ambulance.getInventory();
 
-        List<ItemResponse> itemResponses = new ArrayList<>();
+        Map<Integer, ItemContainer> itemsInInventory = inventory.getItems();
+        Item item = itemService.getById(itemId);
+
+        ItemContainer container;
+        if (itemsInInventory.containsKey(item.getItemId())) {
+            container = itemsInInventory.get(item.getItemId());
+            container.addMultiple(count);
+        } else {
+            ItemUtils itemUtils = ItemUtils.getInstance();
+
+            container = new ItemContainer();
+            container.setUnit(itemUtils.itemMeasuringUnitsLookup.get(item.getClass()));
+            container.addMultiple(count);
+
+            itemsInInventory.put(item.getItemId(), container);
+        }
+
+        itemContainerRepository.save(container);
+        inventoryRepository.save(inventory);
+    }
+
+    public List<EquipmentResponse> getItems(String licensePlate) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND);
+        }
+
+        List<EquipmentResponse> responseList = new ArrayList<>();
+
+        Ambulance ambulance = ambulanceOptional.get();
+        var itemsMap = ambulance.getInventory().getItems();
+        List<Integer> itemIds = new ArrayList<>(itemsMap.keySet());
+
         List<Item> items = itemRepository.getItemsByItemIdIn(itemIds);
         if (!items.isEmpty()) {
             for (Item item : items) {
-                ItemResponse itemResponse = new ItemResponse();
+                ItemResponseAbstractFactory responseFactory = ItemResponseFactoryProvider.getItemFactory(item.getDiscriminatorValue());
+                AbstractItemResponse itemResponse = responseFactory.createResponse(item);
 
-                // TODO: CONVERT TO RESPONSE FACTORY
-                switch (item.getDiscriminatorValue()) {
-                    case SINGLE_USE -> {
-                        SingleUseItem s = (SingleUseItem) item;
+                EquipmentResponse equipmentResponse = new EquipmentResponse();
+                equipmentResponse.setItem(itemResponse);
+                equipmentResponse.setItemData(new EquipmentResponse.ItemContainerResponse(itemsMap.get(item.getItemId())));
 
-                        itemResponse.setItemId(s.getItemId());
-                        itemResponse.setName(s.getName());
-                        itemResponse.setDescription(s.getDescription());
-                        itemResponse.setType(s.getDiscriminatorValue());
-                    }
-
-                    case MEDICINES -> {
-                        MedicineItem m = (MedicineItem) item;
-
-                        itemResponse.setItemId(m.getItemId());
-                        itemResponse.setManufacturer(m.getManufacturer());
-                        itemResponse.setType(m.getDiscriminatorValue());
-                        itemResponse.setDescription(m.getDescription());
-                        itemResponse.setName(m.getName());
-                    }
-                }
-
-                itemResponses.add(itemResponse);
+                responseList.add(equipmentResponse);
             }
 
-            return itemResponses;
+            return responseList;
         }
 
         return Collections.emptyList();

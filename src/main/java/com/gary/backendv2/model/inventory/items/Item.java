@@ -15,7 +15,7 @@ public abstract class Item {
     private Integer itemId;
 
     @Transient
-    public ItemType getDiscriminatorValue(){
+    public ItemType getDiscriminatorValue() {
         return ItemType.fromClass(this.getClass());
     }
 }

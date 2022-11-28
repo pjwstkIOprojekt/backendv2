@@ -15,6 +15,7 @@ public class MedicineItemFactory implements ItemAbstractFactory {
         medicineItem.setName(medicineItemRequest.getName());
         medicineItem.setDescription(medicineItemRequest.getDescription());
         medicineItem.setManufacturer(medicineItemRequest.getManufacturer());
+        medicineItem.setExpirationDate(medicineItemRequest.getExpirationDate());
 
         return medicineItem;
     }
