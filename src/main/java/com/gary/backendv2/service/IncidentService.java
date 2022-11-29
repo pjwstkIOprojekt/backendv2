@@ -1,16 +1,16 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.AccidentReport;
+import com.gary.backendv2.model.IncidentReport;
 import com.gary.backendv2.model.Ambulance;
 import com.gary.backendv2.model.Dispatcher;
 import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
-import com.gary.backendv2.model.dto.response.AccidentReportResponse;
+import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
-import com.gary.backendv2.repository.AccidentReportRepository;
+import com.gary.backendv2.repository.IncidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.DispatcherRepository;
 import com.gary.backendv2.repository.IncidentRepository;
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class IncidentService {
 	private final IncidentRepository incidentRepository;
-	private final AccidentReportRepository accidentReportRepository;
+	private final IncidentReportRepository incidentReportRepository;
 	private final AmbulanceRepository ambulanceRepository;
 	private final AmbulanceService ambulanceService;
 	private final DispatcherRepository dispatcherRepository;
@@ -44,7 +44,7 @@ public class IncidentService {
 						.incidentStatusType(incident.getIncidentStatusType())
 						.dangerScale(incident.getDangerScale())
 						.reactionJustification(incident.getReactionJustification())
-						.accidentReport(AccidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getAccidentReport()))
+						.accidentReport(IncidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getIncidentReport()))
 						.build()
 			);
 		}
@@ -62,7 +62,7 @@ public class IncidentService {
 				.incidentStatusType(incident.getIncidentStatusType())
 				.dangerScale(incident.getDangerScale())
 				.reactionJustification(incident.getReactionJustification())
-				.accidentReport(AccidentReportResponse.of(incident.getAccidentReport()))
+				.accidentReport(IncidentReportResponse.of(incident.getIncidentReport()))
 				.build();
 	}
 
@@ -80,23 +80,23 @@ public class IncidentService {
 							.incidentStatusType(incident.getIncidentStatusType())
 							.dangerScale(incident.getDangerScale())
 							.reactionJustification(incident.getReactionJustification())
-							.accidentReport(AccidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getAccidentReport()))
+							.accidentReport(IncidentReportResponse.of(incidentMap.get(incident.getIncidentId()).getIncidentReport()))
 							.build()
 			);
 		}
 		return incidentResponses;
 	}
 
-	public void addFromReport(AccidentReport accidentReport){
+	public void addFromReport(IncidentReport incidentReport){
 		Incident incident = Incident
 				.builder()
-				.accidentReport(accidentReport)
+				.incidentReport(incidentReport)
 				.incidentStatusType(IncidentStatusType.NEW)
 				.build();
 		assignDispatcher(incident);
 		incidentRepository.save(incident);
-		accidentReport.setIncident(incident);
-		accidentReportRepository.save(accidentReport);
+		incidentReport.setIncident(incident);
+		incidentReportRepository.save(incidentReport);
 	}
 
 	public void update (Integer id, IncidentRequest incidentRequest){

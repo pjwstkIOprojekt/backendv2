@@ -2,16 +2,13 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.*;
-import com.gary.backendv2.model.dto.response.AllergyResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
-import com.gary.backendv2.repository.AccidentReportRepository;
+import com.gary.backendv2.repository.IncidentReportRepository;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.DispatcherRepository;
 import com.gary.backendv2.repository.IncidentRepository;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,23 +16,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 public class IncidentServiceTest {
 	private final IncidentRepository incidentRepository = mock(IncidentRepository.class);
-	private final AccidentReportRepository accidentReportRepository = mock(AccidentReportRepository.class);
+	private final IncidentReportRepository incidentReportRepository = mock(IncidentReportRepository.class);
 	private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
 	private final AmbulanceService ambulanceService = mock(AmbulanceService.class);
 	private final DispatcherRepository dispatcherRepository = mock(DispatcherRepository.class);
 	private final EmployeeService employeeService = mock(EmployeeService.class);
-	private final IncidentService incidentService = new IncidentService(incidentRepository, accidentReportRepository,ambulanceRepository,ambulanceService, dispatcherRepository);
+	private final IncidentService incidentService = new IncidentService(incidentRepository, incidentReportRepository,ambulanceRepository,ambulanceService, dispatcherRepository);
 
 	@Test
 	void getAll(){
-		AccidentReport accidentReport = new AccidentReport();
-		accidentReport.setAccidentId(1);
+		IncidentReport incidentReport = new IncidentReport();
+		incidentReport.setAccidentId(1);
 		Incident incident = new Incident();
-		incident.setAccidentReport(accidentReport);
+		incident.setIncidentReport(incidentReport);
 		List<Incident> expected = List.of(incident);
 		when(incidentRepository.findAll()).thenReturn(expected);
 		var result = incidentService.getAll();
@@ -47,9 +43,9 @@ public class IncidentServiceTest {
 		int id = 1;
 		Incident expected = new Incident();
 		expected.setIncidentId(1);
-		AccidentReport accidentReport = new AccidentReport();
-		accidentReport.setAccidentId(1);
-		expected.setAccidentReport(accidentReport);
+		IncidentReport incidentReport = new IncidentReport();
+		incidentReport.setAccidentId(1);
+		expected.setIncidentReport(incidentReport);
 
 		when(incidentRepository.findByIncidentId(id)).thenReturn(Optional.of(expected));
 
