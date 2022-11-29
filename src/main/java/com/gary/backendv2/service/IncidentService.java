@@ -104,7 +104,9 @@ public class IncidentService {
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
 
-		incident.setIncidentStatusType(incidentRequest.getIncidentStatusType());
+		if(incident.getIncidentStatusType() != incidentRequest.getIncidentStatusType()){
+			changeIncidentStatus(id, incidentRequest.getIncidentStatusType());
+		}
 		incident.setDangerScale(incidentRequest.getDangerScale());
 		incident.setReactionJustification(incidentRequest.getReactionJustification());
 		incidentRepository.save(incident);
@@ -140,6 +142,8 @@ public class IncidentService {
 			case CLOSED -> {
 				if (incident.getIncidentStatusType() != IncidentStatusType.ACCEPTED) {
 					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.CLOSED.toString().toLowerCase());
+				}else{
+					incident.getDispatcher().setOpenIncidents(incident.getDispatcher().getOpenIncidents()-1);
 				}
 			}
 			case ASSIGNED -> {
@@ -150,6 +154,8 @@ public class IncidentService {
 			case REJECTED -> {
 				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
 					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.REJECTED.toString().toLowerCase());
+				}else{
+					incident.getDispatcher().setOpenIncidents(incident.getDispatcher().getOpenIncidents()-1);
 				}
 			}
 			case ACCEPTED -> {
@@ -159,6 +165,7 @@ public class IncidentService {
 			}
 		}
 		incident.setIncidentStatusType(incidentStatusType);
+		dispatcherRepository.save(incident.getDispatcher());
 		incidentRepository.save(incident);
 	}
 
