@@ -3,6 +3,7 @@ package com.gary.backendv2.model.dto.request;
 import com.gary.backendv2.model.enums.EmergencyType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class AccidentReportRequest {
+public class IncidentReportRequest {
 	@Email
 	private String email;
 	private String bandCode;
@@ -23,13 +24,14 @@ public class AccidentReportRequest {
 	private EmergencyType emergencyType;
 	@Min(1)
 	@NotNull
-	private int victimCount;
-	@NotBlank
+	private Integer victimCount;
+	@NotNull
 	private Double longitude;
-	@NotBlank
+	@NotNull
 	private Double latitude;
-	@NotBlank
-	private boolean consciousness;
-	@NotBlank
-	private boolean breathing;
+	@NotNull
+	private Boolean concious;
+	@NotNull
+	private Boolean breathing;
+	private String description;
 }

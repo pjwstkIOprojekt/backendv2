@@ -11,5 +11,5 @@ import java.util.Map;
 @Setter
 public class AmbulanceStateResponse {
     private AmbulanceStateType type;
-    private Map<String, LocalDateTime> timeWindow;
+    private LocalDateTime timestamp;
 }
