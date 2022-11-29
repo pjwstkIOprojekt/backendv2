@@ -6,6 +6,7 @@ import com.gary.backendv2.model.enums.AmbulanceType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -37,12 +38,23 @@ public class Ambulance {
     @JoinColumn(name = "history_id")
     private AmbulanceHistory ambulanceHistory;
 
+    @ManyToMany
+    @JoinTable(name = "ambulances_incidents",
+            joinColumns = @JoinColumn(name = "ambulance"),
+            inverseJoinColumns = @JoinColumn(name = "disease"))
+    private Set<Incident> incidents = new LinkedHashSet<>();
+
     @Transient
     private AmbulanceState currentState;
+
 
     @OneToMany(mappedBy = "ambulance",cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<EquipmentInAmbulance> equipmentInAmbulances;
+
+    public AmbulanceState getCurrentState() {
+        return ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
+    }
 
     public AmbulanceState findCurrentState() {
         currentState = ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);

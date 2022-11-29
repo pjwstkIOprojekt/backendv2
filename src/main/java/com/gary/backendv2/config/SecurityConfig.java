@@ -5,12 +5,14 @@ import com.gary.backendv2.security.jwt.AuthEntryPointJwt;
 import com.gary.backendv2.security.jwt.AuthTokenFilter;
 import com.gary.backendv2.security.service.UserDetailsService;
 import com.gary.backendv2.security.RoleOrder;
+import com.gary.backendv2.utils.MaptilerConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,7 +54,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             // other public endpoints of your API may be appended to this array
-            "/enum/**"
+            "/enum/**",
+            "/facility/**"
     };
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -83,6 +86,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         try {
             roleOrder.addRule(RoleName.ADMIN, RoleName.AMBULANCE_MANAGER);
             roleOrder.addRule(RoleName.ADMIN, RoleName.DISPATCHER);
+            roleOrder.addRule(RoleName.DISPATCHER, RoleName.EMPLOYEE);
+            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.EMPLOYEE);
+            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.EMPLOYEE);
             roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.PARAMEDIC);
             roleOrder.addRule(RoleName.PARAMEDIC, RoleName.USER);
             roleOrder.addRule(RoleName.DISPATCHER, RoleName.USER);
@@ -106,6 +112,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return expressionHandler;
     }
 
+    @Bean
+    public MaptilerConstants maptilerConstants() {
+        return new MaptilerConstants();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
@@ -116,6 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/hello/user/**").hasRole("USER")
                 .antMatchers("/hello/admin/**").hasRole("ADMIN")
+                .antMatchers("/hello/dispatch/create").permitAll()
                 .antMatchers("/allergy").permitAll()
                 .antMatchers("/allergy/**").permitAll()
                 .antMatchers("/trusted/**").permitAll()
@@ -125,6 +137,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/disease/**").permitAll()
                 .antMatchers("/equipment/**").permitAll()
                 .antMatchers("/tutorial/**").permitAll()
+                .antMatchers("/dispatch/**").hasRole("DISPATCHER")
+                .antMatchers("/employee/**").hasRole("EMPLOYEE")
+                .antMatchers("/incident/**").hasRole("EMPLOYEE")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/accident_report/**").permitAll()
+
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

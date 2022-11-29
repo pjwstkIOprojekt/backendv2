@@ -2,7 +2,10 @@ package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.EquipmentInAmbulanceRequest;
+import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
 import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
+import com.gary.backendv2.model.dto.response.AmbulanceResponse;
+import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.service.AmbulanceService;
 import com.gary.backendv2.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
@@ -38,14 +41,24 @@ public class AmbulanceController {
         return ResponseEntity.ok(ambulanceService.getAmbulanceCurrentState(licensePlate));
     }
 
-    @PostMapping("/{licensePlate}/state")
-    public ResponseEntity<?> changeAmbulanceState(@PathVariable String licensePlate, @RequestBody @Valid UpdateAmbulanceStateRequest changeStateRequest) {
-        return ResponseEntity.ok(ambulanceService.changeAmbulanceState(licensePlate, changeStateRequest));
+    @GetMapping("/{licensePlate}/location/path")
+    public ResponseEntity<?> getAmbulancePath(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getAmbulancePath(licensePlate));
+    }
+
+    @PostMapping("/{licensePlate}/state/{state}")
+    public ResponseEntity<?> changeAmbulanceState(@PathVariable String licensePlate, @PathVariable AmbulanceStateType state) {
+        return ResponseEntity.ok(ambulanceService.changeAmbulanceState(licensePlate, state));
     }
 
     @PostMapping
     public ResponseEntity<?> addAmbulance(@RequestBody @Valid AddAmbulanceRequest addAmbulanceRequest) {
         return ResponseEntity.ok(ambulanceService.addAmbulance(addAmbulanceRequest));
+    }
+
+    @PostMapping("/{licensePlate}/location")
+    public void postLocation(@PathVariable String licensePlate, @Valid @RequestBody PostAmbulanceLocationRequest postAmbulanceLocationRequest) {
+        ambulanceService.addGeoLocation(licensePlate, postAmbulanceLocationRequest);
     }
 
     @PutMapping

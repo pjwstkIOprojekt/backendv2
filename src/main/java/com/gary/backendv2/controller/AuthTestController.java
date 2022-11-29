@@ -1,13 +1,25 @@
 package com.gary.backendv2.controller;
 
+import com.gary.backendv2.model.Dispatcher;
+import com.gary.backendv2.model.enums.RoleName;
+import com.gary.backendv2.model.security.Role;
+import com.gary.backendv2.repository.RoleRepository;
+import com.gary.backendv2.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Set;
 
 
 @RestController
