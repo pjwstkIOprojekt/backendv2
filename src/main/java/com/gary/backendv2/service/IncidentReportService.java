@@ -54,7 +54,7 @@ public class IncidentReportService {
 
 	public IncidentReportResponse getById(Integer id){
 		Optional<IncidentReport> accidentReportOptional = incidentReportRepository.findByAccidentId(id);
-		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident report with id %s not found", id));
 		IncidentReport incidentReport = accidentReportOptional.get();
 
 		return IncidentReportResponse.of(incidentReport);
@@ -92,7 +92,7 @@ public class IncidentReportService {
 
 	public void updateById(Integer id, AccidentReportUpdateRequest accidentReportUpdateRequest){
 		Optional<IncidentReport> accidentReportOptional = incidentReportRepository.findByAccidentId(id);
-		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident report with id %s not found", id));
 		IncidentReport incidentReport = accidentReportOptional.get();
 		incidentReport.setBreathing(accidentReportUpdateRequest.isBreathing());
 		incidentReport.setDescription(accidentReportUpdateRequest.getDescription());
@@ -106,7 +106,7 @@ public class IncidentReportService {
 
 	public void deleteById(Integer id){
 		Optional<IncidentReport> accidentReportOptional = incidentReportRepository.findByAccidentId(id);
-		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Accident report with id %s not found", id));
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident report with id %s not found", id));
 		incidentReportRepository.delete(accidentReportOptional.get());
 	}
 }
