@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccidentReport {
+public class IncidentReport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer accidentId;
@@ -22,6 +22,8 @@ public class AccidentReport {
 
 	@Embedded
 	private Location location;
+
+	private String address;
 
 	private String bandCode;
 

@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController()
 @RequestMapping(path = "/enum")
@@ -47,4 +45,7 @@ public class EnumController {
 
 	@GetMapping("/roles")
 	public List<String> getRoles() {return EnumUtils.getEnumValues(RoleName.class);}
+
+	@GetMapping("/incident_status")
+	public List<String> getIncidentStatuses() {return  EnumUtils.getEnumValues(IncidentStatusType.class);}
 }
