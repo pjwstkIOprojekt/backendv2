@@ -21,7 +21,7 @@ public class Incident {
 	private IncidentStatusType incidentStatusType;
 	private String reactionJustification;
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "incident")
-	private AccidentReport accidentReport;
+	private IncidentReport incidentReport;
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Dispatcher dispatcher;
 	@ManyToMany(mappedBy = "incidents")
