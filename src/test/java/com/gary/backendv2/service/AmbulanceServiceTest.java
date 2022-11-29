@@ -16,10 +16,7 @@ import com.gary.backendv2.repository.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +31,12 @@ class AmbulanceServiceTest {
 
     @Test
     void getAllAmbulances() {
-        List<Ambulance> expected = List.of(new Ambulance());
+        Ambulance ambulance = new Ambulance();
+        AmbulanceHistory ambulanceHistory = new AmbulanceHistory();
+        AmbulanceState ambulanceState = new AmbulanceState();
+        ambulanceHistory.getAmbulanceStates().add(ambulanceState);
+        ambulance.setAmbulanceHistory(ambulanceHistory);
+        List<Ambulance> expected = List.of(ambulance);
 
         when(ambulanceRepository.findAll()).thenReturn(expected);
 
