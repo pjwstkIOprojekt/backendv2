@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface DispatcherRepository extends JpaRepository<Dispatcher, Integer> {
-	List<Dispatcher> getAllByWorking(Boolean isWorking);
 }
