@@ -47,5 +47,5 @@ public class User {
     private Set<Review> reviewSet;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "reporter")
-    private Set<AccidentReport> accidentReports;
+    private Set<IncidentReport> incidentReports;
 }
