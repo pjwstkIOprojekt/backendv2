@@ -13,5 +13,5 @@ public class IncidentResponse {
 	private Integer dangerScale;
 	private IncidentStatusType incidentStatusType;
 	private String reactionJustification;
-	private AccidentReportResponse accidentReport;
+	private IncidentReportResponse accidentReport;
 }

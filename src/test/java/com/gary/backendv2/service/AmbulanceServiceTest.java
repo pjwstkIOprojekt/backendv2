@@ -16,32 +16,45 @@ import com.gary.backendv2.repository.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AmbulanceServiceTest {
+    private final ItemService itemService = mock(ItemService.class);
     private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
     private final AmbulanceStateRepository ambulanceStateRepository = mock(AmbulanceStateRepository.class);
     private final AmbulanceHistoryRepository ambulanceHistoryRepository = mock(AmbulanceHistoryRepository.class);
-
     private final AmbulanceLocationRepository ambulanceLocationRepository = mock(AmbulanceLocationRepository.class);
-    private final AmbulanceService ambulanceService = new AmbulanceService(ambulanceRepository, ambulanceStateRepository, ambulanceHistoryRepository, ambulanceLocationRepository);
+    private final ItemRepository itemRepository = mock(ItemRepository.class);
+    private final ItemContainerRepository itemContainerRepository = mock(ItemContainerRepository.class);
+    private final InventoryRepository inventoryRepository = mock(InventoryRepository.class);
+    private final AmbulanceService ambulanceService = new AmbulanceService(
+            itemService,
+            ambulanceRepository,
+            ambulanceStateRepository,
+            ambulanceHistoryRepository,
+            ambulanceLocationRepository,
+            itemRepository,
+            itemContainerRepository,
+            inventoryRepository);
 
 
     @Test
     void getAllAmbulances() {
-        List<Ambulance> expected = List.of(new Ambulance());
+        Ambulance ambulance = new Ambulance();
+        AmbulanceHistory ambulanceHistory = new AmbulanceHistory();
+        AmbulanceState ambulanceState = new AmbulanceState();
+        ambulanceHistory.getAmbulanceStates().add(ambulanceState);
+        ambulance.setAmbulanceHistory(ambulanceHistory);
+        List<Ambulance> expected = List.of(ambulance);
 
         when(ambulanceRepository.findAll()).thenReturn(expected);
 
 
-        var result = ambulanceRepository.findAll();
+        var result = ambulanceService.getAllAmbulances();
 
         assertEquals(expected.size(), result.size());
     }

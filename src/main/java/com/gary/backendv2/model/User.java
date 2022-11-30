@@ -48,5 +48,4 @@ public class User {
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "reporter")
     private Set<AccidentReport> accidentReports;
-
 }

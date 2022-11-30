@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class AccidentReportRequest {
+public class IncidentReportRequest {
 	@Email
 	private String email;
 	private String bandCode;
