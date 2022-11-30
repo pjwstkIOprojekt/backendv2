@@ -16,7 +16,6 @@ import java.util.Set;
 public class Ambulance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ambulance_id")
     private Integer ambulanceId;
 
     @Enumerated(EnumType.STRING)
@@ -46,11 +45,6 @@ public class Ambulance {
 
     @Transient
     private AmbulanceState currentState;
-
-
-    @OneToMany(mappedBy = "ambulance",cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<EquipmentInAmbulance> equipmentInAmbulances;
 
     public AmbulanceState getCurrentState() {
         return ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);

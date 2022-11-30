@@ -1,13 +1,9 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
-import com.gary.backendv2.model.dto.request.EquipmentInAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
-import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
-import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.service.AmbulanceService;
-import com.gary.backendv2.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +15,6 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AmbulanceController {
     private final AmbulanceService ambulanceService;
-    private final EquipmentService equipmentService;
 
     @GetMapping
     public ResponseEntity<?> getAllAmbulances() {
@@ -70,23 +65,4 @@ public class AmbulanceController {
     public void deleteAmbulance(@PathVariable String licensePlate) {
         ambulanceService.deleteAmbulance(licensePlate);
     }
-
-    @GetMapping("/{licensePlate}/equipment")
-    public ResponseEntity<?> getEquipmentinAmbylance(@PathVariable String licensePlate) {
-        return ResponseEntity.ok(equipmentService.getEquipmentInAmbulance(licensePlate));
-    }
-
-    @PostMapping("/{licencePlate}/{equipmentId}")
-    public void addEquipmentToAmbulance(@PathVariable String licencePlate,@PathVariable Integer equipmentId, @RequestBody EquipmentInAmbulanceRequest equipmentInAmbulanceRequest) {
-        equipmentService.addEquipmentToAmbulance(licencePlate, equipmentId, equipmentInAmbulanceRequest);
-    }
-
-    @DeleteMapping("/{licencePlate}/{equipmentId}")
-    public void deleteEquipmentFromAmbulance(@PathVariable String licencePlate,@PathVariable Integer equipmentId) {
-        equipmentService.deleteEquipmentFromAmbulance(licencePlate,equipmentId);
-    }
-
-
-
-
 }

@@ -214,7 +214,6 @@ public class AmbulanceService {
         ambulance.setLocation(locationAnyNull ? Location.defaultLocation() : Location.of(addRequest.getLongitude(), addRequest.getLatitude()));
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
-        ambulance.setEquipmentInAmbulances(new HashSet<>());
         return ambulance;
     }
 
