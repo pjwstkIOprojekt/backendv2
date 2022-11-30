@@ -36,7 +36,6 @@ public class AmbulanceService {
     private final AmbulanceStateRepository ambulanceStateRepository;
     private final AmbulanceHistoryRepository ambulanceHistoryRepository;
     private final AmbulanceLocationRepository ambulanceLocationRepository;
-
     private final ItemRepository itemRepository;
     private final ItemContainerRepository itemContainerRepository;
     private final InventoryRepository inventoryRepository;
