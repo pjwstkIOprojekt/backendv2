@@ -23,12 +23,23 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AmbulanceServiceTest {
+    private final ItemService itemService = mock(ItemService.class);
     private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
     private final AmbulanceStateRepository ambulanceStateRepository = mock(AmbulanceStateRepository.class);
     private final AmbulanceHistoryRepository ambulanceHistoryRepository = mock(AmbulanceHistoryRepository.class);
-
     private final AmbulanceLocationRepository ambulanceLocationRepository = mock(AmbulanceLocationRepository.class);
-    private final AmbulanceService ambulanceService = new AmbulanceService(ambulanceRepository, ambulanceStateRepository, ambulanceHistoryRepository, ambulanceLocationRepository);
+    private final ItemRepository itemRepository = mock(ItemRepository.class);
+    private final ItemContainerRepository itemContainerRepository = mock(ItemContainerRepository.class);
+    private final InventoryRepository inventoryRepository = mock(InventoryRepository.class);
+    private final AmbulanceService ambulanceService = new AmbulanceService(
+            itemService,
+            ambulanceRepository,
+            ambulanceStateRepository,
+            ambulanceHistoryRepository,
+            ambulanceLocationRepository,
+            itemRepository,
+            itemContainerRepository,
+            inventoryRepository);
 
 
     @Test

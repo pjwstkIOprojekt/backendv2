@@ -2,6 +2,7 @@ package com.gary.backendv2.model;
 
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceType;
+import com.gary.backendv2.model.inventory.Inventory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,6 +45,10 @@ public class Ambulance {
 
     @Transient
     private AmbulanceState currentState;
+
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "inventory_id")
+    private Inventory inventory;
 
     public AmbulanceState getCurrentState() {
         return ambulanceHistory.getAmbulanceStates().get(ambulanceHistory.getAmbulanceStates().size() - 1);
