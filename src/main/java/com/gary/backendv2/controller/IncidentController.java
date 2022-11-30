@@ -1,6 +1,7 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.dto.request.IncidentRequest;
+import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.service.IncidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,11 @@ public class IncidentController {
 		return ResponseEntity.ok(incidentService.getById(id));
 	}
 
+	@GetMapping("/status/{status}")
+	public ResponseEntity<?> getByStatus (@PathVariable IncidentStatusType status){
+		return ResponseEntity.ok(incidentService.getByStatus(status));
+	}
+
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid IncidentRequest incidentRequest){
 		incidentService.update(id, incidentRequest);
@@ -41,5 +47,11 @@ public class IncidentController {
 	public ResponseEntity<?> addAmbulances(@PathVariable Integer id, @RequestBody List<String> licencePlates){
 		incidentService.addAmbulances(id, licencePlates);
 		return ResponseEntity.ok("Ambulances assigned successfully to incident");
+	}
+
+	@PostMapping("/{id}/status/{status}")
+	public ResponseEntity<?> changeStatus(@PathVariable Integer id, @PathVariable IncidentStatusType status){
+		incidentService.changeIncidentStatus(id, status);
+		return ResponseEntity.ok("Status successfully changed");
 	}
 }
