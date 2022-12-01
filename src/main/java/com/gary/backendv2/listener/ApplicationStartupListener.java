@@ -5,8 +5,7 @@ import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.dto.request.SignupRequest;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
-import com.gary.backendv2.repository.RoleRepository;
-import com.gary.backendv2.repository.UserRepository;
+import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +31,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     PasswordEncoder passwordEncoder;
     @Autowired
     ApplicationContext applicationContext;
-
     @Autowired
     AuthService authService;
 
@@ -44,7 +41,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-       try {
+
+
+        try {
            createRoles();
        } catch (RuntimeException e) {
            log.info(e.getMessage());

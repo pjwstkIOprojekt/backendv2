@@ -180,7 +180,7 @@ public class IncidentService {
 	}
 
 	private void assignDispatcher(Incident incident){
-		List<Dispatcher> dispatchers = dispatcherRepository.getAllByWorking(true);
+		List<Dispatcher> dispatchers = getAllByWorking();
 		if(dispatchers.size() == 0){
 			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "There is no dispatcher on duty");
 		}
@@ -201,5 +201,14 @@ public class IncidentService {
 		changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
 		incidentRepository.save(incident);
 		dispatcherRepository.save(dispatcher);
+	}
+
+	private List<Dispatcher> getAllByWorking(){
+		List<Dispatcher> dispatchers = new ArrayList<>();
+
+		for(Dispatcher d: dispatcherRepository.findAll()){
+			if(d.getWorking()) dispatchers.add(d);
+		}
+		return dispatchers;
 	}
 }
