@@ -1,6 +1,7 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.Incident;
 import com.gary.backendv2.model.IncidentReport;
 import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.repository.IncidentReportRepository;
@@ -12,8 +13,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 public class IncidentReportServiceTest {
 	private final IncidentReportRepository incidentReportRepository = mock(IncidentReportRepository.class);
@@ -58,5 +59,15 @@ public class IncidentReportServiceTest {
 		String actualMessage = exception.getMessage();
 
 		assertTrue(actualMessage.contains(expectedMessage));
+	}
+	@Test
+	void removeIncidentRaport(){
+
+		int id = 2137;
+		IncidentReport incidentReport = new IncidentReport();
+		when(incidentReportRepository.findByAccidentId(id)).thenReturn(Optional.of(incidentReport));
+		incidentReportService.deleteById(id);
+		verify(incidentReportRepository,times(1)).delete(any(IncidentReport.class));
+
 	}
 }

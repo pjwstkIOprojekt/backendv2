@@ -106,7 +106,7 @@ public class MedicalInfoServiceTest {
 
         medicalInfoService.removeBlood(id);
 
-        verify(medicalInfoRepository, times(1)).save(any(MedicalInfo.class));
+        verify(medicalInfoRepository, times(1)).delete(any(MedicalInfo.class));
 
     }
 
