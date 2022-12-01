@@ -110,10 +110,10 @@ public class TutorialService {
         User u = optionalUser.get();
 
         Review review = Review.builder()
-                .user(u)
+                .reviewer(u)
                 .tutorial(t)
                 .value(reviewRequest.getValue())
-                .discription(reviewRequest.getDiscription())
+                .reviewDescription(reviewRequest.getDiscription())
                 .build();
 
         u.getReviewSet().add(review);
@@ -144,6 +144,11 @@ public class TutorialService {
         }
         Review review = optionalReview.get();
 
+        // delete only if delete request comes from poster or an admin TODO: admin branch not implemented yet
+        if (!review.getReviewer().getUserId().equals(user.getUserId())) {
+            return;
+        }
+
         user.getReviewSet().remove(review);
         tutorial.getReviewSet().remove(review);
         userRepository.save(user);
@@ -159,7 +164,7 @@ public class TutorialService {
         }
         Review review = optionalReview.get();
         review.setValue(reviewRequest.getValue());
-        review.setDiscription(review.getDiscription());
+        review.setReviewDescription(review.getReviewDescription());
         reviewRepository.save(review);
     }
 

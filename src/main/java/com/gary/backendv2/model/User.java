@@ -42,7 +42,7 @@ public class User {
     private TrustedPerson trustedPerson;
 
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "reviewer")
     @JsonIgnore
     private Set<Review> reviewSet;
 

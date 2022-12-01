@@ -24,22 +24,22 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User reviewer;
 
     private Double value;
 
-    private String discription;
+    private String reviewDescription;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review = (Review) o;
-        return Objects.equals(id, review.id) && Objects.equals(tutorial, review.tutorial) && Objects.equals(user, review.user) && Objects.equals(value, review.value) && Objects.equals(discription, review.discription);
+        return Objects.equals(id, review.id) && Objects.equals(tutorial, review.tutorial) && Objects.equals(reviewer, review.reviewer) && Objects.equals(value, review.value) && Objects.equals(reviewDescription, review.reviewDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tutorial, user, value, discription);
+        return Objects.hash(id, tutorial, reviewer, value, reviewDescription);
     }
 }
