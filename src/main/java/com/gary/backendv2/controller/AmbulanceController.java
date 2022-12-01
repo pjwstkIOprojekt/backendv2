@@ -2,8 +2,6 @@ package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
-import com.gary.backendv2.model.dto.request.UpdateAmbulanceStateRequest;
-import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.service.AmbulanceService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
@@ -136,6 +135,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/medical_info/**").permitAll()
                 .antMatchers("/ambulance/**").permitAll()
                 .antMatchers("/disease/**").permitAll()
+                .antMatchers("/equipment/**").permitAll()
+                .antMatchers("/tutorial/**").permitAll()
                 .antMatchers("/dispatch/**").hasRole("DISPATCHER")
                 .antMatchers("/employee/**").hasRole("EMPLOYEE")
                 .antMatchers("/incident/**").hasRole("EMPLOYEE")
