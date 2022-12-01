@@ -1,12 +1,10 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.exception.NotFoundException;
-import com.gary.backendv2.model.Allergy;
-import com.gary.backendv2.model.Ambulance;
+import com.gary.backendv2.model.ambulance.Ambulance;
 
-import com.gary.backendv2.model.AmbulanceHistory;
-import com.gary.backendv2.model.AmbulanceState;
+import com.gary.backendv2.model.ambulance.AmbulanceHistory;
+import com.gary.backendv2.model.ambulance.AmbulanceState;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.enums.AmbulanceClass;

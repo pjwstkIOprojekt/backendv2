@@ -9,15 +9,9 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class TutorialRequest {
-
-
     Integer tutorialId;
-
     @NotBlank
     String name;
-
-    @Enumerated(EnumType.STRING)
     TutorialType tutorialType;
-
     String tutorialHTML;
 }

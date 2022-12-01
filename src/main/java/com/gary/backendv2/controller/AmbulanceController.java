@@ -52,7 +52,7 @@ public class AmbulanceController {
     @Operation(summary = "Adds items to the ambulance if count not provided adds one")
     @PostMapping("/{licensePlate}/items/add/{itemId}")
     public void addItem(@PathVariable String licensePlate, @PathVariable Integer itemId, @RequestParam(required = false) Integer count) {
-        if (count > 1) {
+        if (count != null && count > 1) {
             ambulanceService.addItems(licensePlate, itemId, count);
         } else ambulanceService.addItem(licensePlate, itemId);
     }

@@ -1,8 +1,8 @@
 package com.gary.backendv2.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
-import com.gary.backendv2.model.User;
-import com.gary.backendv2.model.dto.request.SignupRequest;
+import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.*;

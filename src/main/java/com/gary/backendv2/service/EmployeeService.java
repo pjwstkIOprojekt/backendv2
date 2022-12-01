@@ -1,11 +1,10 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.AbstractEmployee;
-import com.gary.backendv2.model.EmployeeShift;
-import com.gary.backendv2.model.MappedSchedule;
-import com.gary.backendv2.model.User;
-import com.gary.backendv2.model.security.UserPrincipal;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
+import com.gary.backendv2.model.users.employees.EmployeeShift;
+import com.gary.backendv2.model.users.employees.MappedSchedule;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.EmployeeShiftRepository;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.security.service.AuthService;

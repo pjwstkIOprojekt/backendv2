@@ -1,6 +1,6 @@
 package com.gary.backendv2.repository;
 
-import com.gary.backendv2.model.IncidentReport;
+import com.gary.backendv2.model.incident.IncidentReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

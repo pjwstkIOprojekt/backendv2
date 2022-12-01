@@ -1,6 +1,9 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gary.backendv2.model.incident.IncidentReport;
+import com.gary.backendv2.model.Review;
+import com.gary.backendv2.model.TrustedPerson;
 import com.gary.backendv2.model.security.Role;
 import lombok.*;
 

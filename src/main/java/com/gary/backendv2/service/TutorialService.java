@@ -3,7 +3,7 @@ package com.gary.backendv2.service;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.Tutorial;
-import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.ReviewRequest;
 import com.gary.backendv2.model.dto.request.TutorialRequest;
 import com.gary.backendv2.model.dto.response.TutorialResponse;

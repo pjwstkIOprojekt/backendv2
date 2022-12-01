@@ -1,5 +1,6 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users.employees;
 
+import com.gary.backendv2.model.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

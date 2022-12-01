@@ -1,6 +1,6 @@
 package com.gary.backendv2.repository;
 
-import com.gary.backendv2.model.Ambulance;
+import com.gary.backendv2.model.ambulance.Ambulance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
