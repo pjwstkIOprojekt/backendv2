@@ -32,9 +32,11 @@ public class Ambulance {
 
     private Integer seats;
 
-
     @Embedded
     private Location location ;
+
+    @OneToOne
+    private Crew crew;
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "history_id")

@@ -21,6 +21,7 @@ import com.gary.backendv2.repository.RoleRepository;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.repository.WorkScheduleRepository;
 import com.gary.backendv2.utils.JwtUtils;
+import com.gary.backendv2.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -176,8 +177,7 @@ public class AuthService {
             workSchedule.setSchedule(getDefaultWorkSchedule());
             workSchedule.setCreatedAt(LocalDateTime.now());
         } else {
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String json = ow.writeValueAsString(employeeRequest.getWorkSchedule());
+            String json = Utils.POJOtoJsonString(employeeRequest.getWorkSchedule());
 
             workSchedule.setSchedule(json);
             workSchedule.setCreatedAt(LocalDateTime.now());

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ambulance")
@@ -70,6 +71,11 @@ public class AmbulanceController {
     @PostMapping("/{licensePlate}/location")
     public void postLocation(@PathVariable String licensePlate, @Valid @RequestBody PostAmbulanceLocationRequest postAmbulanceLocationRequest) {
         ambulanceService.addGeoLocation(licensePlate, postAmbulanceLocationRequest);
+    }
+
+    @PostMapping("/{licensePlate}/crew")
+    public void addMedics(@PathVariable String licensePlate, Integer[] medicIds) {
+        ambulanceService.assignMedics(licensePlate, List.of(medicIds));
     }
 
     @PutMapping
