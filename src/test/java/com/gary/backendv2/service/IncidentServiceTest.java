@@ -98,4 +98,25 @@ public class IncidentServiceTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
+    @Test
+    void updateShouldWork() {
+        int id = 2137;
+        Incident incident = new Incident();
+        IncidentRequest incidentRequest = new IncidentRequest();
+        incidentRequest.setDangerScale(3);
+        when(incidentRepository.findByIncidentId(id)).thenReturn(Optional.of(incident));
+        incidentService.update(id, incidentRequest);
+        verify(incidentRepository, times(1)).save(any(Incident.class));
+    }
+
+    @Test
+    void updateShouldFail() {
+        int id = 2137;
+        Incident incident = new Incident();
+        IncidentRequest incidentRequest = new IncidentRequest();
+        incidentRequest.setDangerScale(3);
+        Exception exc = assertThrows(HttpException.class, () -> {
+            incidentService.update(id, incidentRequest);
+        });
+    }
 }
