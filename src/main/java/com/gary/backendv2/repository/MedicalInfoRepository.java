@@ -1,6 +1,6 @@
 package com.gary.backendv2.repository;
 
-import com.gary.backendv2.model.MedicalInfo;
+import com.gary.backendv2.model.users.MedicalInfo;
 import com.gary.backendv2.model.enums.BloodType;
 import com.gary.backendv2.model.enums.RhType;
 import org.springframework.data.jpa.repository.JpaRepository;

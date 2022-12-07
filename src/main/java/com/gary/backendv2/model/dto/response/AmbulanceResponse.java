@@ -1,15 +1,12 @@
 package com.gary.backendv2.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.gary.backendv2.model.Ambulance;
-import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
+import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.AmbulanceType;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

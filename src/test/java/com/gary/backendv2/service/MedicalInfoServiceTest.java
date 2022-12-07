@@ -1,8 +1,8 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.MedicalInfo;
-import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.users.MedicalInfo;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.BloodRequest;
 import com.gary.backendv2.model.enums.BloodType;
 import com.gary.backendv2.model.enums.RhType;
@@ -13,7 +13,6 @@ import com.gary.backendv2.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

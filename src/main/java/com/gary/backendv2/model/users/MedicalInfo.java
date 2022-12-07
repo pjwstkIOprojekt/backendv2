@@ -1,7 +1,10 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users;
 
+import com.gary.backendv2.model.Allergy;
+import com.gary.backendv2.model.Disease;
 import com.gary.backendv2.model.enums.BloodType;
 import com.gary.backendv2.model.enums.RhType;
+import com.gary.backendv2.model.users.User;
 import lombok.*;
 
 import javax.persistence.*;

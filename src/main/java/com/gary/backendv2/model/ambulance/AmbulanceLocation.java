@@ -1,5 +1,6 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.ambulance;
 
+import com.gary.backendv2.model.Location;
 import lombok.Getter;
 import lombok.Setter;
 

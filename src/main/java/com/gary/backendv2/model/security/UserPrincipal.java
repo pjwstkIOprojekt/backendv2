@@ -1,6 +1,6 @@
 package com.gary.backendv2.model.security;
 
-import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.users.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

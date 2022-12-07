@@ -1,17 +1,16 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.exception.NotFoundException;
-import com.gary.backendv2.model.Allergy;
-import com.gary.backendv2.model.Ambulance;
+import com.gary.backendv2.model.ambulance.Ambulance;
 
-import com.gary.backendv2.model.AmbulanceHistory;
-import com.gary.backendv2.model.AmbulanceState;
+import com.gary.backendv2.model.ambulance.AmbulanceHistory;
+import com.gary.backendv2.model.ambulance.AmbulanceState;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.AmbulanceType;
+import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +30,8 @@ class AmbulanceServiceTest {
     private final ItemRepository itemRepository = mock(ItemRepository.class);
     private final ItemContainerRepository itemContainerRepository = mock(ItemContainerRepository.class);
     private final InventoryRepository inventoryRepository = mock(InventoryRepository.class);
+    private final CrewRepository crewRepository = mock(CrewRepository.class);
+    private final MedicRepository medicRepository = mock(MedicRepository.class);
     private final AmbulanceService ambulanceService = new AmbulanceService(
             itemService,
             ambulanceRepository,
@@ -39,7 +40,9 @@ class AmbulanceServiceTest {
             ambulanceLocationRepository,
             itemRepository,
             itemContainerRepository,
-            inventoryRepository);
+            inventoryRepository,
+            crewRepository,
+            medicRepository);
 
 
     @Test

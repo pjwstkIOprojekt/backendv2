@@ -1,10 +1,11 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.incident;
 
+import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.enums.*;
+import com.gary.backendv2.model.users.User;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter

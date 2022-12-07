@@ -4,6 +4,7 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.factories.ItemResponseFactoryProvider;
 import com.gary.backendv2.factories.asbtract.ItemResponseAbstractFactory;
 import com.gary.backendv2.model.*;
+import com.gary.backendv2.model.ambulance.*;
 import com.gary.backendv2.model.dto.PathElement;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
@@ -13,8 +14,7 @@ import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.model.inventory.items.Item;
-import com.gary.backendv2.model.inventory.items.MedicineItem;
-import com.gary.backendv2.model.inventory.items.SingleUseItem;
+import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.utils.ItemUtils;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +39,8 @@ public class AmbulanceService {
     private final ItemRepository itemRepository;
     private final ItemContainerRepository itemContainerRepository;
     private final InventoryRepository inventoryRepository;
+    private final CrewRepository crewRepository;
+    private final MedicRepository medicRepository;
 
     public List<AmbulanceResponse> getAllAmbulances() {
         List<Ambulance> all = ambulanceRepository.findAll();
@@ -83,6 +85,29 @@ public class AmbulanceService {
         ambulanceStateResponse.setTimestamp(currentState.getTimestamp());
 
         return ambulanceStateResponse;
+    }
+
+
+    public void assignMedics(String licensePlate, List<Integer> medicIds) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
+        }
+
+        Crew crew = null;
+        Ambulance ambulance = ambulanceOptional.get();
+        if (ambulance.getCrew() == null) {
+            crew = crewRepository.save(new Crew());
+            ambulance.setCrew(crew);
+        }
+
+        crew = ambulance.getCrew();
+
+        List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
+
+        crew.getMedics().addAll(medics);
+
+        crewRepository.save(crew);
     }
 
     public AmbulanceResponse addAmbulance(AddAmbulanceRequest addRequest) {

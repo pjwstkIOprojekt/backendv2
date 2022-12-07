@@ -1,7 +1,6 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users.employees;
 
 import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;

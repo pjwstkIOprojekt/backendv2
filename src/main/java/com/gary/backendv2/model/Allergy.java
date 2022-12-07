@@ -1,4 +1,5 @@
 package com.gary.backendv2.model;
+import com.gary.backendv2.model.users.MedicalInfo;
 import lombok.*;
 
 import com.gary.backendv2.model.enums.AllergyType;

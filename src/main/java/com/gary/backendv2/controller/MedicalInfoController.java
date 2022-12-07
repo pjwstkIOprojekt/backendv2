@@ -1,6 +1,5 @@
 package com.gary.backendv2.controller;
 
-import com.gary.backendv2.model.MedicalInfo;
 import com.gary.backendv2.model.dto.request.BloodRequest;
 import com.gary.backendv2.service.MedicalInfoService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import java.util.List;
 
 @RestController()
 @RequestMapping(path = "/medical_info")

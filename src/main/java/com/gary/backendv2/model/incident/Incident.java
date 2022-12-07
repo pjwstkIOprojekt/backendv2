@@ -1,6 +1,8 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.incident;
 
+import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.enums.IncidentStatusType;
+import com.gary.backendv2.model.users.employees.Dispatcher;
 import lombok.*;
 
 import javax.persistence.*;

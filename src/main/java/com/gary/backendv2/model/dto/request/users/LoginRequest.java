@@ -1,4 +1,4 @@
-package com.gary.backendv2.model.dto.request;
+package com.gary.backendv2.model.dto.request.users;
 
 import lombok.Getter;
 import lombok.Setter;

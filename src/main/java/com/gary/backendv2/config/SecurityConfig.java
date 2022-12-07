@@ -88,9 +88,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             roleOrder.addRule(RoleName.ADMIN, RoleName.DISPATCHER);
             roleOrder.addRule(RoleName.DISPATCHER, RoleName.EMPLOYEE);
             roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.EMPLOYEE);
-            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.EMPLOYEE);
-            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.PARAMEDIC);
-            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.USER);
+            roleOrder.addRule(RoleName.MEDIC, RoleName.EMPLOYEE);
+            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.MEDIC);
+            roleOrder.addRule(RoleName.MEDIC, RoleName.USER);
             roleOrder.addRule(RoleName.DISPATCHER, RoleName.USER);
         } catch (Exception e) {
             log.error(e.getMessage());

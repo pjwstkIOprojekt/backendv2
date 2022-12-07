@@ -1,11 +1,9 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.exception.NotFoundException;
-import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.Disease;
-import com.gary.backendv2.model.MedicalInfo;
-import com.gary.backendv2.model.User;
+import com.gary.backendv2.model.users.MedicalInfo;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.DiseaseRequest;
 import com.gary.backendv2.model.dto.response.DiseaseResponse;
 import com.gary.backendv2.repository.DiseaseRepository;

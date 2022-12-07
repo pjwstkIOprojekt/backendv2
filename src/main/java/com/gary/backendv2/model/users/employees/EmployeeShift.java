@@ -1,12 +1,10 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users.employees;
 
-import com.vladmihalcea.hibernate.type.array.LocalDateArrayType;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Getter
 @Setter
