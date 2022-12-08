@@ -2,8 +2,7 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.TrustedPerson;
-import com.gary.backendv2.model.User;
-import com.gary.backendv2.model.dto.request.AllergyRequest;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.TrustedPersonRequest;
 import com.gary.backendv2.model.dto.response.TrustedPersonResponse;
 import com.gary.backendv2.repository.TrustedPersonRepository;

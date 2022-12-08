@@ -1,7 +1,6 @@
 package com.gary.backendv2.model.security;
 
-import com.gary.backendv2.model.User;
-import com.gary.backendv2.model.enums.RoleName;
+import com.gary.backendv2.model.users.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;

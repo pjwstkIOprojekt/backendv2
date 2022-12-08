@@ -1,6 +1,5 @@
 package com.gary.backendv2.utils;
 
-import com.gary.backendv2.model.User;
 import com.gary.backendv2.model.security.UserPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

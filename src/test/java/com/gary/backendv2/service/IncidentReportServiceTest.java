@@ -1,7 +1,7 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.IncidentReport;
+import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.repository.IncidentReportRepository;
 import com.gary.backendv2.repository.UserRepository;

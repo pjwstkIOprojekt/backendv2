@@ -1,5 +1,6 @@
 package com.gary.backendv2.model;
 
+import com.gary.backendv2.model.users.User;
 import lombok.*;
 
 import javax.persistence.*;

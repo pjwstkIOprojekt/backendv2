@@ -4,21 +4,23 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.factories.ItemResponseFactoryProvider;
 import com.gary.backendv2.factories.asbtract.ItemResponseAbstractFactory;
 import com.gary.backendv2.model.*;
+import com.gary.backendv2.model.ambulance.*;
 import com.gary.backendv2.model.dto.PathElement;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
 import com.gary.backendv2.model.dto.response.*;
 import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
+import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.model.inventory.items.Item;
-import com.gary.backendv2.model.inventory.items.MedicineItem;
-import com.gary.backendv2.model.inventory.items.SingleUseItem;
+import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.utils.ItemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,8 @@ public class AmbulanceService {
     private final ItemRepository itemRepository;
     private final ItemContainerRepository itemContainerRepository;
     private final InventoryRepository inventoryRepository;
+    private final CrewRepository crewRepository;
+    private final MedicRepository medicRepository;
 
     public List<AmbulanceResponse> getAllAmbulances() {
         List<Ambulance> all = ambulanceRepository.findAll();
@@ -51,17 +55,15 @@ public class AmbulanceService {
     }
 
     public AmbulanceResponse getAmbulanceByLicensePlate(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
-        else return AmbulanceResponse.of(ambulanceOptional.get());
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        return AmbulanceResponse.of(ambulance);
     }
 
     public AmbulanceHistoryResponse getAmbulanceHistory(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
+        Ambulance ambulance = getAmbulance(licensePlate);
 
         AmbulanceHistoryResponse ambulanceHistoryResponse = new AmbulanceHistoryResponse();
-        Ambulance ambulance = ambulanceOptional.get();
         Set<AmbulanceStateResponse> ambulanceStateResponseSet = populateStateResponseSet(ambulance);
 
         ambulanceHistoryResponse.setLicensePlate(ambulance.getLicensePlate());
@@ -71,10 +73,8 @@ public class AmbulanceService {
     }
 
     public AmbulanceStateResponse getAmbulanceCurrentState(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
+        Ambulance ambulance = getAmbulance(licensePlate);
 
-        Ambulance ambulance = ambulanceOptional.get();
         ambulance.findCurrentState();
         AmbulanceState currentState = ambulance.getCurrentState();
 
@@ -83,6 +83,50 @@ public class AmbulanceService {
         ambulanceStateResponse.setTimestamp(currentState.getTimestamp());
 
         return ambulanceStateResponse;
+    }
+
+    public List<MedicResponse> getCrewMedics(String licensePlate) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Crew crew = ambulance.getCrew();
+        if (crew == null) {
+            return Collections.emptyList();
+        }
+        Set<Medic> medics = crew.getMedics();
+
+        List<MedicResponse> medicResponses = new ArrayList<>();
+        medics.forEach(x -> {
+            MedicResponse medicResponse = new MedicResponse();
+            medicResponse.setEmail(x.getEmail());
+            medicResponse.setFirstName(x.getFirstName());
+            medicResponse.setLastName(x.getLastName());
+            medicResponse.setUserId(x.getUserId());
+
+            medicResponses.add(medicResponse);
+        });
+
+        return medicResponses;
+    }
+
+    public void assignMedics(String licensePlate, List<Integer> medicIds) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
+        if (medics.isEmpty()) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, String.format(", User with ids of: %s are not medics", medicIds));
+        }
+
+        Crew crew = null;
+        if (ambulance.getCrew() == null) {
+            crew = crewRepository.save(new Crew());
+            ambulance.setCrew(crew);
+        }
+
+        crew = ambulance.getCrew();
+
+        crew.getMedics().addAll(medics);
+
+        crewRepository.save(crew);
     }
 
     public AmbulanceResponse addAmbulance(AddAmbulanceRequest addRequest) {
@@ -95,10 +139,7 @@ public class AmbulanceService {
     }
 
     public AmbulanceStateResponse changeAmbulanceState(String licensePlate, AmbulanceStateType newState) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
-
-        Ambulance ambulance = ambulanceOptional.get();
+        Ambulance ambulance = getAmbulance(licensePlate);
 
         AmbulanceState currentState =  ambulance.getCurrentState();
         if (currentState.getStateType() == newState) {
@@ -126,10 +167,7 @@ public class AmbulanceService {
     }
 
     public void updateAmbulance(AddAmbulanceRequest addAmbulanceRequest) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(addAmbulanceRequest.getLicensePlate());
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", addAmbulanceRequest.getLicensePlate()));
-
-        Ambulance ambulance = ambulanceOptional.get();
+        Ambulance ambulance = getAmbulance(addAmbulanceRequest.getLicensePlate());
 
         ambulance.setLicensePlate(addAmbulanceRequest.getLicensePlate());
         ambulance.setAmbulanceType(addAmbulanceRequest.getAmbulanceType());
@@ -140,18 +178,14 @@ public class AmbulanceService {
     }
 
     public void deleteAmbulance(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
+        Ambulance ambulance = getAmbulance(licensePlate);
 
-        ambulanceRepository.delete(ambulanceOptional.get());
+        ambulanceRepository.delete(ambulance);
     }
 
     public void addGeoLocation(String licensePlate, PostAmbulanceLocationRequest newLocation) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND);
-        }
-        Ambulance ambulance = ambulanceOptional.get();
+        Ambulance ambulance = getAmbulance(licensePlate);
+
 
         if (ambulance.getCurrentState().getStateType() == AmbulanceStateType.ON_ACTION) {
             AmbulanceLocation ambulanceLocation = new AmbulanceLocation();
@@ -164,12 +198,8 @@ public class AmbulanceService {
     }
 
     public void addItem(String licensePlate, Integer itemId) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND);
-        }
+        Ambulance ambulance = getAmbulance(licensePlate);
 
-        Ambulance ambulance = ambulanceOptional.get();
         Inventory inventory = ambulance.getInventory();
 
         Map<Integer, ItemContainer> itemsInInventory = inventory.getItems();
@@ -194,12 +224,8 @@ public class AmbulanceService {
     }
 
     public void addItems(String licensePlate, Integer itemId, Integer count) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND);
-        }
+        Ambulance ambulance = getAmbulance(licensePlate);
 
-        Ambulance ambulance = ambulanceOptional.get();
         Inventory inventory = ambulance.getInventory();
 
         Map<Integer, ItemContainer> itemsInInventory = inventory.getItems();
@@ -224,14 +250,10 @@ public class AmbulanceService {
     }
 
     public List<EquipmentResponse> getItems(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND);
-        }
+        Ambulance ambulance = getAmbulance(licensePlate);
 
         List<EquipmentResponse> responseList = new ArrayList<>();
 
-        Ambulance ambulance = ambulanceOptional.get();
         var itemsMap = ambulance.getInventory().getItems();
         List<Integer> itemIds = new ArrayList<>(itemsMap.keySet());
 
@@ -254,12 +276,50 @@ public class AmbulanceService {
         return Collections.emptyList();
     }
 
-    public AmbulancePathResponse getAmbulancePath(String licensePlate) {
-        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
-        if (ambulanceOptional.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND);
+    public void removeItemById(String licensePlate, Integer itemId, Integer count) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Inventory inventory = ambulance.getInventory();
+        ItemContainer container = inventory.getItems().get(itemId);
+        if (count != null && count > 1) {
+            if (container.getCount() >= count) {
+                container.removeMultiple(count);
+            } else {
+                throw new HttpException(HttpStatus.BAD_REQUEST, String.format("Requested to delete more items of id %s than there is (Item count -> %s > %s <- Requested count)", itemId, count, container.getCount()));
+            }
+        } else {
+            container.decrementCount();
         }
-        Ambulance ambulance = ambulanceOptional.get();
+
+        ambulanceRepository.save(ambulance);
+    }
+
+    public void removeAllItemById(String licensePlate, Integer itemId) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Inventory inventory = ambulance.getInventory();
+        ItemContainer container = inventory.getItems().get(itemId);
+
+        container.removeMultiple(container.getCount());
+
+        ambulanceRepository.save(ambulance);
+    }
+
+    public void clearInventory(String licensePlate) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Inventory inventory = ambulance.getInventory();
+
+        for (Map.Entry<Integer, ItemContainer> kv : inventory.getItems().entrySet()) {
+            ItemContainer container = kv.getValue();
+            container.removeMultiple(kv.getValue().getCount());
+        }
+
+        ambulanceRepository.save(ambulance);
+    }
+
+    public AmbulancePathResponse getAmbulancePath(String licensePlate) {
+        Ambulance ambulance = getAmbulance(licensePlate);
 
         List<AmbulanceLocation> ambulanceLocations = ambulanceLocationRepository.getAmbulanceLocationByAmbulance_LicensePlate(ambulance.getLicensePlate());
 
@@ -315,6 +375,15 @@ public class AmbulanceService {
         ambulance.setInventory(inventory);
 
         return ambulance;
+    }
+
+    private Ambulance getAmbulance(String licensePlate) {
+        Optional<Ambulance> ambulanceOptional = ambulanceRepository.findByLicensePlate(licensePlate);
+        if (ambulanceOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s not found", licensePlate));
+        }
+
+        return ambulanceOptional.get();
     }
 
 }

@@ -1,13 +1,16 @@
 package com.gary.backendv2.controller;
 
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
+import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
+import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
 import com.gary.backendv2.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/employee")
@@ -30,4 +33,14 @@ public class LoggedEmployeeController {
     }
 
 
+    @PostMapping("/schedule/update")
+    @Operation(summary = "Change logged user's work schedule", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> changeSchedule(@RequestBody UpdateWorkScheduleRequest workSchedule, Authentication authentication) {
+        return ResponseEntity.ok(employeeService.updateWorkSchedule(workSchedule, authentication));
+    }
+    @GetMapping("/medic/assigned-to")
+    @Operation(summary = "Find to which ambulance you are assigned to", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> findAssignedAmbulance(Authentication authentication) {
+        return ResponseEntity.ok(employeeService.findAssignedAmbulance(authentication));
+    }
 }

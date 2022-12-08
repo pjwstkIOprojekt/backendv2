@@ -1,7 +1,6 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users.employees;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;

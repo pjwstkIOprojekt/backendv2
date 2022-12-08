@@ -1,24 +1,29 @@
 package com.gary.backendv2.security.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.Dispatcher;
-import com.gary.backendv2.model.MedicalInfo;
-import com.gary.backendv2.model.User;
-import com.gary.backendv2.model.WorkSchedule;
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.model.security.UserPrincipal;
-import com.gary.backendv2.model.dto.request.LoginRequest;
-import com.gary.backendv2.model.dto.request.SignupRequest;
+import com.gary.backendv2.model.dto.request.users.LoginRequest;
+import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.enums.RoleName;
+import com.gary.backendv2.model.users.*;
+import com.gary.backendv2.model.users.employees.Dispatcher;
+import com.gary.backendv2.model.users.employees.Medic;
+import com.gary.backendv2.model.users.employees.WorkSchedule;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.RoleRepository;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.repository.WorkScheduleRepository;
 import com.gary.backendv2.utils.JwtUtils;
+import com.gary.backendv2.utils.Utils;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
+import lombok.SneakyThrows;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -50,6 +55,7 @@ public class AuthService {
 
     private PasswordEncoder passwordEncoder;
     private AuthenticationManager authenticationManager;
+    private  final WorkScheduleRepository workScheduleRepository;
     private JwtUtils jwtUtils;
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
@@ -72,6 +78,7 @@ public class AuthService {
                 .email(userPrincipal.getUsername())
                 .token(jwt)
                 .roles(roles)
+                .userId(userPrincipal.getUserData().getUserId())
                 .type("Bearer ")
                 .build();
     }
@@ -109,33 +116,75 @@ public class AuthService {
 
         switch (employeeType) {
             case DISPATCHER -> registerDispatcher(signupRequest);
-            case PARAMEDIC -> throw new NotImplementedException("Paramedic not yet implemented");
+            case MEDIC -> registerMedic(signupRequest);
         }
     }
 
-    private  final WorkScheduleRepository workScheduleRepository;
+    @SneakyThrows
     private void registerDispatcher(SignupRequest signupRequest) {
-        String scheduleDefinition = getDefaultWorkSchedule();
-        WorkSchedule workSchedule = new WorkSchedule();
-        workSchedule.setSchedule(scheduleDefinition);
-        workSchedule.setCreatedAt(LocalDateTime.now());
+        RegisterEmployeeRequest employeeRequest = (RegisterEmployeeRequest) signupRequest;
+
+        WorkSchedule workSchedule = getWorkScheduleFromRequest(employeeRequest);
 
         workSchedule = workScheduleRepository.save(workSchedule);
 
         Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setFirstName(signupRequest.getFirstName());
-        dispatcher.setLastName(signupRequest.getLastName());
-        dispatcher.setEmail(signupRequest.getEmail());
-        dispatcher.setPhoneNumber(signupRequest.getPhoneNumber());
+        dispatcher.setFirstName(employeeRequest.getFirstName());
+        dispatcher.setLastName(employeeRequest.getLastName());
+        dispatcher.setEmail(employeeRequest.getEmail());
+        dispatcher.setPhoneNumber(employeeRequest.getPhoneNumber());
         dispatcher.setWorkSchedule(workSchedule);
-        dispatcher.setBirthDate(signupRequest.getBirthDate());
-        dispatcher.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        dispatcher.setBirthDate(employeeRequest.getBirthDate());
+        dispatcher.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
 
 
-        Role userRole = Optional.ofNullable(roleRepository.findByName(RoleName.DISPATCHER.getPrefixedName())).orElseThrow(() -> new RuntimeException("Role " + RoleName.DISPATCHER + " not found!"));
+        Role userRole = Optional.ofNullable(
+                roleRepository.findByName(RoleName.DISPATCHER.getPrefixedName())
+        ).orElseThrow(() -> new RuntimeException("Role " + RoleName.DISPATCHER + " not found!"));
 
         dispatcher.setRoles(Set.of(userRole));
         userRepository.save(dispatcher);
+    }
+
+    @SneakyThrows
+    private void registerMedic(SignupRequest signupRequest) {
+        RegisterEmployeeRequest employeeRequest = (RegisterEmployeeRequest) signupRequest;
+
+        WorkSchedule workSchedule = getWorkScheduleFromRequest(employeeRequest);
+
+        workSchedule = workScheduleRepository.save(workSchedule);
+
+        Medic medic = new Medic();
+        medic.setFirstName(employeeRequest.getFirstName());
+        medic.setLastName(employeeRequest.getLastName());
+        medic.setEmail(employeeRequest.getEmail());
+        medic.setPhoneNumber(employeeRequest.getPhoneNumber());
+        medic.setWorkSchedule(workSchedule);
+        medic.setBirthDate(employeeRequest.getBirthDate());
+        medic.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
+
+        Role userRole = Optional.ofNullable(
+                roleRepository.findByName(RoleName.MEDIC.getPrefixedName())
+        ).orElseThrow(() -> new RuntimeException("Role " + RoleName.MEDIC + " not found!"));
+
+        medic.setRoles(Set.of(userRole));
+        userRepository.save(medic);
+    }
+
+    private WorkSchedule getWorkScheduleFromRequest(RegisterEmployeeRequest employeeRequest) throws JsonProcessingException {
+        WorkSchedule workSchedule = new WorkSchedule();
+
+        if (employeeRequest.getWorkSchedule().isEmpty()) {
+            workSchedule.setSchedule(getDefaultWorkSchedule());
+            workSchedule.setCreatedAt(LocalDateTime.now());
+        } else {
+            String json = Utils.POJOtoJsonString(employeeRequest.getWorkSchedule());
+
+            workSchedule.setSchedule(json);
+            workSchedule.setCreatedAt(LocalDateTime.now());
+        }
+
+        return workSchedule;
     }
 
     private String getDefaultWorkSchedule() {

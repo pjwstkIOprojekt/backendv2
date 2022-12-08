@@ -1,9 +1,9 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.ambulance;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gary.backendv2.model.incident.Incident;
+import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.enums.AmbulanceClass;
 import com.gary.backendv2.model.enums.AmbulanceType;
-import lombok.*;
 import com.gary.backendv2.model.inventory.Inventory;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,9 +32,11 @@ public class Ambulance {
 
     private Integer seats;
 
-
     @Embedded
     private Location location ;
+
+    @OneToOne
+    private Crew crew;
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "history_id")

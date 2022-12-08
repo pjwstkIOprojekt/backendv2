@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ambulance")
@@ -49,10 +50,15 @@ public class AmbulanceController {
         return ResponseEntity.ok(ambulanceService.getItems(licensePlate));
     }
 
+    @GetMapping("/{licensePlate}/crew")
+    public ResponseEntity<?> getAllAssignedMedics(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getCrewMedics(licensePlate));
+    }
+
     @Operation(summary = "Adds items to the ambulance if count not provided adds one")
     @PostMapping("/{licensePlate}/items/add/{itemId}")
     public void addItem(@PathVariable String licensePlate, @PathVariable Integer itemId, @RequestParam(required = false) Integer count) {
-        if (count > 1) {
+        if (count != null && count > 1) {
             ambulanceService.addItems(licensePlate, itemId, count);
         } else ambulanceService.addItem(licensePlate, itemId);
     }
@@ -72,6 +78,11 @@ public class AmbulanceController {
         ambulanceService.addGeoLocation(licensePlate, postAmbulanceLocationRequest);
     }
 
+    @PostMapping("/{licensePlate}/crew")
+    public void addMedics(@PathVariable String licensePlate, Integer[] medicIds) {
+        ambulanceService.assignMedics(licensePlate, List.of(medicIds));
+    }
+
     @PutMapping
     public void updateAmbulance(@RequestBody @Valid AddAmbulanceRequest addAmbulanceRequest) {
         ambulanceService.updateAmbulance(addAmbulanceRequest);
@@ -85,7 +96,7 @@ public class AmbulanceController {
     @Operation(summary = "Removes item from an ambulance. If count is not provided removes one item")
     @DeleteMapping("/{licensePlate}/items/remove/{itemId}")
     public void removeItem(@PathVariable String licensePlate, @PathVariable Integer itemId, @RequestParam(required = false) Integer count) {
-        throw new NotImplementedException();
+        ambulanceService.removeItemById(licensePlate, itemId, count);
     }
 
     @Operation(summary = "Removes all items of given id from an ambulance")
@@ -93,6 +104,11 @@ public class AmbulanceController {
     public void removeAllItemsOfId(
             @PathVariable String licensePlate,
             @PathVariable Integer itemId) {
-        throw new NotImplementedException();
+        ambulanceService.removeAllItemById(licensePlate, itemId);
+    }
+
+    @DeleteMapping("/{licensePlate}/items/remove/all")
+    public void removeAllItems(@PathVariable String licensePlate) {
+        ambulanceService.clearInventory(licensePlate);
     }
 }
