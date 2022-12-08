@@ -8,7 +8,6 @@ import com.gary.backendv2.factories.impl.response.MedicineItemResponseFactory;
 import com.gary.backendv2.factories.impl.response.MultiUseItemResponseFactory;
 import com.gary.backendv2.factories.impl.response.SingleUseItemResponseFactory;
 import com.gary.backendv2.model.enums.ItemType;
-import org.apache.commons.lang3.NotImplementedException;
 
 public class ItemResponseFactoryProvider {
     public static ItemResponseAbstractFactory getItemFactory(ItemType itemType) {

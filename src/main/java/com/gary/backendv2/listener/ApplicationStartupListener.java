@@ -119,7 +119,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     }
 
     private void createSampleEmployees() {
-        Map<EmployeeType, List<RegisterEmployeeRequest>> map = new HashMap<>();
+        Map<EmployeeType, List<RegisterEmployeeRequest>> map = new LinkedHashMap<>();
 
         for (var etype : EmployeeType.values()) {
             map.put(etype, new ArrayList<>());
