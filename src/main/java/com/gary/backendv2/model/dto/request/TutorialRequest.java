@@ -14,4 +14,5 @@ public class TutorialRequest {
     String name;
     TutorialType tutorialType;
     String tutorialHTML;
+    String thumbnail;
 }

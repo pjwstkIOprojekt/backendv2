@@ -23,6 +23,8 @@ public class Tutorial {
 
     private String name;
 
+    private String thumbnail;
+
     @Enumerated(EnumType.STRING)
     private TutorialType tutorialType;
 
