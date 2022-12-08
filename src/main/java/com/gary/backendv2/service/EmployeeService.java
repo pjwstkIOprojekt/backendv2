@@ -90,6 +90,7 @@ public class EmployeeService {
             WorkScheduleResponse response = new WorkScheduleResponse();
 
             // TODO FIX SCHEDULE JSON PARSER
+            // TODO 8.12.2022, still broken
             MappedSchedule mappedSchedule = employee.getWorkSchedule().getMappedSchedule();
 
 
@@ -102,7 +103,7 @@ public class EmployeeService {
     public AmbulanceResponse findAssignedAmbulance(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
         if (currentUser instanceof Medic m) {
-            Optional<Ambulance> ambulanceOptional = ambulanceRepository.findAssignedMedic(m.getUserId());
+            Optional<Ambulance> ambulanceOptional = ambulanceRepository.findAssignedAmbulance(m.getUserId());
             if (ambulanceOptional.isEmpty()) {
                 throw new HttpException(HttpStatus.NOT_FOUND, String.format("Medic %s is not assigned to any ambulance", m.getUserId()));
             } else {

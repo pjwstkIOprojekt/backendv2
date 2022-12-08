@@ -8,7 +8,7 @@ import com.gary.backendv2.model.inventory.items.SingleUseItem;
 public enum ItemType {
     SINGLE_USE(SingleUseItem.class),
     MEDICAL(MedicineItem.class),
-    MULTI_USE(MultiUseItem.class), // NOT IMPLEMENTED YET
+    MULTI_USE(MultiUseItem.class),
     AMBULANCE_EQUIPMENT(AmbulanceEquipmentItem.class);
 
     private final Class<?> mappedClass;

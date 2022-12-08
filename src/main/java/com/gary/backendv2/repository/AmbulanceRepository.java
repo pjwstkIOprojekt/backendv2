@@ -1,7 +1,6 @@
 package com.gary.backendv2.repository;
 
 import com.gary.backendv2.model.ambulance.Ambulance;
-import com.gary.backendv2.model.users.employees.Medic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,5 +18,5 @@ public interface AmbulanceRepository extends JpaRepository<Ambulance, Integer> {
                     "join users u on cm.medics_user_id = u.user_id\n" +
                     "where u.user_id = ?1",
             nativeQuery = true)
-    Optional<Ambulance> findAssignedMedic(Integer medicId);
+    Optional<Ambulance> findAssignedAmbulance(Integer medicId);
 }
