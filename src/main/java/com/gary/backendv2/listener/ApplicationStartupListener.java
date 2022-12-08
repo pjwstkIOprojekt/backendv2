@@ -1,12 +1,18 @@
 package com.gary.backendv2.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
+import com.gary.backendv2.model.Location;
+import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
+import com.gary.backendv2.model.enums.AmbulanceClass;
+import com.gary.backendv2.model.enums.AmbulanceType;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
+import com.gary.backendv2.service.AmbulanceService;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +23,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.validation.*;
+import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -34,6 +42,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Autowired
     AuthService authService;
 
+    @Autowired
+    AmbulanceService ambulanceService;
+
     @Value("${gary.app.admin.credentials.email}")
     private String adminEmail;
     @Value("${gary.app.admin.credentials.password}")
@@ -41,20 +52,19 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        seed();
+    }
 
-
+    private void seed() {
         try {
-           createRoles();
-       } catch (RuntimeException e) {
-           log.info(e.getMessage());
-       }
-
-        try {
-           createAdminAccount();
-           createSampleUsers();
-       } catch (Exception e) {
-           log.info(e.getMessage());
-       }
+            createRoles();
+            createAdminAccount();
+            createSampleUsers();
+            createSampleAmbulances();
+        } catch (Exception e) {
+            log.error("There were some errors during initial database seed process. Shutting down");
+            SpringApplication.exit(applicationContext, () -> 1);
+        }
     }
 
     private void createRoles() throws RuntimeException {
@@ -102,6 +112,50 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
         List<SignupRequest> regular = List.of(s1, s2, s3);
         regular.forEach(x -> authService.registerUser(x));
+
+
+    }
+
+    private void createSampleAmbulances() {
+        AddAmbulanceRequest a1 = new AddAmbulanceRequest();
+        a1.setAmbulanceType(AmbulanceType.A);
+        a1.setAmbulanceClass(AmbulanceClass.BASIC);
+        a1.setLatitude(Location.defaultLocation().getLatitude());
+        a1.setLongitude(Location.defaultLocation().getLongitude());
+        a1.setSeats(5);
+        a1.setLicensePlate("LBI55362");
+
+        AddAmbulanceRequest a2 = new AddAmbulanceRequest();
+        a2.setAmbulanceType(AmbulanceType.B);
+        a2.setAmbulanceClass(AmbulanceClass.SPECIAL);
+        a2.setLatitude(Location.defaultLocation().getLatitude());
+        a2.setLongitude(Location.defaultLocation().getLongitude());
+        a2.setSeats(9);
+        a2.setLicensePlate("WPI33221");
+
+        AddAmbulanceRequest a3 = new AddAmbulanceRequest();
+        a3.setAmbulanceType(AmbulanceType.C);
+        a3.setAmbulanceClass(AmbulanceClass.TRANSPORT);
+        a3.setLatitude(Location.defaultLocation().getLatitude());
+        a3.setLongitude(Location.defaultLocation().getLongitude());
+        a3.setSeats(7);
+        a3.setLicensePlate("WB32213");
+
+        List<AddAmbulanceRequest> requests = List.of(a1, a2 ,a3);
+
+        @Cleanup
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        requests.forEach(x -> {
+            var validationErrors = validator.validate(x);
+            if (validationErrors.isEmpty()) {
+                ambulanceService.addAmbulance(x);
+            } else {
+                validationErrors.forEach(y -> log.error(y.getMessage()));
+                throw new ValidationException();
+            }
+        });
     }
 
     private void createAdminAccount() throws AdminAccountExistsException {
