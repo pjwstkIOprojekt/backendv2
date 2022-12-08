@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 
 @RestController
 @RequestMapping("/tutorial")
@@ -38,20 +39,26 @@ public class TutorialController {
         tutorialService.deleteTutorial(tutorialId);
     }
 
-    @PostMapping("/{tutorialId}/{userId}")
-    public void addReviewToTutorial(@PathVariable Integer tutorialId, @PathVariable Integer userId,
+    @PostMapping("/{tutorialId}/{email}")
+    public void addReviewToTutorial(@PathVariable Integer tutorialId, @PathVariable @Email String email,
                                     @RequestBody @Valid ReviewRequest reviewRequest) {
-        tutorialService.addReviewToTutorial(userId,tutorialId,reviewRequest);
+        tutorialService.addReviewToTutorial(email,tutorialId,reviewRequest);
     }
 
-    @DeleteMapping("/{tutorialId}/{userId}/{reviewId}")
-    public void deleteReviewFromTutorial(@PathVariable Integer tutorialId, @PathVariable Integer userId,
+    @DeleteMapping("/{tutorialId}/{email}/{reviewId}")
+    public void deleteReviewFromTutorial(@PathVariable Integer tutorialId, @PathVariable @Email String email,
                                          @PathVariable Integer reviewId) {
-        tutorialService.deleteReviewFromTutorial(tutorialId, userId, reviewId);
+        tutorialService.deleteReviewFromTutorial(email, tutorialId, reviewId);
     }
 
     @PutMapping("/{reviewId}")
     public void updateReview(@PathVariable Integer reviewId, @RequestBody ReviewRequest reviewRequest) {
         tutorialService.updateTutorialReview(reviewId,reviewRequest);
     }
+
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<?> getReviewById(@PathVariable Integer reviewId) {return ResponseEntity.ok(tutorialService.getReviewById(reviewId));}
+
+    @GetMapping("/{tutorialId}/reviews")
+    public ResponseEntity<?> getAllReviewsForTutorial(@PathVariable Integer tutorialId) {return ResponseEntity.ok(tutorialService.getAllReviewsForTutorial(tutorialId));}
 }
