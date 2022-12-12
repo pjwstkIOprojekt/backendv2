@@ -1,4 +1,4 @@
-package com.gary.backendv2.factories.impl;
+package com.gary.backendv2.factories.impl.response;
 
 import com.gary.backendv2.factories.asbtract.ItemResponseAbstractFactory;
 import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
