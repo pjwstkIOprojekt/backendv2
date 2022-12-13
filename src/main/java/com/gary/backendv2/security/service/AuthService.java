@@ -78,6 +78,7 @@ public class AuthService {
                 .email(userPrincipal.getUsername())
                 .token(jwt)
                 .roles(roles)
+                .userId(userPrincipal.getUserData().getUserId())
                 .type("Bearer ")
                 .build();
     }
