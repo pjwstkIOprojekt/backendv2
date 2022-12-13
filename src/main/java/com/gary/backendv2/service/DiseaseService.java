@@ -61,8 +61,7 @@ public class DiseaseService {
 		if (optionalDisease.isEmpty()) {
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find disease with %s", id));
 		}
-		Disease disease = optionalDisease.get();
-		diseaseRepository.delete(disease);
+		diseaseRepository.delete(optionalDisease.get());
 	}
 
 	public void updateDisease(Integer id, DiseaseRequest diseaseRequest){
