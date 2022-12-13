@@ -56,7 +56,7 @@ public class TutorialController {
         tutorialService.updateTutorialReview(reviewId,reviewRequest);
     }
 
-    @GetMapping("/{reviewId}")
+    @GetMapping("/review/{reviewId}")
     public ResponseEntity<?> getReviewById(@PathVariable Integer reviewId) {return ResponseEntity.ok(tutorialService.getReviewById(reviewId));}
 
     @GetMapping("/{tutorialId}/reviews")

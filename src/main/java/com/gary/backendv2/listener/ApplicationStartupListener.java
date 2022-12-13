@@ -1,12 +1,15 @@
 package com.gary.backendv2.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
+import com.gary.backendv2.model.Tutorial;
+import com.gary.backendv2.model.enums.TutorialType;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
+import com.gary.backendv2.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +37,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Autowired
     AuthService authService;
 
+    @Autowired
+    TutorialRepository tutorialRepository;
+
     @Value("${gary.app.admin.credentials.email}")
     private String adminEmail;
     @Value("${gary.app.admin.credentials.password}")
@@ -52,6 +58,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         try {
            createAdminAccount();
            createSampleUsers();
+           createTutorial();
        } catch (Exception e) {
            log.info(e.getMessage());
        }
@@ -123,5 +130,50 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
             log.info("Admin account created: email: {}, password: {}", adminEmail, adminPassword);
         } else throw new AdminAccountExistsException("Admin account already exists.");
+    }
+
+    private void createTutorial() {
+        Tutorial tutorial = new Tutorial();
+        tutorial.setName("Pierwsza pomoc - RKO");
+        tutorial.setThumbnail("https://projektaed.pl/wp-content/uploads/2020/05/pierwsza_pomoc_w_trakcie_pandemii.jpg");
+        tutorial.setTutorialType(TutorialType.COURSE);
+        tutorial.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/RKO.html"));
+
+        Tutorial tutorial1 = new Tutorial();
+        tutorial1.setName("Pierwsza pomoc - atak epilepsji");
+        tutorial1.setThumbnail("https://kursypierwszejpomocy.com.pl/wp-content/uploads/2019/07/32.jpg");
+        tutorial1.setTutorialType(TutorialType.COURSE);
+        tutorial1.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/AtakEpilepsji.html"));
+
+        Tutorial tutorial2 = new Tutorial();
+        tutorial2.setName("Pierwsza pomoc - porażenie prądem");
+        tutorial2.setThumbnail("https://bi.im-g.pl/im/af/97/18/z25785775AMP,Porazenie-pradem.jpg");
+        tutorial2.setTutorialType(TutorialType.COURSE);
+        tutorial2.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/PorazeniePradem.html"));
+
+        Tutorial tutorial3 = new Tutorial();
+        tutorial3.setName("Omdlenie");
+        tutorial3.setThumbnail("https://cdn.galleries.smcloud.net/t/galleries/gf-bS8B-giVD-WyAk_jak-rozpoznac-omdlenie-pierwsza-pomoc-664x442-nocrop.jpg");
+        tutorial3.setTutorialType(TutorialType.GENERAL);
+        tutorial3.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Omdlenie.html"));
+
+        Tutorial tutorial4 = new Tutorial();
+        tutorial4.setName("Oparzenie");
+        tutorial4.setTutorialType(TutorialType.COURSE);
+        tutorial4.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Oparzenia.html"));
+
+        Tutorial tutorial5 = new Tutorial();
+        tutorial5.setName("Udar");
+        tutorial5.setTutorialType(TutorialType.GENERAL);
+        tutorial5.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Udar1.html"));
+
+        Tutorial tutorial6 = new Tutorial();
+        tutorial6.setName("Zasłabnięcia");
+        tutorial6.setThumbnail("https://ocdn.eu/pulscms-transforms/1/kSIk9kpTURBXy8yYTgzMDJhZTliYzNlNzQ0Mjc4YTJhN2VlODUzMDc3Ny5qcGeSlQMAzKbNFNLNC7aTBc0DAs0BkN4AAaEwBQ");
+        tutorial6.setTutorialType(TutorialType.GENERAL);
+        tutorial6.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Zasłabnięcia.html"));
+
+        List<Tutorial> tutorials = List.of(tutorial, tutorial1, tutorial2,tutorial3,tutorial4,tutorial5,tutorial6);
+        tutorialRepository.saveAll(tutorials);
     }
 }

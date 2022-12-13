@@ -3,7 +3,6 @@ package com.gary.backendv2.service;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.Tutorial;
-import com.gary.backendv2.model.dto.response.AllTutorialsResponse;
 import com.gary.backendv2.model.dto.response.ReviewResponse;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.ReviewRequest;
@@ -30,13 +29,13 @@ public class TutorialService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
-    public List<AllTutorialsResponse> getAllTutorial() {
+    public List<TutorialResponse> getAllTutorial() {
         List<Tutorial> tutorials = tutorialRepository.findAll();
-        List<AllTutorialsResponse> tutorialResponses = new ArrayList<>();
+        List<TutorialResponse> tutorialResponses = new ArrayList<>();
         for (Tutorial t : tutorials) {
             OptionalDouble avarageRating = t.getReviewSet().stream().mapToDouble(Review::getValue).average();
             tutorialResponses.add(
-                    AllTutorialsResponse
+                    TutorialResponse
                             .builder()
                             .tutorialId(t.getTutorialId())
                             .tutorialType(t.getTutorialType())
