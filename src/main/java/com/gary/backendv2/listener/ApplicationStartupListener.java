@@ -237,45 +237,46 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     }
 
     private void createTutorial() {
+
         Tutorial tutorial = new Tutorial();
         tutorial.setName("Pierwsza pomoc - RKO");
         tutorial.setThumbnail("https://projektaed.pl/wp-content/uploads/2020/05/pierwsza_pomoc_w_trakcie_pandemii.jpg");
         tutorial.setTutorialType(TutorialType.COURSE);
-        tutorial.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/RKO.html"));
+        tutorial.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/RKO.html"));
 
         Tutorial tutorial1 = new Tutorial();
         tutorial1.setName("Pierwsza pomoc - atak epilepsji");
         tutorial1.setThumbnail("https://kursypierwszejpomocy.com.pl/wp-content/uploads/2019/07/32.jpg");
         tutorial1.setTutorialType(TutorialType.COURSE);
-        tutorial1.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/AtakEpilepsji.html"));
+        tutorial1.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/AtakEpilepsji.html"));
 
         Tutorial tutorial2 = new Tutorial();
         tutorial2.setName("Pierwsza pomoc - porażenie prądem");
         tutorial2.setThumbnail("https://bi.im-g.pl/im/af/97/18/z25785775AMP,Porazenie-pradem.jpg");
         tutorial2.setTutorialType(TutorialType.COURSE);
-        tutorial2.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/PorazeniePradem.html"));
+        tutorial2.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/PorazeniePradem.html"));
 
         Tutorial tutorial3 = new Tutorial();
         tutorial3.setName("Omdlenie");
         tutorial3.setThumbnail("https://cdn.galleries.smcloud.net/t/galleries/gf-bS8B-giVD-WyAk_jak-rozpoznac-omdlenie-pierwsza-pomoc-664x442-nocrop.jpg");
         tutorial3.setTutorialType(TutorialType.GENERAL);
-        tutorial3.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Omdlenie.html"));
+        tutorial3.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/Omdlenie.html"));
 
         Tutorial tutorial4 = new Tutorial();
         tutorial4.setName("Oparzenie");
         tutorial4.setTutorialType(TutorialType.COURSE);
-        tutorial4.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Oparzenia.html"));
+        tutorial4.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/Oparzenia.html"));
 
         Tutorial tutorial5 = new Tutorial();
         tutorial5.setName("Udar");
         tutorial5.setTutorialType(TutorialType.GENERAL);
-        tutorial5.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Udar1.html"));
+        tutorial5.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/Udar1.html"));
 
         Tutorial tutorial6 = new Tutorial();
         tutorial6.setName("Zasłabnięcia");
         tutorial6.setThumbnail("https://ocdn.eu/pulscms-transforms/1/kSIk9kpTURBXy8yYTgzMDJhZTliYzNlNzQ0Mjc4YTJhN2VlODUzMDc3Ny5qcGeSlQMAzKbNFNLNC7aTBc0DAs0BkN4AAaEwBQ");
         tutorial6.setTutorialType(TutorialType.GENERAL);
-        tutorial6.setTutorialHTML(FileUtils.readFile("src/main/java/com/gary/backendv2/tutorials/Zasłabnięcia.html"));
+        tutorial6.setTutorialHTML(FileUtils.loadFile("classpath:tutorials/Zasłabnięcia.html"));
 
         List<Tutorial> tutorials = List.of(tutorial, tutorial1, tutorial2,tutorial3,tutorial4,tutorial5,tutorial6);
         tutorialRepository.saveAll(tutorials);
