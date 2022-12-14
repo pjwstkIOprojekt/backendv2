@@ -29,6 +29,7 @@ public class Backup {
 
 	private LocalDateTime time;
 
+	@Enumerated(EnumType.STRING)
 	private BackupType backupType;
 
 	@ManyToOne
