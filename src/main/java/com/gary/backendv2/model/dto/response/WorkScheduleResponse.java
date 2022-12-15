@@ -3,7 +3,7 @@ package com.gary.backendv2.model.dto.response;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import lombok.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -11,5 +11,5 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkScheduleResponse {
-    Map<String, RegisterEmployeeRequest.ScheduleDto> newSchedule = new HashMap<>();
+    Map<String, RegisterEmployeeRequest.ScheduleDto> schedule = new LinkedHashMap<>();
 }
