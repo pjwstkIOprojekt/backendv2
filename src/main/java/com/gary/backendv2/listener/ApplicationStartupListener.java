@@ -21,6 +21,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,8 @@ import javax.transaction.Transactional;
 import javax.validation.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -59,17 +62,25 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
     @Transactional
     void seed() {
-        try {
-            createRoles();
-            createAdminAccount();
-            createSampleUsers();
-            createSampleAmbulances();
-            createSampleEmployees();
-            createTutorials();
-        } catch (Exception e) {
-            log.error("There were some errors during initial database seed process. Shutting down");
-            e.printStackTrace();
-            SpringApplication.exit(applicationContext, () -> 1);
+        var roles = roleRepository.findAll();
+        var users = roleRepository.findAll();
+        var ambulances = roleRepository.findAll();
+
+        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty();
+        log.info("Seeding: {}", doSeed);
+        if (doSeed) {
+            try {
+                createRoles();
+                createAdminAccount();
+                createSampleUsers();
+                createSampleAmbulances();
+                createSampleEmployees();
+                createTutorials();
+            } catch (Exception e) {
+                log.error("There were some errors during initial database seed process. Shutting down");
+                e.printStackTrace();
+                SpringApplication.exit(applicationContext, () -> 1);
+            }
         }
     }
 
@@ -85,9 +96,19 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         role.setName(name.getPrefixedName());
 
         try {
-            Role r = roleRepository.save(role);
+            roleRepository.save(role);
         } catch (Exception e) {
-            throw new RuntimeException();
+            if (e instanceof DataIntegrityViolationException violationException) {
+                if ((violationException.getMostSpecificCause().toString().contains("Detail: Key (name)=(ROLE_"))) {
+                    Pattern pattern = Pattern.compile("ROLE_\\w+");
+                    Matcher matcher = pattern.matcher(violationException.getMostSpecificCause().toString());
+                    if (matcher.find()) {
+                        String rolename = matcher.group(0);
+
+                        log.info("Role {} exists, skipping", rolename);
+                    }
+                }
+            }
         }
     }
 
@@ -196,7 +217,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         });
     }
 
-    private void createAdminAccount() throws AdminAccountExistsException {
+    private void createAdminAccount() {
         Optional<User> adminUser = Optional.ofNullable(userRepository.getByEmail("admin@gary.com"));
         if (adminUser.isEmpty()) {
             Optional<Role> adminRole = Optional.ofNullable(roleRepository.findByName(RoleName.ADMIN.getPrefixedName()));
@@ -214,7 +235,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
             userRepository.save(user);
 
             log.info("Admin account created: email: {}, password: {}", adminEmail, adminPassword);
-        } else throw new AdminAccountExistsException("Admin account already exists.");
+        }
     }
 
     private void createTutorials() {

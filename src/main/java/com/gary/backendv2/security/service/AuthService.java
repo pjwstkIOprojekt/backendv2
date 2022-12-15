@@ -3,6 +3,7 @@ package com.gary.backendv2.security.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.enums.EmployeeType;
@@ -14,6 +15,7 @@ import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.users.*;
 import com.gary.backendv2.model.users.employees.Dispatcher;
+import com.gary.backendv2.model.users.employees.MappedSchedule;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
 import com.gary.backendv2.repository.MedicalInfoRepository;
@@ -187,6 +189,7 @@ public class AuthService {
         return workSchedule;
     }
 
+    @SneakyThrows
     private String getDefaultWorkSchedule() {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource("classpath:default-work-schedule.json");
