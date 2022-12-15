@@ -12,9 +12,13 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.users.employees.MappedSchedule;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.FileCopyUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
-
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -22,17 +26,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+
+@Slf4j
 public class Utils {
 
     @SneakyThrows
     public static String POJOtoJsonString(Object object) {
-        System.out.println(object.getClass());
-        System.out.println(!(object instanceof WorkSchedule) || !(object instanceof Map<?,?>));
-        System.out.println(!(object instanceof WorkSchedule));
-        System.out.println(!(object instanceof Map<?,?>));
-        System.out.println(false || true);
-        System.out.println(true || false);
-
         // java pls
         boolean isNotWorkSchedule = !(object instanceof WorkSchedule);
         boolean isNotMap = !(object instanceof Map<?,?>);
@@ -52,6 +56,24 @@ public class Utils {
         return ow.writeValueAsString(object);
     }
 
+
+    public static String loadClasspathResource(String classpath) {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource(classpath);
+
+        String fileContents = "";
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
+            fileContents = FileCopyUtils.copyToString(reader);
+        }
+        catch (IOException e) {
+            log.error("Error loading classpath resource: {}", classpath);
+        }
+
+        return fileContents;
+        
+    }
+        
+        
     public static class ScheduleDeserializer extends StdDeserializer<MappedSchedule> {
 
         public ScheduleDeserializer() {

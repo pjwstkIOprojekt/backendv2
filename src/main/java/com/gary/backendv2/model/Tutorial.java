@@ -26,8 +26,10 @@ public class Tutorial {
     @Enumerated(EnumType.STRING)
     private TutorialType tutorialType;
 
-    @Lob
+    @Column(columnDefinition = "text")
     private String tutorialHTML;
+
+    private String thumbnail;
 
     @OneToMany(mappedBy = "tutorial")
     @JsonIgnore

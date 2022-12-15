@@ -14,9 +14,11 @@ public class TutorialResponse {
 
     String name;
 
+    String thumbnail;
+
     TutorialType tutorialType;
 
-    Double avarageRating;
+    Double averageRating;
 
     String tutorialHTML;
 }

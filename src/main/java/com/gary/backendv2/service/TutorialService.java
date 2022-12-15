@@ -3,6 +3,7 @@ package com.gary.backendv2.service;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.Tutorial;
+import com.gary.backendv2.model.dto.response.ReviewResponse;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.ReviewRequest;
 import com.gary.backendv2.model.dto.request.TutorialRequest;
@@ -38,7 +39,8 @@ public class TutorialService {
                             .tutorialId(t.getTutorialId())
                             .tutorialType(t.getTutorialType())
                             .name(t.getName())
-                            .avarageRating(avarageRating.isPresent() ? avarageRating.getAsDouble() : 0.0)
+                            .averageRating(avarageRating.isPresent() ? avarageRating.getAsDouble() : 0.0)
+                            .thumbnail(t.getThumbnail())
                             .tutorialHTML(t.getTutorialHTML())
                             .build()
             );
@@ -58,8 +60,9 @@ public class TutorialService {
                 .tutorialId(t.getTutorialId())
                 .tutorialType(t.getTutorialType())
                 .name(t.getName())
-                .avarageRating(avarageRating.isPresent() ? avarageRating.getAsDouble() : 0.0)
+                .averageRating(avarageRating.isPresent() ? avarageRating.getAsDouble() : 0.0)
                 .tutorialHTML(t.getTutorialHTML())
+                .thumbnail(t.getThumbnail())
                 .build();
     }
 
@@ -69,6 +72,7 @@ public class TutorialService {
                 .tutorialType(tutorialRequest.getTutorialType())
                 .name(tutorialRequest.getName())
                 .tutorialHTML(tutorialRequest.getTutorialHTML())
+                .thumbnail(tutorialRequest.getThumbnail())
                 .build();
         tutorialRepository.save(tutorial);
     }
@@ -91,21 +95,22 @@ public class TutorialService {
         t.setTutorialType(tutorialRequest.getTutorialType());
         t.setName(tutorialRequest.getName());
         t.setTutorialHTML(tutorialRequest.getTutorialHTML());
+        t.setThumbnail(tutorialRequest.getThumbnail());
         tutorialRepository.save(t);
     }
 
 
-    public void addReviewToTutorial(Integer userId, Integer tutorialId, ReviewRequest reviewRequest) {
+    public void addReviewToTutorial(String email, Integer tutorialId, ReviewRequest reviewRequest) {
         Optional<Tutorial> optionalTutorial = tutorialRepository.findById(tutorialId);
         if (optionalTutorial.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find tutorial with %s", tutorialId));
         }
         Tutorial t = optionalTutorial.get();
 
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", userId));
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
         }
         User u = optionalUser.get();
 
@@ -123,17 +128,17 @@ public class TutorialService {
         tutorialRepository.save(t);
     }
 
-    public void deleteReviewFromTutorial(Integer userId, Integer tutorialId, Integer reviewId){
+    public void deleteReviewFromTutorial(String email, Integer tutorialId, Integer reviewId){
         Optional<Tutorial> optionalTutorial = tutorialRepository.findById(tutorialId);
         if (optionalTutorial.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find tutorial with %s", tutorialId));
         }
         Tutorial tutorial = optionalTutorial.get();
 
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", userId));
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
         }
         User user = optionalUser.get();
 
@@ -169,4 +174,37 @@ public class TutorialService {
     }
 
 
+    public ReviewResponse getReviewById(Integer reviewId) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+
+        if (optionalReview.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find review with %s", reviewId));
+        }
+        Review review = optionalReview.get();
+        return ReviewResponse.builder()
+                .tutorial(review.getTutorial())
+                .reviewer(review.getReviewer())
+                .reviewDescription(review.getReviewDescription())
+                .value(review.getValue())
+                .build();
+    }
+
+    public List<ReviewResponse> getAllReviewsForTutorial(Integer tutorialId) {
+        Optional<Tutorial> optionalTutorial = tutorialRepository.findById(tutorialId);
+        if (optionalTutorial.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find tutorial with %s", tutorialId));
+        }
+        Tutorial tutorial = optionalTutorial.get();
+        List<ReviewResponse> tutorialReviews = new ArrayList<>();
+        for (Review review : tutorial.getReviewSet()) {
+            tutorialReviews.add(
+                    ReviewResponse.builder()
+                            .tutorial(review.getTutorial())
+                            .reviewer(review.getReviewer())
+                            .reviewDescription(review.getReviewDescription())
+                            .value(review.getValue())
+                            .build());
+        }
+        return tutorialReviews;
+    }
 }

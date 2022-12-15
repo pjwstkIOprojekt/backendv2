@@ -2,18 +2,17 @@ package com.gary.backendv2.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
 import com.gary.backendv2.model.Location;
+import com.gary.backendv2.model.Tutorial;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
-import com.gary.backendv2.model.enums.AmbulanceClass;
-import com.gary.backendv2.model.enums.AmbulanceType;
-import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.enums.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
-import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.utils.Utils;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,8 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
+    TutorialRepository tutorialRepository;
+    @Autowired
     ApplicationContext applicationContext;
     @Autowired
     AuthService authService;
@@ -64,8 +65,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         var roles = roleRepository.findAll();
         var users = roleRepository.findAll();
         var ambulances = roleRepository.findAll();
+        var tutorials = tutorialRepository.findAll();
 
-        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty();
+        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty() && tutorials.isEmpty();
         log.info("Seeding: {}", doSeed);
         if (doSeed) {
             try {
@@ -74,6 +76,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
                 createSampleUsers();
                 createSampleAmbulances();
                 createSampleEmployees();
+                createTutorials();
             } catch (Exception e) {
                 log.error("There were some errors during initial database seed process. Shutting down");
                 e.printStackTrace();
@@ -235,4 +238,51 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
             log.info("Admin account created: email: {}, password: {}", adminEmail, adminPassword);
         }
     }
+
+    private void createTutorials() {
+
+        Tutorial tutorial = new Tutorial();
+        tutorial.setName("Pierwsza pomoc - RKO");
+        tutorial.setThumbnail("https://projektaed.pl/wp-content/uploads/2020/05/pierwsza_pomoc_w_trakcie_pandemii.jpg");
+        tutorial.setTutorialType(TutorialType.COURSE);
+        tutorial.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_cpr.html"));
+
+        Tutorial tutorial1 = new Tutorial();
+        tutorial1.setName("Pierwsza pomoc - atak epilepsji");
+        tutorial1.setThumbnail("https://kursypierwszejpomocy.com.pl/wp-content/uploads/2019/07/32.jpg");
+        tutorial1.setTutorialType(TutorialType.COURSE);
+        tutorial1.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_epilepsy.html"));
+
+        Tutorial tutorial2 = new Tutorial();
+        tutorial2.setName("Pierwsza pomoc - porażenie prądem");
+        tutorial2.setThumbnail("https://bi.im-g.pl/im/af/97/18/z25785775AMP,Porazenie-pradem.jpg");
+        tutorial2.setTutorialType(TutorialType.COURSE);
+        tutorial2.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_electric_shock.html"));
+
+        Tutorial tutorial3 = new Tutorial();
+        tutorial3.setName("Omdlenie");
+        tutorial3.setThumbnail("https://cdn.galleries.smcloud.net/t/galleries/gf-bS8B-giVD-WyAk_jak-rozpoznac-omdlenie-pierwsza-pomoc-664x442-nocrop.jpg");
+        tutorial3.setTutorialType(TutorialType.GENERAL);
+        tutorial3.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_fainting.html"));
+
+        Tutorial tutorial4 = new Tutorial();
+        tutorial4.setName("Oparzenie");
+        tutorial4.setTutorialType(TutorialType.COURSE);
+        tutorial4.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_burns.html"));
+
+        Tutorial tutorial5 = new Tutorial();
+        tutorial5.setName("Udar");
+        tutorial5.setTutorialType(TutorialType.GENERAL);
+        tutorial5.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_stroke.html"));
+
+        Tutorial tutorial6 = new Tutorial();
+        tutorial6.setName("Zasłabnięcia");
+        tutorial6.setThumbnail("https://ocdn.eu/pulscms-transforms/1/kSIk9kpTURBXy8yYTgzMDJhZTliYzNlNzQ0Mjc4YTJhN2VlODUzMDc3Ny5qcGeSlQMAzKbNFNLNC7aTBc0DAs0BkN4AAaEwBQ");
+        tutorial6.setTutorialType(TutorialType.GENERAL);
+        tutorial6.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_faint.html"));
+
+        List<Tutorial> tutorials = List.of(tutorial, tutorial1, tutorial2,tutorial3,tutorial4,tutorial5,tutorial6);
+        tutorialRepository.saveAll(tutorials);
+    }
+
 }
