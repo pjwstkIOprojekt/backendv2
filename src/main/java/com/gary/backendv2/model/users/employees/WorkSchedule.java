@@ -1,7 +1,7 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.users.employees;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -17,15 +17,18 @@ import java.time.LocalDateTime;
 public class WorkSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer scheduleId;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
+    @JsonIgnore
     private String schedule;
 
     @Transient
     private MappedSchedule mappedSchedule;
 
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     public void setSchedule(String json) {

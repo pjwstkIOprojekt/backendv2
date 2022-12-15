@@ -1,7 +1,7 @@
 package com.gary.backendv2.model;
 
+import com.gary.backendv2.model.users.User;
 import lombok.*;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;

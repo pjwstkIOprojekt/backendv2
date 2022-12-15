@@ -1,6 +1,6 @@
 package com.gary.backendv2.model.dto.response;
 
-import com.gary.backendv2.model.IncidentReport;
+import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.enums.EmergencyType;
 import lombok.Builder;

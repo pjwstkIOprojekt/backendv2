@@ -88,9 +88,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             roleOrder.addRule(RoleName.ADMIN, RoleName.DISPATCHER);
             roleOrder.addRule(RoleName.DISPATCHER, RoleName.EMPLOYEE);
             roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.EMPLOYEE);
-            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.EMPLOYEE);
-            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.PARAMEDIC);
-            roleOrder.addRule(RoleName.PARAMEDIC, RoleName.USER);
+            roleOrder.addRule(RoleName.MEDIC, RoleName.EMPLOYEE);
+            roleOrder.addRule(RoleName.AMBULANCE_MANAGER, RoleName.MEDIC);
+            roleOrder.addRule(RoleName.MEDIC, RoleName.USER);
             roleOrder.addRule(RoleName.DISPATCHER, RoleName.USER);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -124,6 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
+                // TODO change permitAlls to correct role access
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/hello/user/**").hasRole("USER")
                 .antMatchers("/hello/admin/**").hasRole("ADMIN")
@@ -143,6 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/accident_report/**").permitAll()
                 .antMatchers("/item/**").permitAll()
+                .antMatchers("/employee/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

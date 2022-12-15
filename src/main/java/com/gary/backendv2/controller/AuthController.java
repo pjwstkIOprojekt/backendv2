@@ -1,8 +1,8 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.dto.request.LoginRequest;
-import com.gary.backendv2.model.dto.request.SignupRequest;
+import com.gary.backendv2.model.dto.request.users.LoginRequest;
+import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.dto.response.ServerResponse;
 import com.gary.backendv2.security.service.AuthService;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")

@@ -1,4 +1,4 @@
-package com.gary.backendv2.model;
+package com.gary.backendv2.model.ambulance;
 
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import lombok.Getter;
