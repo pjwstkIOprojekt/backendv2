@@ -65,8 +65,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         var roles = roleRepository.findAll();
         var users = roleRepository.findAll();
         var ambulances = roleRepository.findAll();
+        var tutorials = tutorialRepository.findAll();
 
-        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty();
+        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty() && tutorials.isEmpty();
         log.info("Seeding: {}", doSeed);
         if (doSeed) {
             try {

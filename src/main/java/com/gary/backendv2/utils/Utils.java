@@ -37,13 +37,6 @@ public class Utils {
 
     @SneakyThrows
     public static String POJOtoJsonString(Object object) {
-        System.out.println(object.getClass());
-        System.out.println(!(object instanceof WorkSchedule) || !(object instanceof Map<?,?>));
-        System.out.println(!(object instanceof WorkSchedule));
-        System.out.println(!(object instanceof Map<?,?>));
-        System.out.println(false || true);
-        System.out.println(true || false);
-
         // java pls
         boolean isNotWorkSchedule = !(object instanceof WorkSchedule);
         boolean isNotMap = !(object instanceof Map<?,?>);
@@ -76,7 +69,7 @@ public class Utils {
             log.error("Error loading classpath resource: {}", classpath);
         }
 
-        return fileContents
+        return fileContents;
         
     }
         
