@@ -1,12 +1,12 @@
 package com.gary.backendv2.controller;
 
+import com.gary.backendv2.model.dto.request.BackupUpdateRequest;
 import com.gary.backendv2.service.BackupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController()
 @RequestMapping(path = "/backup")
@@ -17,5 +17,20 @@ public class BackupController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Integer id){
 		return ResponseEntity.ok(backupService.getById(id));
+	}
+
+	@GetMapping
+	public ResponseEntity<?> getAll(){ return ResponseEntity.ok(backupService.getAll()); }
+
+	@PutMapping("/{id}")
+	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid BackupUpdateRequest backupUpdateRequest){
+		backupService.update(id, backupUpdateRequest);
+		return ResponseEntity.ok("Backup successfully updated");
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable Integer id){
+		backupService.delete(id);
+		return ResponseEntity.ok("Backup successfully deleted.");
 	}
 }
