@@ -1,6 +1,7 @@
 package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.Allergy;
 import com.gary.backendv2.model.Disease;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.ambulance.AmbulanceHistory;
@@ -140,7 +141,7 @@ public class IncidentReportServiceTest {
         int id = 2137;
         when(incidentReportRepository.findByAccidentId(id)).thenReturn(Optional.empty());
         Exception exception = assertThrows(HttpException.class, () -> {
-            incidentService.delete(id);
+            incidentReportService.deleteById(id);
         });
         String expectedMessage = String.format("Cannot find disease with %s", id);
         String actualMessage = exception.getMessage();
@@ -154,8 +155,9 @@ public class IncidentReportServiceTest {
         IncidentReport incidentReport = new IncidentReport();
         when(incidentReportRepository.findByAccidentId(id)).thenReturn(Optional.of(incidentReport));
 
-        incidentService.delete(id);
+        incidentReportService.deleteById(id);
 
         verify(incidentReportRepository, times(1)).delete(any(IncidentReport.class));
+
     }
 }
