@@ -143,11 +143,14 @@ public class IncidentReportServiceTest {
         Exception exception = assertThrows(HttpException.class, () -> {
             incidentReportService.deleteById(id);
         });
-        String expectedMessage = String.format("Cannot find disease with %s", id);
+        String expectedMessage = String.format("Incident report with id %s not found", id);
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
+
+
+
 
     @Test
     void deleteShouldWork() {
