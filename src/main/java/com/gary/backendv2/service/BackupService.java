@@ -2,9 +2,12 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Backup;
+import com.gary.backendv2.model.dto.request.BackupAddRequest;
 import com.gary.backendv2.model.dto.request.BackupUpdateRequest;
 import com.gary.backendv2.model.dto.response.BackupResponse;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.BackupRepository;
+import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BackupService {
 	private BackupRepository backupRepository;
+	private UserRepository userRepository;
+
+	public void add(BackupAddRequest backupAddRequest){
+		Optional<User> userOptional = userRepository.findByEmail(backupAddRequest.getRequester());
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", backupAddRequest.getRequester()));
+		}
+	}
 
 	public BackupResponse getById(Integer id){
 		Optional<Backup> backupOptional = backupRepository.findByBackupId(id);
