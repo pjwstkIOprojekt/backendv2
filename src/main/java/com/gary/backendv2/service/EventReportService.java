@@ -4,7 +4,10 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.EventReport;
 import com.gary.backendv2.model.dto.request.EventReportRequest;
 import com.gary.backendv2.model.dto.response.EventReportResponse;
+import com.gary.backendv2.model.dto.response.users.UserResponse;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.EventReportRepository;
+import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ public class EventReportService {
 
     private final EventReportRepository eventReportRepository;
 
+    private final UserRepository userRepository;
+
     public List<EventReportResponse> getAllReportedEvents() {
         List<EventReport> eventReports = eventReportRepository.findAll();
         List<EventReportResponse> eventReportResponses = new ArrayList<>();
@@ -32,12 +37,23 @@ public class EventReportService {
                             .dangerScale(e.getDangerScale())
                             .location(e.getLocation())
                             .emergencyType(e.getEmergencyType())
-                            .reporter(e.getReporter())
+                            .userResponse(getUserResponse(e))
                             .description(e.getDescription())
                             .build()
             );
         }
         return eventReportResponses;
+    }
+
+    private UserResponse getUserResponse(EventReport e) {
+        User u = e.getReporter();
+        return UserResponse.builder()
+                .email(u.getEmail())
+                .birthDate(u.getBirthDate())
+                .phoneNumber(u.getPhoneNumber())
+                .firstName(u.getFirstName())
+                .lastName(u.getLastName())
+                .build();
     }
 
     public EventReportResponse getReportedEventById(Integer id){
@@ -52,7 +68,7 @@ public class EventReportService {
                 .dangerScale(e.getDangerScale())
                 .location(e.getLocation())
                 .emergencyType(e.getEmergencyType())
-                .reporter(e.getReporter())
+                .userResponse(getUserResponse(e))
                 .description(e.getDescription())
                 .build();
     }
@@ -63,7 +79,7 @@ public class EventReportService {
                 .dangerScale(eventReportRequest.getDangerScale())
                 .location(eventReportRequest.getLocation())
                 .emergencyType(eventReportRequest.getEmergencyType())
-                .reporter(eventReportRequest.getReporter())
+                .reporter((userRepository.findByEmail(eventReportRequest.getEmail())).get())
                 .description(eventReportRequest.getDescription())
                 .build();
         eventReportRepository.save(e);

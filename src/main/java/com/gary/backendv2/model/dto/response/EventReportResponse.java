@@ -1,8 +1,9 @@
 package com.gary.backendv2.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.gary.backendv2.model.Location;
+import com.gary.backendv2.model.dto.response.users.UserResponse;
 import com.gary.backendv2.model.enums.EmergencyType;
-import com.gary.backendv2.model.users.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class EventReportResponse {
     Integer dangerScale;
     Location location;
     EmergencyType emergencyType;
-    User reporter;
+    @JsonUnwrapped
+    UserResponse userResponse;
     String description;
 }
