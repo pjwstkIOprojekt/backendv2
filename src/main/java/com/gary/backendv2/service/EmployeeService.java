@@ -2,14 +2,14 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.ambulance.Ambulance;
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
-import com.gary.backendv2.model.users.employees.AbstractEmployee;
-import com.gary.backendv2.model.users.employees.EmployeeShift;
-import com.gary.backendv2.model.users.employees.MappedSchedule;
+import com.gary.backendv2.model.dto.response.users.GenericEmployeeResponse;
+import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
-import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.EmployeeShiftRepository;
 import com.gary.backendv2.repository.UserRepository;
@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,17 +88,47 @@ public class EmployeeService {
 
             employee = userRepository.save(employee);
 
-            WorkScheduleResponse response = new WorkScheduleResponse();
-
-            // TODO FIX SCHEDULE JSON PARSER
-            // TODO 8.12.2022, still broken
-            MappedSchedule mappedSchedule = employee.getWorkSchedule().getMappedSchedule();
-
-
-            return response;
+            return getWorkScheduleResponse(employee);
         }
 
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
+    }
+
+
+    public WorkScheduleResponse getSchedule(Authentication authentication) {
+        User currentUser = authService.getLoggedUserFromAuthentication(authentication);
+        if (currentUser instanceof AbstractEmployee employee) {
+            return getWorkScheduleResponse(employee);
+        }
+
+        throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
+    }
+
+    public List<GenericEmployeeResponse> getAllSchedules() {
+        List<GenericEmployeeResponse> responses = new ArrayList<>();
+
+        List<AbstractEmployee> employees = userRepository.findAllEmployees();
+        for (AbstractEmployee e : employees) {
+            GenericEmployeeResponse response = new GenericEmployeeResponse();
+
+            response.setEmail(e.getEmail());
+            response.setId(e.getUserId());
+            response.setName(e.getFirstName());
+            response.setLastName(e.getLastName());
+            response.setWorkSchedule(getWorkScheduleResponse(e));
+
+            if (e instanceof Dispatcher d) {
+                response.setEmployeeType(EmployeeType.DISPATCHER);
+            }
+
+            if (e instanceof Medic m) {
+                response.setEmployeeType(EmployeeType.MEDIC);
+            }
+
+            responses.add(response);
+        }
+
+        return responses;
     }
 
     public AmbulanceResponse findAssignedAmbulance(Authentication authentication) {
@@ -113,6 +144,22 @@ public class EmployeeService {
         } else {
             throw new HttpException(HttpStatus.FORBIDDEN, "Not a medic");
         }
+    }
+
+    private WorkScheduleResponse getWorkScheduleResponse(AbstractEmployee employee) {
+        WorkSchedule newSchedule = employee.getWorkSchedule();
+        MappedSchedule mappedSchedule = newSchedule.getMappedSchedule();
+
+        WorkScheduleResponse response = new WorkScheduleResponse();
+
+        for (var kv : mappedSchedule.getTimeTable().entrySet()) {
+            response.getSchedule().put(
+                    String.valueOf(kv.getKey()),
+                    new RegisterEmployeeRequest.ScheduleDto(
+                            mappedSchedule.getWorkingHours(kv.getKey()).getLeft().toString(),
+                            mappedSchedule.getWorkingHours(kv.getKey()).getRight().toString()));
+        }
+        return response;
     }
 
     private EmployeeShift startNewShift(AbstractEmployee e) {

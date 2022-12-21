@@ -124,6 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
+                // TODO change permitAlls to correct role access
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/hello/user/**").hasRole("USER")
                 .antMatchers("/hello/admin/**").hasRole("ADMIN")
@@ -143,6 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/accident_report/**").permitAll()
                 .antMatchers("/item/**").permitAll()
+                .antMatchers("/employee/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
