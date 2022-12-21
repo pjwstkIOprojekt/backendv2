@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -30,6 +31,10 @@ public abstract class AbstractEmployee extends User {
 
 
     public EmployeeShift getCurrentShift() {
+        if (shifts.isEmpty()) {
+            return null;
+        }
+
         EmployeeShift shift = shifts.get(shifts.size() - 1);
         for(EmployeeShift e: shifts){
             if(e.getActualStartTime().isBefore(LocalDateTime.now()) && shift.getActualStartTime().isBefore(e.getActualStartTime())){
@@ -40,6 +45,11 @@ public abstract class AbstractEmployee extends User {
     }
 
     public Boolean getWorking(){
+        Optional<EmployeeShift> shiftOptional = Optional.ofNullable(getCurrentShift());
+        if (shiftOptional.isEmpty()) {
+            return false;
+        }
+
         return getCurrentShift().getActualStartTime().isBefore(LocalDateTime.now()) && getCurrentShift().getActualEndTime() == null ;
     }
 }

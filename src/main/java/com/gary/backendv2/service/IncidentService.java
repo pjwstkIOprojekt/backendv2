@@ -182,7 +182,7 @@ public class IncidentService {
 	private void assignDispatcher(Incident incident){
 		List<Dispatcher> dispatchers = getAllByWorking();
 		if(dispatchers.size() == 0){
-			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "There is no dispatcher on duty");
+			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "No dispatchers currently available");
 		}
 		List<Dispatcher> possibleAssigments = new ArrayList<>();
 		int activeIncidents = Integer.MAX_VALUE;
