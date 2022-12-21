@@ -1,5 +1,6 @@
 package com.gary.backendv2.controller;
 
+import com.gary.backendv2.model.dto.request.BackupAddRequest;
 import com.gary.backendv2.model.dto.request.BackupUpdateRequest;
 import com.gary.backendv2.service.BackupService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,12 @@ public class BackupController {
 
 	@GetMapping
 	public ResponseEntity<?> getAll(){ return ResponseEntity.ok(backupService.getAll()); }
+
+	@PostMapping
+	public ResponseEntity<?> add (@RequestBody @Valid BackupAddRequest backupAddRequest){
+		backupService.add(backupAddRequest);
+		return ResponseEntity.ok("Response successfully updated");
+	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid BackupUpdateRequest backupUpdateRequest){

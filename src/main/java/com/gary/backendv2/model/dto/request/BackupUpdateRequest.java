@@ -17,6 +17,5 @@ public class BackupUpdateRequest {
 	@NotBlank
 	private String justification;
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	private BackupType backupType;
 }

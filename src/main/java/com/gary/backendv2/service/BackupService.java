@@ -5,13 +5,18 @@ import com.gary.backendv2.model.Backup;
 import com.gary.backendv2.model.dto.request.BackupAddRequest;
 import com.gary.backendv2.model.dto.request.BackupUpdateRequest;
 import com.gary.backendv2.model.dto.response.BackupResponse;
+import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
 import com.gary.backendv2.repository.BackupRepository;
+import com.gary.backendv2.repository.IncidentRepository;
 import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +26,25 @@ import java.util.Optional;
 public class BackupService {
 	private BackupRepository backupRepository;
 	private UserRepository userRepository;
+	private IncidentRepository incidentRepository;
 
 	public void add(BackupAddRequest backupAddRequest){
 		Optional<User> userOptional = userRepository.findByEmail(backupAddRequest.getRequester());
 		if (userOptional.isEmpty()) {
 			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", backupAddRequest.getRequester()));
 		}
+		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(backupAddRequest.getIncidentId());
+		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", backupAddRequest.getIncidentId()));
+		Backup backup = Backup
+				.builder()
+				.accepted(backupAddRequest.getAccepted())
+				.backupType(backupAddRequest.getBackupType())
+				.incident(accidentReportOptional.get())
+				.justification(backupAddRequest.getJustification())
+				.time(LocalDateTime.now())
+				.requester((AbstractEmployee) userOptional.get())
+				.build();
+		backupRepository.save(backup);
 	}
 
 	public BackupResponse getById(Integer id){
