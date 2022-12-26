@@ -108,6 +108,27 @@ public class AmbulanceService {
         return medicResponses;
     }
 
+    public void removeMedics(String licensePlate, List<Integer> medicIds){
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
+        if (medics.isEmpty()) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, String.format(", User with ids of: %s are not medics", medicIds));
+        }
+
+        Crew crew = null;
+        if (ambulance.getCrew() == null) {
+            crew = crewRepository.save(new Crew());
+            ambulance.setCrew(crew);
+        }
+
+        crew = ambulance.getCrew();
+
+        crew.getMedics().removeAll(medics);
+
+        crewRepository.save(crew);
+    }
+
     public void assignMedics(String licensePlate, List<Integer> medicIds) {
         Ambulance ambulance = getAmbulance(licensePlate);
 
