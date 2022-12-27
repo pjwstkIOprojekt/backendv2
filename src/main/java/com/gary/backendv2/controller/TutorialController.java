@@ -3,6 +3,7 @@ package com.gary.backendv2.controller;
 import com.gary.backendv2.model.dto.request.ReviewRequest;
 import com.gary.backendv2.model.dto.request.TutorialRequest;
 import com.gary.backendv2.service.TutorialService;
+import com.gary.backendv2.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ public class TutorialController {
 
     @GetMapping
     public ResponseEntity<?> getAllTutorials() {return ResponseEntity.ok(tutorialService.getAllTutorial());}
+
+    @GetMapping("/css")
+    public ResponseEntity<?> getCss(){ return ResponseEntity.ok(Utils.getTutorialCss()); }
 
     @GetMapping("/{tutorialId}")
     public ResponseEntity<?> getTutorialById(@PathVariable Integer tutorialId){
