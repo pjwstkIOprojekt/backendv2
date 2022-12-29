@@ -1,4 +1,4 @@
-body
+.tutorial body
 {   margin-top: 0%;
     margin-bottom: 0.2% ;
     margin-left: 10%;
@@ -9,11 +9,11 @@ body
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     background-color: rgb(255, 255, 255);
 }
-h1{
+.tutorial h1{
     text-align: center;
     color:rgb(45, 26, 255);
 }
-h3{
+.tutorial h3{
     text-align: left;
     font-size: x-large;
     margin-top: 4%;
@@ -21,7 +21,7 @@ h3{
     color:rgb(251, 132, 63);
 
 }
-h4{
+.tutorial h4{
     font-weight: normal;
     font-size: larger;
     text-align: left;
@@ -29,50 +29,50 @@ h4{
     margin-bottom: 0.1%;
 }
 
-hr{
+.tutorial hr{
     margin-top: 15px;
     color: black;
     display: flex;
     width: 75%;
 }
-p{
+.tutorial p{
     margin-bottom: 0.2%;
 }
-article img{
+.tutorial article img{
 	border-radius: 5%;
     display: block;
     margin-left: auto;
     margin-right: auto;
     width: 80%;
 }
-img{
+.tutorial img{
     border-radius: 5%;
     display: block;
     margin-left: auto;
     margin-right: auto;
     width: 50%;
 }
-li ol{
+.tutorial li ol{
     list-style-type: lower-alpha;
 }
-ul li{
+.tutorial ul li{
     margin-top: 0.2%;
     margin-bottom: 0.2% ;
 }
 
-li img{
+.tutorial li img{
     margin-top: 1%;
     margin-bottom: 1% ;
 }
 @media only screen and (max-width: 600px) {
-    article img{
+    .tutorial article img{
         border-radius: 5%;
         display: block;
         margin-left: auto;
         margin-right: auto;
         width: auto;
     }   
-    img{
+    .tutorial img{
         border-radius: 5%;
         display: block;
         margin-left: auto;
@@ -81,14 +81,14 @@ li img{
     }
 }
 @media only screen and (max-width: 768px) {
-    article img{
+    .tutorial article img{
         border-radius: 5%;
         display: block;
         margin-left: auto;
         margin-right: auto;
         width: 90%;
         }
-        img{
+        .tutorial img{
         border-radius: 5%;
         display: block;
         margin-left: auto;
@@ -96,7 +96,7 @@ li img{
         width: 100%;
         }
 }
-section a {
+.tutorial section a {
     font-size: small;
     margin-top: 0%;
     margin-bottom: 0%;
