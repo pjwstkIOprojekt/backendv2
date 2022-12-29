@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
+    @GetMapping("/medic")
+    public ResponseEntity<?> getMedics() { return ResponseEntity.ok(employeeService.getAllMedics()); }
+
     @GetMapping("/all/schedule")
     public ResponseEntity<?> getSchedules() {
         return ResponseEntity.ok(employeeService.getAllSchedules());
