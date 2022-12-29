@@ -83,6 +83,11 @@ public class AmbulanceController {
         ambulanceService.assignMedics(licensePlate, List.of(medicIds));
     }
 
+    @DeleteMapping("/{licensePlate}/crew")
+    public void removeMedics(@PathVariable String licensePlate, Integer[] medicIds) {
+        ambulanceService.removeMedics(licensePlate, List.of(medicIds));
+    }
+    
     @PutMapping
     public void updateAmbulance(@RequestBody @Valid AddAmbulanceRequest addAmbulanceRequest) {
         ambulanceService.updateAmbulance(addAmbulanceRequest);

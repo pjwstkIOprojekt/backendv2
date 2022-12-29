@@ -168,4 +168,8 @@ public class Utils {
             jgen.writeEndObject();
         }
     }
+
+    public static String getTutorialCss(){
+        return Utils.loadClasspathResource("classpath:templates/style.css");
+    }
 }
