@@ -7,11 +7,13 @@ import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
 import com.gary.backendv2.model.dto.response.users.GenericEmployeeResponse;
+import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.EmployeeShiftRepository;
+import com.gary.backendv2.repository.MedicRepository;
 import com.gary.backendv2.repository.UserRepository;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.utils.Utils;
@@ -34,6 +36,7 @@ import java.util.Optional;
 public class EmployeeService {
     private final EmployeeShiftRepository employeeShiftRepository;
     private final UserRepository userRepository;
+    private final MedicRepository medicRepository;
 
     private final AmbulanceRepository ambulanceRepository;
     private final AuthService authService;
@@ -144,6 +147,22 @@ public class EmployeeService {
         } else {
             throw new HttpException(HttpStatus.FORBIDDEN, "Not a medic");
         }
+    }
+
+    public List<MedicResponse> getAllMedics(){
+        List<MedicResponse> medicResponses = new ArrayList<>();
+        for(Medic m : medicRepository.findAll()){
+            medicResponses.add(
+                  MedicResponse
+                          .builder()
+                          .email(m.getEmail())
+                          .firstName(m.getFirstName())
+                          .lastName(m.getLastName())
+                          .userId(m.getUserId())
+                          .build()
+            );
+        }
+        return medicResponses;
     }
 
     private WorkScheduleResponse getWorkScheduleResponse(AbstractEmployee employee) {
