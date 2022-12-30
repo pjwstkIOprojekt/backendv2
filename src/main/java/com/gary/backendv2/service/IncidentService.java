@@ -125,10 +125,12 @@ public class IncidentService {
 		List<Ambulance> selectedAmbulances = ambulanceRepository.getAmbulancesByLicensePlateIsIn(ambulancesLicencePlates);
 
 		for (Ambulance a:selectedAmbulances) {
-			a.getIncidents().add(incident);
-			incident.getAmbulances().add(a);
-			ambulanceService.changeAmbulanceState(a.getLicensePlate(), AmbulanceStateType.ON_ACTION);
-			ambulanceRepository.save(a);
+			if(a.getCurrentState().getStateType() == AmbulanceStateType.AVAILABLE) {
+				a.getIncidents().add(incident);
+				incident.getAmbulances().add(a);
+				ambulanceService.changeAmbulanceState(a.getLicensePlate(), AmbulanceStateType.ON_ACTION);
+				ambulanceRepository.save(a);
+			}
 		}
 		incidentRepository.save(incident);
 	}
