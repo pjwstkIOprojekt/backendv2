@@ -159,18 +159,23 @@ public class AuthService {
     }
 
     public void resetPassword(String token, String newPassword) {
-        Optional<ResetPasswordToken> tokenOptional = resetPasswordTokenRepository.findFirstByToken(token);
+        Optional<ResetPasswordToken> tokenOptional = resetPasswordTokenRepository.findByTokenOrderByCreatedAtDesc(token);
         if (tokenOptional.isEmpty()) {
             throw new HttpException(HttpStatus.BAD_REQUEST);
         }
 
         ResetPasswordToken t = tokenOptional.get();
+        if (!t.isValid()) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Invalid token, probably been used already. Try generate a new one");
+        }
+
         User user = t.getUser();
 
         user.setPassword(passwordEncoder.encode(newPassword));
 
-        // TODO invalidate used token
+        t.setValid(false);
 
+        resetPasswordTokenRepository.save(t);
         userRepository.save(user);
     }
 

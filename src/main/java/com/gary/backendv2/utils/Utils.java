@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
@@ -66,6 +67,8 @@ public class Utils {
         ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
         resetPasswordToken.setUser(user);
         resetPasswordToken.setToken(token);
+        resetPasswordToken.setValid(true);
+        resetPasswordToken.setCreatedAt(LocalDateTime.now());
 
         return resetPasswordToken;
     }

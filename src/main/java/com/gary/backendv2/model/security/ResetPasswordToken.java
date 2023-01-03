@@ -19,4 +19,8 @@ public class ResetPasswordToken {
 
     @OneToOne(fetch = FetchType.EAGER)
     private User user;
+
+    private boolean valid;
+
+    private LocalDateTime createdAt;
 }
