@@ -169,6 +169,8 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
 
+        // TODO invalidate used token
+
         userRepository.save(user);
     }
 
