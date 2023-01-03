@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
-public class AppConfig {
+public class JavaMailConfig {
 
     @Value("${spring.mail.username}")
     private String gmailUserName;
