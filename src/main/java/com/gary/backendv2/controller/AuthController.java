@@ -1,11 +1,12 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.exception.HttpException;
-import com.gary.backendv2.model.dto.request.users.LoginRequest;
-import com.gary.backendv2.model.dto.request.users.SignupRequest;
+import com.gary.backendv2.model.dto.request.users.*;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.dto.response.ServerResponse;
 import com.gary.backendv2.security.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,28 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(new ServerResponse("User registered successfully!", HttpStatus.OK));
+    }
+
+    @PutMapping("/password/change")
+    @Operation(summary = "Change password", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, Authentication authentication) {
+        authService.changePassword(authentication, changePasswordRequest);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password/reset")
+    public ResponseEntity<?> generatePasswordResetToken(@Valid @RequestBody PasswordResetTokenRequest passwordResetTokenRequest) {
+        authService.sendPasswordResetToken(passwordResetTokenRequest);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/password/reset")
+    public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        authService.resetPassword(token, resetPasswordRequest.getNewPassword());
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/info")
