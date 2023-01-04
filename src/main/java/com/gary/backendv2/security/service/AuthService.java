@@ -3,6 +3,7 @@ package com.gary.backendv2.security.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.dto.request.users.*;
+import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.security.ResetPasswordToken;
 import com.gary.backendv2.model.security.ResetPasswordTokenRepository;
@@ -11,6 +12,7 @@ import com.gary.backendv2.model.security.UserPrincipal;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.users.*;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
@@ -23,6 +25,7 @@ import com.gary.backendv2.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.users.GenericUser;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -199,6 +202,30 @@ public class AuthService {
             case DISPATCHER -> registerDispatcher(signupRequest);
             case MEDIC -> registerMedic(signupRequest);
         }
+    }
+
+    public GenericUserResponse getUserInfo(Authentication authentication) {
+        User user = getLoggedUserFromAuthentication(authentication);
+        if (user == null) {
+            throw new HttpException(HttpStatus.FORBIDDEN);
+        }
+
+        GenericUserResponse response = new GenericUserResponse();
+        response.setId(user.getUserId());
+        response.setName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setBirthDate(user.getBirthDate());
+        response.setPhone(user.getPhoneNumber());
+        if (user instanceof AbstractEmployee e) {
+            response.setEmployeeType(e.getDiscriminatorValue());
+
+            response.setWorkSchedule(
+                    Utils.createWorkScheduleResponse(e)
+            );
+        }
+
+        return response;
     }
 
     @SneakyThrows

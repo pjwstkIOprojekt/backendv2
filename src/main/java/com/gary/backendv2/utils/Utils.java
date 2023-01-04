@@ -9,8 +9,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
+import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
 import com.gary.backendv2.model.security.ResetPasswordToken;
 import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
 import com.gary.backendv2.model.users.employees.MappedSchedule;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
 import lombok.SneakyThrows;
@@ -59,6 +62,22 @@ public class Utils {
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 
         return ow.writeValueAsString(object);
+    }
+
+    public static WorkScheduleResponse createWorkScheduleResponse(AbstractEmployee employee) {
+        WorkSchedule newSchedule = employee.getWorkSchedule();
+        MappedSchedule mappedSchedule = newSchedule.getMappedSchedule();
+
+        WorkScheduleResponse response = new WorkScheduleResponse();
+
+        for (var kv : mappedSchedule.getTimeTable().entrySet()) {
+            response.getSchedule().put(
+                    String.valueOf(kv.getKey()),
+                    new RegisterEmployeeRequest.ScheduleDto(
+                            mappedSchedule.getWorkingHours(kv.getKey()).getLeft().toString(),
+                            mappedSchedule.getWorkingHours(kv.getKey()).getRight().toString()));
+        }
+        return response;
     }
 
     public static ResetPasswordToken generatePasswordResetTokenForUser(User user) {
