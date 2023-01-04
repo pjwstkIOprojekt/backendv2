@@ -23,4 +23,6 @@ public class ResetPasswordToken {
     private boolean valid;
 
     private LocalDateTime createdAt;
+
+    private final int validFor = 3600; // minutes
 }

@@ -152,7 +152,11 @@ public class AuthService {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setSubject("Gary: Password Reset");
         email.setFrom(environment.getProperty("spring.mail.username"));
-        email.setText("Reset password for : " + user.getEmail() + "\r\n" + "Reset token: " + token.getToken() + "\r\n" + "Please provide this token in password reset form");
+        email.setText("Reset password for : " +
+                user.getEmail() + "\r\n" +
+                "Reset token: " + token.getToken() + "\r\n" +
+                "This token will expire in 24 hours.\r\n" +
+                "Please provide this token in password reset form");
         email.setTo(user.getEmail());
 
         emailSender.send(email);
@@ -166,7 +170,10 @@ public class AuthService {
 
         ResetPasswordToken t = tokenOptional.get();
         if (!t.isValid()) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, "Invalid token, probably been used already. Try generate a new one");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Invalid token, probably been used already. Try to generate a new one");
+        }
+        if (LocalDateTime.now().isAfter(t.getCreatedAt().plusMinutes(t.getValidFor()))) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Expired token, please generate a new one");
         }
 
         User user = t.getUser();
