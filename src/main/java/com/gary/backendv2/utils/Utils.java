@@ -9,10 +9,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
+import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
+import com.gary.backendv2.model.security.ResetPasswordToken;
+import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
 import com.gary.backendv2.model.users.employees.MappedSchedule;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -20,7 +26,9 @@ import org.springframework.util.FileCopyUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
@@ -56,6 +64,44 @@ public class Utils {
         return ow.writeValueAsString(object);
     }
 
+    public static WorkScheduleResponse createWorkScheduleResponse(AbstractEmployee employee) {
+        WorkSchedule newSchedule = employee.getWorkSchedule();
+        MappedSchedule mappedSchedule = newSchedule.getMappedSchedule();
+
+        WorkScheduleResponse response = new WorkScheduleResponse();
+
+        for (var kv : mappedSchedule.getTimeTable().entrySet()) {
+            response.getSchedule().put(
+                    String.valueOf(kv.getKey()),
+                    new RegisterEmployeeRequest.ScheduleDto(
+                            mappedSchedule.getWorkingHours(kv.getKey()).getLeft().toString(),
+                            mappedSchedule.getWorkingHours(kv.getKey()).getRight().toString()));
+        }
+        return response;
+    }
+
+    public static ResetPasswordToken generatePasswordResetTokenForUser(User user) {
+        String token = generatePasswordResetToken();
+
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
+        resetPasswordToken.setUser(user);
+        resetPasswordToken.setToken(token);
+        resetPasswordToken.setValid(true);
+        resetPasswordToken.setCreatedAt(LocalDateTime.now());
+
+        return resetPasswordToken;
+    }
+
+    @SneakyThrows
+    private static String generatePasswordResetToken() {
+        String chrs = "0123456789abcdefghijklmnopqrstuvwxyz-_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+
+        return secureRandom
+                .ints(24, 0, chrs.length())
+                .mapToObj(chrs::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
+    }
 
     public static String loadClasspathResource(String classpath) {
         ResourceLoader resourceLoader = new DefaultResourceLoader();

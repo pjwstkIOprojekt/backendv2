@@ -6,7 +6,7 @@ import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
-import com.gary.backendv2.model.dto.response.users.GenericEmployeeResponse;
+import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.users.employees.*;
@@ -91,7 +91,7 @@ public class EmployeeService {
 
             employee = userRepository.save(employee);
 
-            return getWorkScheduleResponse(employee);
+            return Utils.createWorkScheduleResponse(employee);
         }
 
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
@@ -101,24 +101,24 @@ public class EmployeeService {
     public WorkScheduleResponse getSchedule(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
         if (currentUser instanceof AbstractEmployee employee) {
-            return getWorkScheduleResponse(employee);
+            return Utils.createWorkScheduleResponse(employee);
         }
 
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
     }
 
-    public List<GenericEmployeeResponse> getAllSchedules() {
-        List<GenericEmployeeResponse> responses = new ArrayList<>();
+    public List<GenericUserResponse> getAllSchedules() {
+        List<GenericUserResponse> responses = new ArrayList<>();
 
         List<AbstractEmployee> employees = userRepository.findAllEmployees();
         for (AbstractEmployee e : employees) {
-            GenericEmployeeResponse response = new GenericEmployeeResponse();
+            GenericUserResponse response = new GenericUserResponse();
 
             response.setEmail(e.getEmail());
             response.setId(e.getUserId());
             response.setName(e.getFirstName());
             response.setLastName(e.getLastName());
-            response.setWorkSchedule(getWorkScheduleResponse(e));
+            response.setWorkSchedule(Utils.createWorkScheduleResponse(e));
 
             if (e instanceof Dispatcher d) {
                 response.setEmployeeType(EmployeeType.DISPATCHER);
@@ -163,22 +163,6 @@ public class EmployeeService {
             );
         }
         return medicResponses;
-    }
-
-    private WorkScheduleResponse getWorkScheduleResponse(AbstractEmployee employee) {
-        WorkSchedule newSchedule = employee.getWorkSchedule();
-        MappedSchedule mappedSchedule = newSchedule.getMappedSchedule();
-
-        WorkScheduleResponse response = new WorkScheduleResponse();
-
-        for (var kv : mappedSchedule.getTimeTable().entrySet()) {
-            response.getSchedule().put(
-                    String.valueOf(kv.getKey()),
-                    new RegisterEmployeeRequest.ScheduleDto(
-                            mappedSchedule.getWorkingHours(kv.getKey()).getLeft().toString(),
-                            mappedSchedule.getWorkingHours(kv.getKey()).getRight().toString()));
-        }
-        return response;
     }
 
     private EmployeeShift startNewShift(AbstractEmployee e) {
