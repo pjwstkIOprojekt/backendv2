@@ -122,7 +122,8 @@ public class AuthService {
 
         String currentPassword = user.getPassword();
 
-        if (currentPassword.equals(passwordEncoder.encode(passwordRequest.getNewPassword()))) {
+        // password mismatch
+        if (!currentPassword.equals(passwordEncoder.encode(passwordRequest.getOldPassword()))) {
             throw new HttpException(HttpStatus.BAD_REQUEST, "There was an error processing your request, try again");
         }
 
