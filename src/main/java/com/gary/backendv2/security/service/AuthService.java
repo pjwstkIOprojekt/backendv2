@@ -22,6 +22,7 @@ import com.gary.backendv2.utils.JwtUtils;
 import com.gary.backendv2.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -123,7 +125,8 @@ public class AuthService {
         String currentPassword = user.getPassword();
 
         // password mismatch
-        if (!currentPassword.equals(passwordEncoder.encode(passwordRequest.getOldPassword()))) {
+        if (!passwordEncoder.matches(passwordRequest.getOldPassword(), currentPassword)) {
+            log.info("Password mismatch");
             throw new HttpException(HttpStatus.BAD_REQUEST, "There was an error processing your request, try again");
         }
 
