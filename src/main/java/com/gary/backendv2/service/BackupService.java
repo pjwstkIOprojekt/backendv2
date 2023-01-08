@@ -24,9 +24,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BackupService {
-	private BackupRepository backupRepository;
-	private UserRepository userRepository;
-	private IncidentRepository incidentRepository;
+	private final BackupRepository backupRepository;
+	private final UserRepository userRepository;
+	private final IncidentRepository incidentRepository;
 
 	public void add(BackupAddRequest backupAddRequest){
 		Optional<User> userOptional = userRepository.findByEmail(backupAddRequest.getRequester());
