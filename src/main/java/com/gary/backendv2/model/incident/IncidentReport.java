@@ -28,6 +28,7 @@ public class IncidentReport {
 
 	private String bandCode;
 
+	@Enumerated(EnumType.STRING)
 	private EmergencyType emergencyType;
 
 	private int victimCount;

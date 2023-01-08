@@ -10,20 +10,21 @@ import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
-import com.gary.backendv2.repository.IncidentReportRepository;
-import com.gary.backendv2.repository.AmbulanceRepository;
-import com.gary.backendv2.repository.DispatcherRepository;
-import com.gary.backendv2.repository.IncidentRepository;
+import com.gary.backendv2.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IncidentService {
+	private final WorkScheduleRepository workScheduleRepository;
 	private final IncidentRepository incidentRepository;
 	private final IncidentReportRepository incidentReportRepository;
 	private final AmbulanceRepository ambulanceRepository;
@@ -92,6 +93,7 @@ public class IncidentService {
 				.builder()
 				.incidentReport(incidentReport)
 				.incidentStatusType(IncidentStatusType.NEW)
+				.createdAt(LocalDateTime.now())
 				.build();
 		assignDispatcher(incident);
 		incidentRepository.save(incident);
@@ -118,21 +120,30 @@ public class IncidentService {
 		incidentRepository.delete(accidentReportOptional.get());
 	}
 
-	public void addAmbulances(Integer id, List<String> ambulancesLicencePlates){
+	public Map<String, String> addAmbulances(Integer id, List<String> ambulancesLicencePlates){
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+		Map<String, String> infoMap = new HashMap<>();
+
 		Incident incident = accidentReportOptional.get();
 		List<Ambulance> selectedAmbulances = ambulanceRepository.getAmbulancesByLicensePlateIsIn(ambulancesLicencePlates);
 
-		for (Ambulance a:selectedAmbulances) {
-			if(a.getCurrentState().getStateType() == AmbulanceStateType.AVAILABLE) {
+		for (Ambulance a : selectedAmbulances) {
+			infoMap.put(a.getLicensePlate(), null);
+			if (a.getCurrentState().getStateType() == AmbulanceStateType.AVAILABLE) {
 				a.getIncidents().add(incident);
 				incident.getAmbulances().add(a);
 				ambulanceService.changeAmbulanceState(a.getLicensePlate(), AmbulanceStateType.ON_ACTION);
 				ambulanceRepository.save(a);
+
+				infoMap.replace(a.getLicensePlate(), String.format("Successfully assigned %s to incident of id %s", a.getLicensePlate(), id));
+			} else {
+				infoMap.replace(a.getLicensePlate(), String.format("Ambulance %s cannot be assigned to incident of id %s because Ambulance status is %s which is not %s", a.getLicensePlate(), id, a.getCurrentState().getStateType(), AmbulanceStateType.AVAILABLE));
 			}
 		}
 		incidentRepository.save(incident);
+
+		return infoMap;
 	}
 
 	public void changeIncidentStatus(Integer id, IncidentStatusType incidentStatusType){
@@ -188,8 +199,10 @@ public class IncidentService {
 		}
 		List<Dispatcher> possibleAssigments = new ArrayList<>();
 		int activeIncidents = Integer.MAX_VALUE;
-		for (Dispatcher dispatcher:dispatchers) {
-			if(dispatcher.getOpenIncidents()<activeIncidents){
+
+		for (Dispatcher dispatcher : dispatchers) {
+			log.info("ACTIVE INCIDENTS: {}", activeIncidents);
+			if(dispatcher.getOpenIncidents() < activeIncidents){
 				possibleAssigments.clear();
 				activeIncidents = dispatcher.getOpenIncidents();
 			}
@@ -197,11 +210,18 @@ public class IncidentService {
 				possibleAssigments.add(dispatcher);
 			}
 		}
-		Dispatcher dispatcher = possibleAssigments.get(ThreadLocalRandom.current().nextInt(0, possibleAssigments.size()-1));
+		Dispatcher dispatcher;
+		if (possibleAssigments.size() == 1) {
+			dispatcher = possibleAssigments.get(0);
+		} else {
+			dispatcher = possibleAssigments.get(ThreadLocalRandom.current().nextInt(0, possibleAssigments.size()-1));
+		}
+
 		dispatcher.setOpenIncidents(dispatcher.getOpenIncidents()+1);
 		dispatcher.getIncidents().add(incident);
+		incident.setDispatcher(dispatcher);
+		incident = incidentRepository.save(incident);
 		changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
-		incidentRepository.save(incident);
 		dispatcherRepository.save(dispatcher);
 	}
 
