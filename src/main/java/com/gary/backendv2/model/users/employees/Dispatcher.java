@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Dispatcher extends AbstractEmployee {
-	private  Integer openIncidents;
+	private Integer openIncidents = 0;
 
 	@OneToMany(mappedBy = "dispatcher")
 	private Set<Incident> incidents = new LinkedHashSet<>();
