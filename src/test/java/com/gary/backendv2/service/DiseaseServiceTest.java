@@ -118,5 +118,8 @@ public class DiseaseServiceTest {
         Exception exc = assertThrows(HttpException.class, () -> {
             diseaseService.updateDisease(id, diseaseRequest);
         });
+        String expectedMess = String.format("Cannot find disease with %s", id);
+        String actualMess = exc.getMessage();
+        assertTrue(actualMess.contains(expectedMess));
     }
 }
