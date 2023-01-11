@@ -30,7 +30,7 @@ public class IncidentReport {
 
 	private EmergencyType emergencyType;
 
-	private int victimCount;
+
 
 	@ManyToOne
 	private User reporter;

@@ -23,4 +23,7 @@ public class Facility {
 
 	@Enumerated(EnumType.STRING)
 	private FacilityType facilityType;
+
+	@ManyToOne
+	private CasualtyReport casualtyReport;
 }
