@@ -1,4 +1,4 @@
-package com.gary.backendv2.listener;
+package com.gary.backendv2.event.listener;
 
 import com.gary.backendv2.exception.AdminAccountExistsException;
 import com.gary.backendv2.model.Location;
