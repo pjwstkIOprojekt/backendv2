@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +53,9 @@ public class CasualtyReportService {
                 throw new HttpException(HttpStatus.NOT_FOUND, "Ambulance not found");
             }
             Inventory currentInventory = ambulance.getInventory();
-            List<CasualtyReport> reports = casualtyReportRepository.findByIncidentAndAmbulanceLicensePlate(incident, licensePlate);
+            List<CasualtyReport> reports = casualtyReportRepository.findByIncident(incident);
+            reports.removeIf(report -> report.getIncident().getAmbulances().stream().noneMatch(x -> x.getLicensePlate().equals(licensePlate)));
+
             for (CasualtyReport report : reports) {
                 ConsumptionOfMaterials consumptionOfMaterials = new ConsumptionOfMaterials();
                 consumptionOfMaterials.setCasualtyReport(report);
