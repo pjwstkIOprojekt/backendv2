@@ -13,6 +13,8 @@ services:
   app:
     environment:
       MAPTILER_API_KEY: ${MAPTILER_API_KEY}
+      GMAIL_USERNAME: ${GMAIL_USERNAME}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
     build:
       context: .
       dockerfile: Dockerfile
