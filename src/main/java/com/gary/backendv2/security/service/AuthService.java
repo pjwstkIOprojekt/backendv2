@@ -110,6 +110,7 @@ public class AuthService {
                 .email(signupRequest.getEmail())
                 .userId(null)
                 .medicalInfo(mi)
+                .bandCode(signupRequest.getBandCode())
                 .build();
 
 
@@ -217,9 +218,9 @@ public class AuthService {
         response.setEmail(user.getEmail());
         response.setBirthDate(user.getBirthDate());
         response.setPhone(user.getPhoneNumber());
+        response.setBandCode(user.getBandCode());
         if (user instanceof AbstractEmployee e) {
             response.setEmployeeType(e.getDiscriminatorValue());
-
             response.setWorkSchedule(
                     Utils.createWorkScheduleResponse(e)
             );

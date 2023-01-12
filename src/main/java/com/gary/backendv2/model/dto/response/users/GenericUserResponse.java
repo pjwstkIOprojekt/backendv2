@@ -23,6 +23,7 @@ public class GenericUserResponse {
     private String lastName;
     private String email;
     private String phone;
+    private String bandCode;
     private LocalDate birthDate;
     private EmployeeType employeeType;
     @JsonUnwrapped
@@ -36,6 +37,7 @@ public class GenericUserResponse {
         r.setName(user.getFirstName());
         r.setLastName(user.getLastName());
         r.setBirthDate(user.getBirthDate());
+        r.setBandCode(user.getBandCode());
 
         return r;
     }
