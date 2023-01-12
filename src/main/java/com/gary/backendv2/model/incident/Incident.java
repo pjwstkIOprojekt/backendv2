@@ -7,6 +7,7 @@ import com.gary.backendv2.model.users.employees.Dispatcher;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -32,4 +33,6 @@ public class Incident {
 	private Set<Ambulance> ambulances;
 	@OneToMany
 	private Set<Backup> backups;
+
+	private LocalDateTime createdAt;
 }

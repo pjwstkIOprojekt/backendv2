@@ -12,6 +12,8 @@ import com.gary.backendv2.model.dto.response.*;
 import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
+import com.gary.backendv2.model.enums.IncidentStatusType;
+import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.model.inventory.items.Item;
@@ -26,12 +28,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AmbulanceService {
+    private final IncidentRepository incidentRepository;
     private final ItemService itemService;
 
     private final AmbulanceRepository ambulanceRepository;
@@ -83,6 +87,34 @@ public class AmbulanceService {
         ambulanceStateResponse.setTimestamp(currentState.getTimestamp());
 
         return ambulanceStateResponse;
+    }
+
+    public IncidentResponse getCurrentIncident(String licensePlate) {
+        List<Incident> incidents = incidentRepository.findAll();
+        List<Incident> incidentCandidates = new ArrayList<>();
+
+        for (Incident incident : incidents) {
+            Optional<Ambulance> ambulanceOptional = incident.getAmbulances().stream().filter(x -> x.getLicensePlate().equals(licensePlate)).findFirst();
+            if (ambulanceOptional.isEmpty()) {
+                continue;
+            }
+
+            incidentCandidates.add(incident);
+        }
+        Optional<Incident> incidentOptional = incidentCandidates.stream().max(Comparator.comparing(Incident::getCreatedAt));
+        if (incidentOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s seems to not be assigned to any incidents", licensePlate));
+        }
+        Incident incident = incidentOptional.get();
+
+        return IncidentResponse
+                .builder()
+                .incidentId(incident.getIncidentId())
+                .accidentReport(IncidentReportResponse.of(incident.getIncidentReport()))
+                .dangerScale(incident.getDangerScale())
+                .incidentStatusType(incident.getIncidentStatusType())
+                .reactionJustification(incident.getReactionJustification())
+                .build();
     }
 
     public List<MedicResponse> getCrewMedics(String licensePlate) {

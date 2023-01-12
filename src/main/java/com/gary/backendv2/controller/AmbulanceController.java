@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,11 @@ public class AmbulanceController {
     @GetMapping("/{licensePlate}/equipment")
     public ResponseEntity<?> getItems(@PathVariable String licensePlate) {
         return ResponseEntity.ok(ambulanceService.getItems(licensePlate));
+    }
+
+    @GetMapping("/{licensePlate}/incident")
+    public ResponseEntity<?> currentIncident(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getCurrentIncident(licensePlate));
     }
 
     @GetMapping("/{licensePlate}/crew")
