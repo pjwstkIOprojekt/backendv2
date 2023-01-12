@@ -13,7 +13,7 @@ import javax.validation.Valid;
 @RequestMapping(path = "/backup")
 @RequiredArgsConstructor
 public class BackupController {
-	private BackupService backupService;
+	private final BackupService backupService;
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Integer id){

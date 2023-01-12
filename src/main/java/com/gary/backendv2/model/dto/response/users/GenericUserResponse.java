@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +27,16 @@ public class GenericUserResponse {
     private EmployeeType employeeType;
     @JsonUnwrapped
     private WorkScheduleResponse workSchedule;
+
+    public static GenericUserResponse of(User user) {
+        GenericUserResponse r = new GenericUserResponse();
+        r.setId(user.getUserId());
+        r.setPhone(user.getPhoneNumber());
+        r.setEmail(user.getEmail());
+        r.setName(user.getFirstName());
+        r.setLastName(user.getLastName());
+        r.setBirthDate(user.getBirthDate());
+
+        return r;
+    }
 }

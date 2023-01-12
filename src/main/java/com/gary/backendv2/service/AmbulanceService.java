@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -140,7 +142,7 @@ public class AmbulanceService {
         return medicResponses;
     }
 
-    public void removeMedics(String licensePlate, List<Integer> medicIds){
+    public void removeMedics(String licensePlate, List<Integer> medicIds) {
         Ambulance ambulance = getAmbulance(licensePlate);
 
         List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
@@ -299,6 +301,15 @@ public class AmbulanceService {
         }
 
         itemContainerRepository.save(container);
+        inventoryRepository.save(inventory);
+    }
+
+    public void editItemUnit(String licensePlate, Integer itemId, ItemContainer.Unit unit) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Inventory inventory = ambulance.getInventory();
+        inventory.getItems().get(itemId).setUnit(unit);
+
         inventoryRepository.save(inventory);
     }
 
