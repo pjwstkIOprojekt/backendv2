@@ -3,6 +3,7 @@ package com.gary.backendv2.controller;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
+import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.service.AmbulanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.Getter;
@@ -69,6 +70,12 @@ public class AmbulanceController {
         } else ambulanceService.addItem(licensePlate, itemId);
     }
 
+    @Operation(summary = "Change unit of an item")
+    @PutMapping("/{licensePlate}/items/add/{itemId}")
+    public void editItemUnit(@PathVariable String licensePlate, @PathVariable Integer itemId, @RequestParam(value = "unit", required = true) ItemContainer.Unit unit) {
+        ambulanceService.editItemUnit(licensePlate, itemId, unit);
+    }
+
     @PostMapping("/{licensePlate}/state/{state}")
     public ResponseEntity<?> changeAmbulanceState(@PathVariable String licensePlate, @PathVariable AmbulanceStateType state) {
         return ResponseEntity.ok(ambulanceService.changeAmbulanceState(licensePlate, state));
@@ -85,8 +92,8 @@ public class AmbulanceController {
     }
 
     @PostMapping("/{licensePlate}/crew")
-    public void addMedics(@PathVariable String licensePlate, Integer[] medicIds) {
-        ambulanceService.assignMedics(licensePlate, List.of(medicIds));
+    public void addMedics(@PathVariable String licensePlate, @RequestBody List<Integer> medicIds) {
+        ambulanceService.assignMedics(licensePlate, medicIds);
     }
 
     @DeleteMapping("/{licensePlate}/crew")

@@ -19,7 +19,7 @@ public class GeocodingService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public MaptilerResponse getAddressFromCoordinates(Location location) {
-        ResponseEntity<MaptilerResponse> response = restTemplate.getForEntity(maptiler.createGeoCodingURL(location.getLongitude(), location.getLatitude()), MaptilerResponse.class);
+        ResponseEntity<MaptilerResponse> response = restTemplate.getForEntity(maptiler.createGeoCodingURL(location.getLatitude(), location.getLongitude()), MaptilerResponse.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Failed to call an external api");
         }

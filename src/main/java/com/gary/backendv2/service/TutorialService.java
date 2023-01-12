@@ -4,6 +4,8 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.Tutorial;
 import com.gary.backendv2.model.dto.response.ReviewResponse;
+import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
+import com.gary.backendv2.model.security.UserPrincipal;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.ReviewRequest;
 import com.gary.backendv2.model.dto.request.TutorialRequest;
@@ -13,6 +15,8 @@ import com.gary.backendv2.repository.TutorialRepository;
 import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -101,18 +105,25 @@ public class TutorialService {
 
 
     public void addReviewToTutorial(String email, Integer tutorialId, ReviewRequest reviewRequest) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
+        }
+        User u = optionalUser.get();
+
         Optional<Tutorial> optionalTutorial = tutorialRepository.findById(tutorialId);
         if (optionalTutorial.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find tutorial with %s", tutorialId));
         }
         Tutorial t = optionalTutorial.get();
+        if (t.getReviewSet().stream().anyMatch(x -> x.getReviewer().equals(u))) {
+            // This tutorial had been already reviewed by this user, so update the score
+            Review r = t.getReviewSet().stream().filter(x -> x.getReviewer().equals(u)).findFirst().orElseThrow(() -> {throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Unidentified error whilst editing the review");});
+            r.setValue(reviewRequest.getValue());
 
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find user with %s", email));
+            reviewRepository.save(r);
+            return;
         }
-        User u = optionalUser.get();
 
         Review review = Review.builder()
                 .reviewer(u)
@@ -126,6 +137,7 @@ public class TutorialService {
 
         userRepository.save(u);
         tutorialRepository.save(t);
+        reviewRepository.save(review);
     }
 
     public void deleteReviewFromTutorial(String email, Integer tutorialId, Integer reviewId){
@@ -162,15 +174,25 @@ public class TutorialService {
     }
 
     public void updateTutorialReview(Integer reviewId, ReviewRequest reviewRequest) {
+        User reviewer;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            UserPrincipal loggedPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            reviewer = userRepository.getByEmail(loggedPrincipal.getUsername());
+        } else throw new HttpException(HttpStatus.FORBIDDEN, "This user cannot edit reviews");
+
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);
 
         if (optionalReview.isEmpty()) {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find review with %s", reviewId));
         }
+
         Review review = optionalReview.get();
-        review.setValue(reviewRequest.getValue());
-        review.setReviewDescription(review.getReviewDescription());
-        reviewRepository.save(review);
+        if (review.getReviewer().equals(reviewer)) {
+            review.setValue(reviewRequest.getValue());
+            review.setReviewDescription(review.getReviewDescription());
+            reviewRepository.save(review);
+        }
     }
 
 
@@ -182,8 +204,8 @@ public class TutorialService {
         }
         Review review = optionalReview.get();
         return ReviewResponse.builder()
-                .tutorial(review.getTutorial())
-                .reviewer(review.getReviewer())
+                .tutorial(TutorialResponse.of(review.getTutorial()))
+                .reviewer(GenericUserResponse.of(review.getReviewer()))
                 .reviewDescription(review.getReviewDescription())
                 .value(review.getValue())
                 .build();
@@ -199,8 +221,8 @@ public class TutorialService {
         for (Review review : tutorial.getReviewSet()) {
             tutorialReviews.add(
                     ReviewResponse.builder()
-                            .tutorial(review.getTutorial())
-                            .reviewer(review.getReviewer())
+                            .tutorial(TutorialResponse.of(review.getTutorial()))
+                            .reviewer(GenericUserResponse.of(review.getReviewer()))
                             .reviewDescription(review.getReviewDescription())
                             .value(review.getValue())
                             .build());

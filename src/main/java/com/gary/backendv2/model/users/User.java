@@ -34,6 +34,7 @@ public class User {
     private LocalDate birthDate;
     private String phoneNumber;
 
+    private String bandCode;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;

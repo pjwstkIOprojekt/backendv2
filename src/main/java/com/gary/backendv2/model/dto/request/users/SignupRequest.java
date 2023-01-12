@@ -28,4 +28,7 @@ public class SignupRequest {
     @Past
     @NotNull
     private LocalDate birthDate;
+
+    @NotBlank
+    private String bandCode;
 }

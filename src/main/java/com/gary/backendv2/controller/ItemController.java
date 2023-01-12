@@ -2,6 +2,7 @@ package com.gary.backendv2.controller;
 
 import com.gary.backendv2.factories.ItemResponseFactoryProvider;
 import com.gary.backendv2.factories.asbtract.ItemResponseAbstractFactory;
+import com.gary.backendv2.model.dto.request.items.EditItemRequest;
 import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
 import com.gary.backendv2.model.inventory.items.Item;
 import com.gary.backendv2.service.ItemService;
@@ -45,4 +46,20 @@ public class ItemController {
 
         return responseFactory.createResponse(item);
     }
+
+    @PutMapping("/edit/{itemId}")
+    public AbstractItemResponse editItem(@PathVariable Integer itemId, @RequestBody EditItemRequest editItemRequest) {
+        Item item = itemService.edit(itemId, editItemRequest);
+
+        ItemResponseAbstractFactory responseFactory = ItemResponseFactoryProvider.getItemFactory(item.getDiscriminatorValue());
+
+        return responseFactory.createResponse(item);
+    }
+
+
+    @DeleteMapping("/delete/{itemId}")
+    public void removeItem(@PathVariable Integer itemId) {
+        itemService.delete(itemId);
+    }
+
 }

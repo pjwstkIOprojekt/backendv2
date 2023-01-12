@@ -121,6 +121,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s1.setFirstName("Test");
         s1.setLastName("Testowski");
         s1.setPhoneNumber("123456789");
+        s1.setBandCode("BAND_TEST_CODE1");
 
         SignupRequest s2 = new SignupRequest();
         s2.setEmail("test2@test.pl");
@@ -129,6 +130,8 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s2.setFirstName("Robert");
         s2.setLastName("Kubica");
         s2.setPhoneNumber("9876543231");
+        s2.setBandCode("BAND_TEST_CODE2");
+
 
         SignupRequest s3 = new SignupRequest();
         s3.setEmail("test3@test.pl");
@@ -137,6 +140,8 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s3.setFirstName("Adam");
         s3.setLastName("Małysz");
         s3.setPhoneNumber("111222333");
+        s3.setBandCode("BAND_TEST_CODE3");
+
 
         List<SignupRequest> regular = List.of(s1, s2, s3);
         regular.forEach(x -> authService.registerUser(x));
