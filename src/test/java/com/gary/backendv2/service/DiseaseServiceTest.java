@@ -75,7 +75,7 @@ public class DiseaseServiceTest {
         int id = 2137;
         when(diseaseRepository.findByDiseaseId(id)).thenReturn(Optional.empty());
         Exception exception = assertThrows(HttpException.class, () -> {
-            diseaseService.getAllById(id);
+            diseaseService.removeDisease(id);
         });
         String expectedMessage = String.format("Cannot find disease with %s", id);
         String actualMessage = exception.getMessage();
