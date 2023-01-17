@@ -59,6 +59,7 @@ public class CasualtyReportService {
             Inventory currentInventory = ambulance.getInventory();
             List<CasualtyReport> reports = casualtyReportRepository.findByIncident(incident);
             reports.removeIf(report -> report.getIncident().getAmbulances().stream().noneMatch(x -> x.getLicensePlate().equals(licensePlate)));
+
             for (CasualtyReport report : reports) {
                 ConsumptionOfMaterials consumptionOfMaterials = new ConsumptionOfMaterials();
                 consumptionOfMaterials.setCasualtyReport(report);
