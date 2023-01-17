@@ -36,14 +36,14 @@ public class TutorialService {
         List<Tutorial> tutorials = tutorialRepository.findAll();
         List<TutorialResponse> tutorialResponses = new ArrayList<>();
         for (Tutorial t : tutorials) {
-            OptionalDouble avarageRating = t.getReviewSet().stream().mapToDouble(Review::getValue).average();
+            OptionalDouble averageRating = t.getReviewSet().stream().mapToDouble(Review::getValue).average();
             tutorialResponses.add(
                     TutorialResponse
                             .builder()
                             .tutorialId(t.getTutorialId())
                             .tutorialType(t.getTutorialType())
                             .name(t.getName())
-                            .averageRating(avarageRating.isPresent() ? avarageRating.getAsDouble() : 0.0)
+                            .averageRating(averageRating.isPresent() ? averageRating.getAsDouble() : 0.0)
                             .thumbnail(t.getThumbnail())
                             .tutorialHTML(t.getTutorialHTML())
                             .build()
@@ -203,7 +203,11 @@ public class TutorialService {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find review with %s", reviewId));
         }
         Review review = optionalReview.get();
+
+        System.out.println(review.getId());
+
         return ReviewResponse.builder()
+                .reviewId(review.getId())
                 .tutorial(TutorialResponse.of(review.getTutorial()))
                 .reviewer(GenericUserResponse.of(review.getReviewer()))
                 .reviewDescription(review.getReviewDescription())
@@ -221,6 +225,7 @@ public class TutorialService {
         for (Review review : tutorial.getReviewSet()) {
             tutorialReviews.add(
                     ReviewResponse.builder()
+                            .reviewId(review.getId())
                             .tutorial(TutorialResponse.of(review.getTutorial()))
                             .reviewer(GenericUserResponse.of(review.getReviewer()))
                             .reviewDescription(review.getReviewDescription())

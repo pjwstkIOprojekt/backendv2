@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class SignupRequest {
+public class EditUserRequest  {
     @NotBlank
     private String firstName;
     @NotBlank
@@ -22,11 +22,8 @@ public class SignupRequest {
     private String email;
     @NotBlank
     private String phoneNumber;
-    @NotBlank
-    private String password;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past
     @NotNull
     private LocalDate birthDate;
-
 }

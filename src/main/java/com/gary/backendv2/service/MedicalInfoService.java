@@ -36,6 +36,36 @@ public class MedicalInfoService {
 				.orElseThrow(()->new HttpException(HttpStatus.NOT_FOUND,  String.format("Cannot find medical info with id %s", id)));
 	}
 
+	public MedicalInfoResponse getByBandCode(String bandCode) {
+		Optional<User> userOptional = userRepository.findByBandCode(bandCode);
+		if (userOptional.isEmpty()) {
+			throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find User with bandcode %s", bandCode));
+		}
+		User user = userOptional.get();
+
+		MedicalInfo medicalInfo = Optional.ofNullable(user.getMedicalInfo()).orElseThrow(() -> new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "This user doesn't have medical info object assigned, weird..."));
+
+		List<AllergyResponse> allergies = new ArrayList<>();
+		List<DiseaseResponse> diseases = new ArrayList<>();
+		for (Allergy a : medicalInfo.getAllergies()) {
+			allergies.add(allergyService.getById(a.getAllergyId()));
+		}
+		for (Disease d : medicalInfo.getDiseases()){
+			if (d.isShareWithBand()) {
+				diseases.add(diseaseService.getAllById(d.getDiseaseId()));
+			}
+		}
+
+		return MedicalInfoResponse
+				.builder()
+				.medicalInfoId(medicalInfo.getMedicalInfoId())
+				.rhType(medicalInfo.getRhType())
+				.bloodType(medicalInfo.getBloodType())
+				.diseases(diseases)
+				.allergies(allergies)
+				.build();
+	}
+
 	public MedicalInfoResponse getByUserEmail(String email){
 		Optional<User> userOptional = userRepository.findByEmail(email);
 		if (userOptional.isEmpty()) {

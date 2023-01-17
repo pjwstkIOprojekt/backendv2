@@ -110,7 +110,7 @@ public class AuthService {
                 .email(signupRequest.getEmail())
                 .userId(null)
                 .medicalInfo(mi)
-                .bandCode(signupRequest.getBandCode())
+                .bandCode(Utils.generateBandCode())
                 .build();
 
 
@@ -205,6 +205,21 @@ public class AuthService {
         }
     }
 
+    public void editUserInfo(EditUserRequest editUserRequest, Authentication authentication) {
+        User user = getLoggedUserFromAuthentication(authentication);
+        if (user == null) {
+            throw new HttpException(HttpStatus.FORBIDDEN);
+        }
+
+        user.setEmail(editUserRequest.getEmail());
+        user.setBirthDate(editUserRequest.getBirthDate());
+        user.setFirstName(editUserRequest.getFirstName());
+        user.setLastName(editUserRequest.getLastName());
+        user.setPhoneNumber(editUserRequest.getPhoneNumber());
+
+        userRepository.save(user);
+    }
+
     public GenericUserResponse getUserInfo(Authentication authentication) {
         User user = getLoggedUserFromAuthentication(authentication);
         if (user == null) {
@@ -245,6 +260,7 @@ public class AuthService {
         dispatcher.setWorkSchedule(workSchedule);
         dispatcher.setBirthDate(employeeRequest.getBirthDate());
         dispatcher.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
+        dispatcher.setBandCode(Utils.generateBandCode());
 
 
         Role userRole = Optional.ofNullable(
@@ -271,6 +287,7 @@ public class AuthService {
         medic.setWorkSchedule(workSchedule);
         medic.setBirthDate(employeeRequest.getBirthDate());
         medic.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
+        medic.setBandCode(Utils.generateBandCode());
 
         Role userRole = Optional.ofNullable(
                 roleRepository.findByName(RoleName.MEDIC.getPrefixedName())

@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     User getByEmail(String email);
     User getByUserId(Integer id);
+    Optional<User> findByBandCode(String bandCode);
     Boolean existsByEmail(String email);
 
     @Query(
