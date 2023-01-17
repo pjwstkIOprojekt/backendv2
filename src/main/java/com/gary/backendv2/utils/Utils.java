@@ -120,12 +120,11 @@ public class Utils {
     private static final int BANDCODE_LENGHT = 3;
     @SneakyThrows
     public static String generateBandCode() {
-        Random secureRandom = SecureRandom.getInstanceStrong();
         DictionaryIndexer indexer = DictionaryIndexer.getInstance();
 
         List<String> bandCode = new ArrayList<>();
         for (int i = 0; i < BANDCODE_LENGHT; i++) {
-            String randomLetter = String.valueOf((char) secureRandom.nextInt('a', 'z'));
+            String randomLetter = String.valueOf((char) ThreadLocalRandom.current().nextInt('a', 'z'));
             List<String> codeCandidates = indexer.indexedDictionary.get(randomLetter);
             int size = codeCandidates.size();
 
