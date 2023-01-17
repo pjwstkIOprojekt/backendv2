@@ -20,6 +20,11 @@ public class MedicalInfoController {
 		return ResponseEntity.ok(medicalInfoService.getByUserEmail(email));
 	}
 
+	@GetMapping("/user/bandcode/{bandCode}")
+	public ResponseEntity<?> getByBandCode(@PathVariable String bandCode) {
+		return ResponseEntity.ok(medicalInfoService.getByBandCode(bandCode));
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> removeMedicalInfo(@PathVariable Integer id){
 		medicalInfoService.removeMedicalInfo(id);

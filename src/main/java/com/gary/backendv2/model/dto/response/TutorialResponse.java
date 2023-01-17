@@ -1,5 +1,6 @@
 package com.gary.backendv2.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.Tutorial;
 import com.gary.backendv2.model.enums.TutorialType;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TutorialResponse {
     Integer tutorialId;
     String name;

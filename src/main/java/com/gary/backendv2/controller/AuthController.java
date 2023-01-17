@@ -69,6 +69,14 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/user/edit")
+    @Operation(summary = "Edit user info", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> updateUser(@Valid @RequestBody EditUserRequest editUserRequest, Authentication authentication) {
+        authService.editUserInfo(editUserRequest, authentication);
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/user/info")
     @Operation(summary = "Get user info", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Object> printAuthentication(Authentication authentication) {

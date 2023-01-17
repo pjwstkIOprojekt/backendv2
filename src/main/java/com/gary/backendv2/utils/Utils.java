@@ -18,7 +18,6 @@ import com.gary.backendv2.model.users.employees.MappedSchedule;
 import com.gary.backendv2.model.users.employees.WorkSchedule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -30,12 +29,11 @@ import java.security.SecureRandom;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -118,8 +116,26 @@ public class Utils {
         return fileContents;
         
     }
-        
-        
+
+    private static final int BANDCODE_LENGHT = 3;
+    @SneakyThrows
+    public static String generateBandCode() {
+        Random secureRandom = SecureRandom.getInstanceStrong();
+        DictionaryIndexer indexer = DictionaryIndexer.getInstance();
+
+        List<String> bandCode = new ArrayList<>();
+        for (int i = 0; i < BANDCODE_LENGHT; i++) {
+            String randomLetter = String.valueOf((char) secureRandom.nextInt('a', 'z'));
+            List<String> codeCandidates = indexer.indexedDictionary.get(randomLetter);
+            int size = codeCandidates.size();
+
+            String randomWord = codeCandidates.get(ThreadLocalRandom.current().nextInt(0, size));
+            bandCode.add(randomWord);
+        }
+
+        return String.join("-", bandCode);
+    }
+
     public static class ScheduleDeserializer extends StdDeserializer<MappedSchedule> {
 
         public ScheduleDeserializer() {

@@ -1,6 +1,5 @@
 package com.gary.backendv2.event.listener;
 
-import com.gary.backendv2.exception.AdminAccountExistsException;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.Tutorial;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
@@ -12,6 +11,7 @@ import com.gary.backendv2.model.security.Role;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.utils.DictionaryIndexer;
 import com.gary.backendv2.utils.Utils;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import javax.validation.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -57,6 +58,13 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        DictionaryIndexer indexer = DictionaryIndexer.getInstance();
+       try {
+           indexer.index();
+       } catch (IOException e) {
+           System.err.println("ERROR INDEXING DICTIONARY");
+       }
+
         seed();
     }
 
@@ -121,7 +129,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s1.setFirstName("Test");
         s1.setLastName("Testowski");
         s1.setPhoneNumber("123456789");
-        s1.setBandCode("BAND_TEST_CODE1");
 
         SignupRequest s2 = new SignupRequest();
         s2.setEmail("test2@test.pl");
@@ -130,7 +137,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s2.setFirstName("Robert");
         s2.setLastName("Kubica");
         s2.setPhoneNumber("9876543231");
-        s2.setBandCode("BAND_TEST_CODE2");
 
 
         SignupRequest s3 = new SignupRequest();
@@ -140,7 +146,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         s3.setFirstName("Adam");
         s3.setLastName("Małysz");
         s3.setPhoneNumber("111222333");
-        s3.setBandCode("BAND_TEST_CODE3");
 
 
         List<SignupRequest> regular = List.of(s1, s2, s3);
@@ -272,11 +277,13 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
         Tutorial tutorial4 = new Tutorial();
         tutorial4.setName("Oparzenie");
+        tutorial4.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_the_Red_Cross.svg/1280px-Flag_of_the_Red_Cross.svg.png");
         tutorial4.setTutorialType(TutorialType.COURSE);
         tutorial4.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_burns.html"));
 
         Tutorial tutorial5 = new Tutorial();
         tutorial5.setName("Udar");
+        tutorial5.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_the_Red_Cross.svg/1280px-Flag_of_the_Red_Cross.svg.png");
         tutorial5.setTutorialType(TutorialType.GENERAL);
         tutorial5.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_stroke.html"));
 
