@@ -9,4 +9,6 @@ import java.util.List;
 public interface CasualtyReportRepository extends JpaRepository<CasualtyReport, Integer> {
 
     List<CasualtyReport> findByIncidentAndAmbulanceLicensePlate(Incident incident, String licensePlate);
+
+    List<CasualtyReport> findByIncident(Incident incident);
 }

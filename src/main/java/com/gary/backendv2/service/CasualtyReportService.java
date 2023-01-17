@@ -5,12 +5,16 @@ import com.gary.backendv2.factories.impl.CasualtyReportFactory;
 import com.gary.backendv2.model.CasualtyReport;
 import com.gary.backendv2.model.Consumption;
 import com.gary.backendv2.model.ConsumptionOfMaterials;
+import com.gary.backendv2.model.Facility;
 import com.gary.backendv2.model.ambulance.Ambulance;
+import com.gary.backendv2.model.dto.request.CasualtyReportRequest;
+import com.gary.backendv2.model.dto.response.CasualtyReportResponse;
 import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.repository.CasualtyReportRepository;
 import com.gary.backendv2.repository.ConsumptionOfMaterialsRepository;
+import com.gary.backendv2.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +32,7 @@ public class CasualtyReportService {
 
     private Map<String, Inventory> stateOfInventory;
 
+    private final FacilityRepository facilityRepository;
     @Autowired
     private final ConsumptionOfMaterialsRepository consumptionOfMaterialsRepository;
 
@@ -52,7 +57,8 @@ public class CasualtyReportService {
                 throw new HttpException(HttpStatus.NOT_FOUND, "Ambulance not found");
             }
             Inventory currentInventory = ambulance.getInventory();
-            List<CasualtyReport> reports = casualtyReportRepository.findByIncidentAndAmbulanceLicensePlate(incident, licensePlate);
+            List<CasualtyReport> reports = casualtyReportRepository.findByIncident(incident);
+            reports.removeIf(report -> report.getIncident().getAmbulances().stream().noneMatch(x -> x.getLicensePlate().equals(licensePlate)));
             for (CasualtyReport report : reports) {
                 ConsumptionOfMaterials consumptionOfMaterials = new ConsumptionOfMaterials();
                 consumptionOfMaterials.setCasualtyReport(report);
@@ -80,6 +86,79 @@ public class CasualtyReportService {
                 }
             }
         }
+    }
+
+    public void addDiscription(Integer id, String description) {
+        Optional<CasualtyReport> optionalCasualtyReport = casualtyReportRepository.findById(id);
+        if(optionalCasualtyReport.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Casualty report with id %s not found", id));
+        }
+        CasualtyReport casualtyReport = optionalCasualtyReport.get();
+        casualtyReport.setDescription(description);
+        casualtyReportRepository.save(casualtyReport);
+    }
+
+    public void addFacility(Integer id, Integer facilityId){
+        Optional<Facility> optionalFacility = facilityRepository.findById(id);
+        if(optionalFacility.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Facility with id %s not found", id));
+        }
+        Facility facility = optionalFacility.get();
+        Optional<CasualtyReport> optionalCasualtyReport = casualtyReportRepository.findById(facilityId);
+        if(optionalCasualtyReport.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Casualty report with id %s not found", facilityId));
+        }
+        CasualtyReport casualtyReport = optionalCasualtyReport.get();
+        casualtyReport.getFacilities().add(facility);
+        facility.setCasualtyReport(casualtyReport);
+        casualtyReportRepository.save(casualtyReport);
+        facilityRepository.save(facility);
+    }
+
+    public List<CasualtyReportResponse> getAllCasualtyReports() {
+        List<CasualtyReport> casualtyReports = casualtyReportRepository.findAll();
+        List<CasualtyReportResponse> allreports = new ArrayList<>();
+        for (CasualtyReport casualtyReport: casualtyReports) {
+            allreports.add(CasualtyReportResponse.builder()
+                            .description(casualtyReport.getDescription())
+                            .facilities(casualtyReport.getFacilities())
+                            .itemCounts(casualtyReport.getItemCounts())
+                            .incident(casualtyReport.getIncident())
+                            .build());
+        }
+        return allreports;
+    }
+    public CasualtyReportResponse getCasualtyReportById(Integer id) {
+        Optional<CasualtyReport> optionalCasualtyReport = casualtyReportRepository.findById(id);
+        if(optionalCasualtyReport.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find casualty report with %s", id));
+        }
+        CasualtyReport report = optionalCasualtyReport.get();
+        return CasualtyReportResponse.builder()
+                .incident(report.getIncident())
+                .description(report.getDescription())
+                .facilities(report.getFacilities())
+                .itemCounts(report.getItemCounts())
+                .build();
+    }
+
+    public void updateDescription(Integer id, CasualtyReportRequest casualtyReportRequest) {
+        Optional<CasualtyReport> optionalCasualtyReport = casualtyReportRepository.findById(id);
+        if(optionalCasualtyReport.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find casualty report with %s", id));
+        }
+        CasualtyReport report = optionalCasualtyReport.get();
+        report.setDescription(casualtyReportRequest.getDescription());
+        casualtyReportRepository.save(report);
+    }
+
+    public void deleteCasualtyReport(Integer id) {
+        Optional<CasualtyReport> optionalCasualtyReport = casualtyReportRepository.findById(id);
+        if(optionalCasualtyReport.isEmpty()){
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find casualty report with %s", id));
+        }
+        CasualtyReport report = optionalCasualtyReport.get();
+        casualtyReportRepository.delete(report);
     }
 
 
