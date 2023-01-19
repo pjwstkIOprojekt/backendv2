@@ -37,6 +37,7 @@ gary:
         password: "admin"
   feature_flags:
     password_reset: ${FEATURE_PASSWORD_RESET}
+    seed: ${SEED}
 
 
 
