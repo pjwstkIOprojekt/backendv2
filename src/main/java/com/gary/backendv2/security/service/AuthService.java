@@ -224,7 +224,7 @@ public class AuthService {
         }
 
         GenericUserResponse response = new GenericUserResponse();
-        response.setUserId(user.getUserId());
+        response.setId(user.getUserId());
         response.setName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());

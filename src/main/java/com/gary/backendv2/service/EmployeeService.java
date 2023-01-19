@@ -119,7 +119,7 @@ public class EmployeeService {
             GenericUserResponse response = new GenericUserResponse();
 
             response.setEmail(e.getEmail());
-            response.setUserId(e.getUserId());
+            response.setId(e.getUserId());
             response.setName(e.getFirstName());
             response.setLastName(e.getLastName());
             response.setWorkSchedule(Utils.createWorkScheduleResponse(e));

@@ -47,6 +47,7 @@ public class LoggedEmployeeController {
     }
 
     @GetMapping("/schedule/is-working")
+    @Operation(summary = "Get whether logged employee is working or not", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getShiftStatus(Authentication authentication) {
         return ResponseEntity.ok(employeeService.amIWorking(authentication));
     }
