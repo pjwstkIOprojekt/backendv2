@@ -13,5 +13,7 @@ public class FacilityResponse {
 	private Integer facilityId;
 	private String name;
 	private Location location;
+
+	private String address;
 	private FacilityType facilityType;
 }

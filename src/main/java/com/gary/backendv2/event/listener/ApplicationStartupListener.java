@@ -24,6 +24,7 @@ import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.service.GeocodingService;
 import com.gary.backendv2.service.IncidentReportService;
 import com.gary.backendv2.service.ItemService;
 import com.gary.backendv2.utils.DictionaryIndexer;
@@ -71,6 +72,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     AuthService authService;
     @Autowired
     AmbulanceService ambulanceService;
+
+    @Autowired
+    GeocodingService geocodingService;
 
     @Autowired
     IncidentReportService incidentReportService;
@@ -135,7 +139,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
            // Sample user generated data
            Map<Class<?>, List<BaseRequest>> databaseInitializationMap = prepareSampleDataRequests();
-           new Facility().accept(objectInitializationVisitor, databaseInitializationMap.get(Facility.class));
+           new Facility().accept(objectInitializationVisitor, geocodingService, databaseInitializationMap.get(Facility.class));
            new Ambulance().accept(objectInitializationVisitor, ambulanceService, databaseInitializationMap.get(Ambulance.class));
            new User().accept(objectInitializationVisitor, authService, databaseInitializationMap.get(User.class));
            new Medic().accept(objectInitializationVisitor, authService, EmployeeType.MEDIC, databaseInitializationMap.get(Medic.class));

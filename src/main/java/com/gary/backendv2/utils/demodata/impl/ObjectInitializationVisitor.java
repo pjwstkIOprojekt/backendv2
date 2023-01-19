@@ -23,6 +23,7 @@ import com.gary.backendv2.repository.FacilityRepository;
 import com.gary.backendv2.repository.ItemRepository;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.service.GeocodingService;
 import com.gary.backendv2.service.IncidentReportService;
 import com.gary.backendv2.service.ItemService;
 import com.gary.backendv2.utils.demodata.EntityVisitor;
@@ -39,9 +40,9 @@ public class ObjectInitializationVisitor implements EntityVisitor {
     private final AmbulanceRepository ambulanceRepository;
 
     @Override
-    public void visit(Facility facility, List<BaseRequest> baseRequests) {
+    public void visit(Facility facility, GeocodingService geocodingService, List<BaseRequest> baseRequests) {
         for (BaseRequest baseRequest : baseRequests) {
-            facilityRepository.save(facility.create((FacilityRequest) baseRequest));
+            facilityRepository.save(facility.create((FacilityRequest) baseRequest, geocodingService));
         }
     }
 

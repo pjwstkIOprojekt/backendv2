@@ -16,13 +16,14 @@ import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.service.GeocodingService;
 import com.gary.backendv2.service.IncidentReportService;
 import com.gary.backendv2.service.ItemService;
 
 import java.util.List;
 
 public interface EntityVisitor {
-    void visit(Facility facility, List<BaseRequest> baseRequests);
+    void visit(Facility facility, GeocodingService geocodingService, List<BaseRequest> baseRequests);
     void visit(Ambulance ambulance, AmbulanceService ambulanceService, List<BaseRequest> baseRequests);
     void visit(User user, AuthService authService, List<BaseRequest> baseRequests);
     void visit(Medic medic, AuthService authService, EmployeeType employeeType, List<BaseRequest> baseRequests);
