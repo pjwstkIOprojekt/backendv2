@@ -38,7 +38,7 @@ public class IncidentReport {
 	@Enumerated(EnumType.STRING)
 	private EmergencyType emergencyType;
 
-	private int victimCount;
+
 
 	@ManyToOne
 	private User reporter;

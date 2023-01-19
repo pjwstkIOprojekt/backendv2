@@ -96,7 +96,6 @@ public class IncidentReportService {
 				.date(LocalDateTime.now())
 				.description(incidentReportRequest.getDescription())
 				.emergencyType(incidentReportRequest.getEmergencyType())
-				.victimCount(incidentReportRequest.getVictimCount())
 				.location(Location.of(incidentReportRequest.getLongitude(), incidentReportRequest.getLatitude()))
 				.build();
 
@@ -119,7 +118,6 @@ public class IncidentReportService {
 		incidentReport.setBandCode(accidentReportUpdateRequest.getBandCode());
 		incidentReport.setConscious(accidentReportUpdateRequest.isConsciousness());
 		incidentReport.setEmergencyType(accidentReportUpdateRequest.getEmergencyType());
-		incidentReport.setVictimCount(accidentReportUpdateRequest.getVictimCount());
 		incidentReport.setLocation(Location.of(accidentReportUpdateRequest.getLongitude(), accidentReportUpdateRequest.getLatitude()));
 		incidentReportRepository.save(incidentReport);
 	}

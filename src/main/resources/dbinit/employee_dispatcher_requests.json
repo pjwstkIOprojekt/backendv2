@@ -6,5 +6,29 @@
       "phoneNumber": "123456789",
       "password": "test123",
       "birthDate": "2000-01-01"
-    }
+    },
+  {
+    "firstName": "Kamil",
+    "lastName": "Kamilowski",
+    "email": "kamil@test.pl",
+    "phoneNumber": "12345678",
+    "password": "111123",
+    "birthDate": "2000-01-01"
+  },
+  {
+    "firstName": "Antek",
+    "lastName": "Antowski",
+    "email": "Antek@test.pl",
+    "phoneNumber": "12345678",
+    "password": "test123",
+    "birthDate": "2000-01-01"
+  },
+  {
+    "firstName": "Anna",
+    "lastName": "Annorowska",
+    "email": "Anka@test.pl",
+    "phoneNumber": "12345678",
+    "password": "test123",
+    "birthDate": "2001-01-01"
+  }
 ]

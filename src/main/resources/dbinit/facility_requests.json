@@ -46,5 +46,51 @@
     "latitude": 52.23495734296105,
     "name": "Metro Świętokrzyska",
     "facilityType": "AED"
+  },
+  {
+    "longitude": 16.935900,
+    "latitude": 52.403260,
+    "name": "Uniwersytecki Szpital",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 20.951870,
+    "latitude": 52.286369,
+    "name": "Szpital Bielański",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 21.037500,
+    "latitude": 52.204950,
+    "name": "Szpital Czerniakowski",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 21.000561,
+    "latitude": 52.198872,
+    "name": "Szpital Czerniakowski",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 20.971920,
+    "latitude": 52.234460,
+    "name": "Wojewódzki Szpital Zakaźny w Warszawie",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 20.971920,
+    "latitude": 52.234460,
+    "name": "Szpital Specjalistyczny \"Inflancka\" im. Krysi Niżyńskiej",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 20.971920,
+    "latitude": 52.234460,
+    "name": "Komisariat Policji Metra Warszawskiego",
+    "facilityType": "POLICE_STATION"
   }
+
+
+
+
 ]

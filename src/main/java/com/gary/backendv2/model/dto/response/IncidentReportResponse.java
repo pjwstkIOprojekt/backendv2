@@ -29,7 +29,6 @@ public class IncidentReportResponse {
 				.builder()
 				.date(incidentReport.getDate())
 				.accidentId(incidentReport.getAccidentId())
-				.victimCount(incidentReport.getVictimCount())
 				.location(incidentReport.getLocation())
 				.emergencyType(incidentReport.getEmergencyType())
 				.breathing(incidentReport.isBreathing())
