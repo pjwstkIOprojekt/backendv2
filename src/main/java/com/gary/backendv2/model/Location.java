@@ -28,6 +28,6 @@ public class Location {
 	}
 
 	public static Location defaultLocation() {
-		return new Location(52.21934563858324, 20.977728377285462);
+		return new Location(20.977728377285462, 52.21934563858324);
 	}
 }
