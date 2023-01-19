@@ -20,5 +20,43 @@
         "end": "22:14"
       }
     }
+  },
+  {
+  "firstName": "Adam",
+  "lastName": "String",
+  "email": "Adam@gmail.com",
+  "phoneNumber": "11111111",
+  "password": "11111111",
+  "birthDate": "2011-01-19",
+  "workSchedule": {
+    "MONDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "TUESDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "WEDNESDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "THURSDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "FRIDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "SATURDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "SUNDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    }
   }
+}
 ]
