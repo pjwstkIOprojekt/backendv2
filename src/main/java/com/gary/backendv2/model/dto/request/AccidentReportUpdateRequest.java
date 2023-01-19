@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class AccidentReportUpdateRequest {
+public class AccidentReportUpdateRequest extends BaseRequest {
 	private String bandCode;
 	@NotNull
 	@Enumerated(EnumType.STRING)

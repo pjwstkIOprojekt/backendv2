@@ -1,0 +1,10 @@
+[
+    {
+      "firstName": "Dyspozytor",
+      "lastName": "Dyspozytorowski",
+      "email": "dispatch@test.pl",
+      "phoneNumber": "123456789",
+      "password": "test123",
+      "birthDate": "2000-01-01"
+    }
+]

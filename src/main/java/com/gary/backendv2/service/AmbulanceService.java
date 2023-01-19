@@ -413,7 +413,7 @@ public class AmbulanceService {
         return responseSet;
     }
 
-    private Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
+    public Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
         Inventory inventory = inventoryRepository.save(new Inventory());
 
 
@@ -427,6 +427,8 @@ public class AmbulanceService {
         ambulanceHistory.getAmbulanceStates().add(ambulanceState);
         ambulanceHistory = ambulanceHistoryRepository.save(ambulanceHistory);
 
+        Crew crew = crewRepository.save(new Crew());
+
         Ambulance ambulance = new Ambulance();
         ambulance.setAmbulanceClass(addRequest.getAmbulanceClass());
         ambulance.setAmbulanceType(addRequest.getAmbulanceType());
@@ -437,6 +439,7 @@ public class AmbulanceService {
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
         ambulance.setInventory(inventory);
+        ambulance.setCrew(crew);
 
         return ambulance;
     }

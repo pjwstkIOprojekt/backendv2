@@ -52,7 +52,7 @@ public class IncidentService {
 		return incidentResponses;
 	}
 
-	public IncidentResponse getById(Integer id){
+	public IncidentResponse getById(Integer id) {
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
@@ -88,14 +88,14 @@ public class IncidentService {
 		return incidentResponses;
 	}
 
-	public void addFromReport(IncidentReport incidentReport){
+	public void addFromReport(IncidentReport incidentReport, boolean seeding){
 		Incident incident = Incident
 				.builder()
 				.incidentReport(incidentReport)
 				.incidentStatusType(IncidentStatusType.NEW)
 				.createdAt(LocalDateTime.now())
 				.build();
-		assignDispatcher(incident);
+		assignDispatcher(incident, seeding);
 		incidentRepository.save(incident);
 		incidentReport.setIncident(incident);
 		incidentReportRepository.save(incidentReport);
@@ -192,9 +192,28 @@ public class IncidentService {
 		return map;
 	}
 
-	private void assignDispatcher(Incident incident){
+
+	private void assignDispatcher(Incident incident) {
+		assignDispatcher(incident, false);
+	}
+
+	private void assignDispatcher(Incident incident, boolean seeding){
 		List<Dispatcher> dispatchers = getAllByWorking();
-		if(dispatchers.size() == 0){
+
+		if (seeding) {
+			Dispatcher d = dispatcherRepository.findByEmail("dispatch@test.pl").orElseThrow(() -> new RuntimeException("Exception during seeding, cannot assign a dispatcher to an Incident report skipping.."));
+
+			d.setOpenIncidents(d.getOpenIncidents()+1);
+			d.getIncidents().add(incident);
+			incident.setDispatcher(d);
+			incident = incidentRepository.save(incident);
+			changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
+			dispatcherRepository.save(d);
+
+			return;
+		}
+
+		if(dispatchers.size() == 0) {
 			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "No dispatchers currently available");
 		}
 		List<Dispatcher> possibleAssigments = new ArrayList<>();

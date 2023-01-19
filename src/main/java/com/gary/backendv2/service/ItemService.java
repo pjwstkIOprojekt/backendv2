@@ -12,6 +12,7 @@ import com.gary.backendv2.repository.ItemContainerRepository;
 import com.gary.backendv2.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.hibernate.Hibernate;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class ItemService {
     }
 
     public Item edit(Integer itemId, EditItemRequest itemRequest) {
-        Item item = itemRepository.getReferenceById(itemId);
+        Item item = (Item) Hibernate.unproxy(itemRepository.getReferenceById(itemId));
 
         Item refHolder;
 

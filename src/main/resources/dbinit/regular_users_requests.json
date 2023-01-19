@@ -1,0 +1,26 @@
+[
+  {
+    "firstName": "Test",
+    "lastName": "Testowski",
+    "email": "test@test.pl",
+    "phoneNumber": "123456789",
+    "password": "test123",
+    "birthDate": "2000-01-01"
+  },
+  {
+    "firstName": "Robert",
+    "lastName": "Kubica",
+    "email": "test2@test.pl",
+    "phoneNumber": "string",
+    "password": "9876543231",
+    "birthDate": "1984-12-07"
+  },
+  {
+    "firstName": "Adam",
+    "lastName": "Małysz",
+    "email": "test3@test.pl",
+    "phoneNumber": "string",
+    "password": "111222333",
+    "birthDate": "1977-12-03"
+  }
+]

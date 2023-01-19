@@ -2,6 +2,7 @@ package com.gary.backendv2.model.dto.request.items;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.gary.backendv2.model.dto.request.BaseRequest;
 import com.gary.backendv2.model.enums.ItemType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,6 @@ import lombok.Setter;
         @JsonSubTypes.Type(value = CreateMultiUseItemRequest.class, name = "MULTI_USE")
 })
 @NoArgsConstructor
-public abstract class AbstractCreateItemRequest {
+public abstract class AbstractCreateItemRequest extends BaseRequest {
     protected ItemType type;
 }

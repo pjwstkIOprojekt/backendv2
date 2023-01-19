@@ -1,6 +1,7 @@
 package com.gary.backendv2.model.dto.request.users;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gary.backendv2.model.dto.request.BaseRequest;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,14 +13,11 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class EditUserRequest  {
+public class EditUserRequest extends BaseRequest {
     @NotBlank
     private String firstName;
     @NotBlank
     private String lastName;
-    @Email
-    @NotBlank
-    private String email;
     @NotBlank
     private String phoneNumber;
     @JsonFormat(pattern = "yyyy-MM-dd")

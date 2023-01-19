@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class BackupUpdateRequest {
+public class BackupUpdateRequest extends BaseRequest {
 	@NotNull
 	private Boolean accepted;
 	@NotBlank

@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class BloodRequest {
+public class BloodRequest extends BaseRequest {
 
 	@Email
 	String userEmail;

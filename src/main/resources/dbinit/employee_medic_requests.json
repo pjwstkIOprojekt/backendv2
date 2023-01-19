@@ -1,0 +1,62 @@
+[
+  {
+    "firstName": "Marcin",
+    "lastName": "Defibrylator",
+    "email": "medic@test.pl",
+    "phoneNumber": "133723456",
+    "password": "test123",
+    "birthDate": "2000-01-19",
+    "workSchedule": {
+      "MONDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      },
+      "TUESDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      },
+      "WEDNESDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      }
+    }
+  },
+  {
+  "firstName": "Adam",
+  "lastName": "String",
+  "email": "Adam@gary.pl",
+  "phoneNumber": "11111111",
+  "password": "11111111",
+  "birthDate": "2011-01-19",
+  "workSchedule": {
+    "MONDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "TUESDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "WEDNESDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "THURSDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "FRIDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "SATURDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    },
+    "SUNDAY": {
+      "start": "00:01",
+      "end": "23:59"
+    }
+  }
+}
+]

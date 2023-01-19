@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 
 @Getter
 @Setter
-public class AddAmbulanceRequest {
+public class AddAmbulanceRequest extends BaseRequest {
     @NotNull
     private AmbulanceClass ambulanceClass;
     @NotNull

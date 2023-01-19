@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class PostAmbulanceLocationRequest {
+public class PostAmbulanceLocationRequest extends BaseRequest{
     @NotNull
     private Double longitude;
     @NotNull

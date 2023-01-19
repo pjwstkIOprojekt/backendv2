@@ -10,7 +10,7 @@ import javax.validation.constraints.Null;
 
 @Getter
 @Setter
-public class TrustedPersonRequest {
+public class TrustedPersonRequest extends BaseRequest {
 	@Email
 	@NotBlank
 	private String userEmail;

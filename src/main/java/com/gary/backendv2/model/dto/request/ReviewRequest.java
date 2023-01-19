@@ -4,7 +4,7 @@ import lombok.Data;
 
 
 @Data
-public class ReviewRequest {
+public class ReviewRequest extends BaseRequest {
 
 
     private Double value;
