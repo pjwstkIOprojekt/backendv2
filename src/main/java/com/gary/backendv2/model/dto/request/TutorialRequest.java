@@ -8,7 +8,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class TutorialRequest {
+public class TutorialRequest extends BaseRequest {
     Integer tutorialId;
     @NotBlank
     String name;

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class DiseaseRequest {
+public class DiseaseRequest extends BaseRequest {
 
 	@Email
 	String userEmail;

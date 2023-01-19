@@ -1,0 +1,24 @@
+[
+  {
+    "firstName": "Marcin",
+    "lastName": "Defibrylator",
+    "email": "medic@test.pl",
+    "phoneNumber": "133723456",
+    "password": "test123",
+    "birthDate": "2000-01-19",
+    "workSchedule": {
+      "MONDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      },
+      "TUESDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      },
+      "WEDNESDAY": {
+        "start": "18:55",
+        "end": "22:14"
+      }
+    }
+  }
+]

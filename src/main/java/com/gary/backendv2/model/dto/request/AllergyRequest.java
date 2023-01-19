@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class AllergyRequest {
+public class AllergyRequest extends BaseRequest{
 	@Email
 	String userEmail;
 

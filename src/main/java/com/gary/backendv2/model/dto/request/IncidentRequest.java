@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class IncidentRequest {
+public class IncidentRequest extends BaseRequest {
 	@NotNull
 	@Min(1)
 	@Max(10)

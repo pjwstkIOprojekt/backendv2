@@ -1,20 +1,39 @@
 package com.gary.backendv2.event.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.gary.backendv2.model.Facility;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.Tutorial;
+import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
+import com.gary.backendv2.model.dto.request.BaseRequest;
+import com.gary.backendv2.model.dto.request.FacilityRequest;
+import com.gary.backendv2.model.dto.request.IncidentReportRequest;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.enums.*;
+import com.gary.backendv2.model.incident.Incident;
+import com.gary.backendv2.model.incident.IncidentReport;
+import com.gary.backendv2.model.inventory.items.MedicineItem;
+import com.gary.backendv2.model.inventory.items.MultiUseItem;
+import com.gary.backendv2.model.inventory.items.SingleUseItem;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.security.Role;
+import com.gary.backendv2.model.users.employees.Dispatcher;
+import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.service.IncidentReportService;
 import com.gary.backendv2.utils.DictionaryIndexer;
 import com.gary.backendv2.utils.Utils;
+import com.gary.backendv2.utils.demodata.impl.ObjectInitializationVisitor;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.dialect.DB2Dialect;
+import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -37,6 +56,8 @@ import java.util.regex.Pattern;
 @Component
 public class ApplicationStartupListener implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
+    private FacilityRepository facilityRepository;
+    @Autowired
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
@@ -51,12 +72,41 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     @Autowired
     AmbulanceService ambulanceService;
 
+    @Autowired
+    IncidentReportService incidentReportService;
+
+    @Autowired
+    ObjectInitializationVisitor objectInitializationVisitor;
+
     @Value("${gary.app.admin.credentials.email}")
     private String adminEmail;
     @Value("${gary.app.admin.credentials.password}")
     private String adminPassword;
+    @Value("#{environment.SEED}")
+    private boolean seed;
+
+    private final String DB_INIT_BASE = "classpath:dbinit/";
+
+    private final Class<?>[] ENTITIES_TO_SEED = {
+            Facility.class,
+            IncidentReport.class,
+            User.class,
+            Medic.class,
+            Dispatcher.class,
+            Ambulance.class
+    };
+
+    private final Map<Class<?>, String> requestsFile = new HashMap<>(){{
+        put(Facility.class, "facility_requests.json");
+        put(Ambulance.class, "ambulance_requests.json");
+        put(User.class, "regular_users_requests.json");
+        put(Medic.class, "employee_medic_requests.json");
+        put(Dispatcher.class, "employee_dispatcher_requests.json");
+        put(IncidentReport.class, "incident_report_requests.json");
+    }};
 
     @Override
+    @SneakyThrows
     public void onApplicationEvent(ContextRefreshedEvent event) {
         DictionaryIndexer indexer = DictionaryIndexer.getInstance();
        try {
@@ -65,32 +115,54 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
            System.err.println("ERROR INDEXING DICTIONARY");
        }
 
-        seed();
+       log.info("Database seeding enabled? {}", seed);
+       if (seed) {
+           // System constants
+           createRoles();
+           createAdminAccount();
+           createTutorials();
+
+           // Sample user generated data
+           Map<Class<?>, List<BaseRequest>> databaseInitializationMap = prepareSampleDataRequests();
+           new Facility().accept(objectInitializationVisitor, databaseInitializationMap.get(Facility.class));
+           new Ambulance().accept(objectInitializationVisitor, ambulanceService, databaseInitializationMap.get(Ambulance.class));
+           new User().accept(objectInitializationVisitor, authService, databaseInitializationMap.get(User.class));
+           new Medic().accept(objectInitializationVisitor, authService, EmployeeType.MEDIC, databaseInitializationMap.get(Medic.class));
+           new Dispatcher().accept(objectInitializationVisitor, authService, EmployeeType.DISPATCHER, databaseInitializationMap.get(Dispatcher.class));
+           new IncidentReport().accept(objectInitializationVisitor, incidentReportService, databaseInitializationMap.get(IncidentReport.class));
+       }
     }
 
-    @Transactional
-    void seed() {
-        var roles = roleRepository.findAll();
-        var users = roleRepository.findAll();
-        var ambulances = roleRepository.findAll();
-        var tutorials = tutorialRepository.findAll();
+    @SneakyThrows
+    private Map<Class<?>, List<BaseRequest>> prepareSampleDataRequests() {
+        Map<Class<?>, List<BaseRequest>> dbMap = new HashMap<>();
 
-        boolean doSeed = roles.isEmpty() && users.isEmpty() && ambulances.isEmpty() && tutorials.isEmpty();
-        log.info("Seeding: {}", doSeed);
-        if (doSeed) {
-            try {
-                createRoles();
-                createAdminAccount();
-                createSampleUsers();
-                createSampleAmbulances();
-                createSampleEmployees();
-                createTutorials();
-            } catch (Exception e) {
-                log.error("There were some errors during initial database seed process. Shutting down");
-                e.printStackTrace();
-                SpringApplication.exit(applicationContext, () -> 1);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        for (Class<?> clazz : ENTITIES_TO_SEED) {
+            String requestsPath = DB_INIT_BASE + requestsFile.get(clazz);
+
+            if (clazz.equals(Facility.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, FacilityRequest.class)));
+            }
+            if (clazz.equals(Ambulance.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, AddAmbulanceRequest.class)));
+            }
+            if (clazz.equals(User.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, SignupRequest.class)));
+            }
+            if (clazz.equals(Medic.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, RegisterEmployeeRequest.class)));
+            }
+            if (clazz.equals(Dispatcher.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, RegisterEmployeeRequest.class)));
+            }
+            if (clazz.equals(IncidentReport.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, IncidentReportRequest.class)));
             }
         }
+
+        return dbMap;
     }
 
     private void createRoles() throws RuntimeException {
@@ -119,113 +191,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
                 }
             }
         }
-    }
-
-    private void createSampleUsers() {
-        SignupRequest s1 = new SignupRequest();
-        s1.setEmail("test@test.pl");
-        s1.setPassword("test123");
-        s1.setBirthDate(LocalDate.of(2000, 1, 1));
-        s1.setFirstName("Test");
-        s1.setLastName("Testowski");
-        s1.setPhoneNumber("123456789");
-
-        SignupRequest s2 = new SignupRequest();
-        s2.setEmail("test2@test.pl");
-        s2.setPassword("test123");
-        s2.setBirthDate(LocalDate.of(1984, 12, 7));
-        s2.setFirstName("Robert");
-        s2.setLastName("Kubica");
-        s2.setPhoneNumber("9876543231");
-
-
-        SignupRequest s3 = new SignupRequest();
-        s3.setEmail("test3@test.pl");
-        s3.setPassword("test123");
-        s3.setBirthDate(LocalDate.of(1977, 12, 3));
-        s3.setFirstName("Adam");
-        s3.setLastName("Małysz");
-        s3.setPhoneNumber("111222333");
-
-
-        List<SignupRequest> regular = List.of(s1, s2, s3);
-        regular.forEach(x -> authService.registerUser(x));
-    }
-
-    private void createSampleEmployees() {
-        Map<EmployeeType, List<RegisterEmployeeRequest>> map = new LinkedHashMap<>();
-
-        for (var etype : EmployeeType.values()) {
-            map.put(etype, new ArrayList<>());
-        }
-
-        RegisterEmployeeRequest s1 = new RegisterEmployeeRequest();
-        s1.setEmail("dispatch1@test.pl");
-        s1.setPassword("test123");
-        s1.setBirthDate(LocalDate.of(2000, 1, 1));
-        s1.setFirstName("Dyspozytor");
-        s1.setLastName("Dyspozytorski");
-        s1.setPhoneNumber("123456789");
-
-        RegisterEmployeeRequest s2 = new RegisterEmployeeRequest();
-        s2.setEmail("medic1@test.pl");
-        s2.setPassword("test123");
-        s2.setBirthDate(LocalDate.of(1984, 12, 7));
-        s2.setFirstName("Marcin");
-        s2.setLastName("Defibrylator");
-        s2.setPhoneNumber("9876543231");
-
-        map.get(EmployeeType.DISPATCHER).add(s1);
-        map.get(EmployeeType.MEDIC).add(s2);
-
-        for (var kv : map.entrySet()) {
-            for (var emp : kv.getValue()) {
-                authService.registerEmployee(kv.getKey(), emp);
-            }
-        }
-
-    }
-
-    private void createSampleAmbulances() {
-        AddAmbulanceRequest a1 = new AddAmbulanceRequest();
-        a1.setAmbulanceType(AmbulanceType.A);
-        a1.setAmbulanceClass(AmbulanceClass.BASIC);
-        a1.setLatitude(Location.defaultLocation().getLatitude());
-        a1.setLongitude(Location.defaultLocation().getLongitude());
-        a1.setSeats(5);
-        a1.setLicensePlate("LBI55362");
-
-        AddAmbulanceRequest a2 = new AddAmbulanceRequest();
-        a2.setAmbulanceType(AmbulanceType.B);
-        a2.setAmbulanceClass(AmbulanceClass.SPECIAL);
-        a2.setLatitude(Location.defaultLocation().getLatitude());
-        a2.setLongitude(Location.defaultLocation().getLongitude());
-        a2.setSeats(9);
-        a2.setLicensePlate("WPI33221");
-
-        AddAmbulanceRequest a3 = new AddAmbulanceRequest();
-        a3.setAmbulanceType(AmbulanceType.C);
-        a3.setAmbulanceClass(AmbulanceClass.TRANSPORT);
-        a3.setLatitude(Location.defaultLocation().getLatitude());
-        a3.setLongitude(Location.defaultLocation().getLongitude());
-        a3.setSeats(7);
-        a3.setLicensePlate("WB32213");
-
-        List<AddAmbulanceRequest> requests = List.of(a1, a2 ,a3);
-
-        @Cleanup
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-
-        requests.forEach(x -> {
-            var validationErrors = validator.validate(x);
-            if (validationErrors.isEmpty()) {
-                ambulanceService.addAmbulance(x);
-            } else {
-                validationErrors.forEach(y -> log.error(y.getMessage()));
-                throw new ValidationException();
-            }
-        });
     }
 
     private void createAdminAccount() {

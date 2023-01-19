@@ -272,7 +272,7 @@ public class AuthService {
     }
 
     @SneakyThrows
-    private void registerMedic(SignupRequest signupRequest) {
+    public void registerMedic(SignupRequest signupRequest) {
         RegisterEmployeeRequest employeeRequest = (RegisterEmployeeRequest) signupRequest;
 
         WorkSchedule workSchedule = getWorkScheduleFromRequest(employeeRequest);

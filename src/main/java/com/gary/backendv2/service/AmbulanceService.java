@@ -413,7 +413,7 @@ public class AmbulanceService {
         return responseSet;
     }
 
-    private Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
+    public Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
         Inventory inventory = inventoryRepository.save(new Inventory());
 
 

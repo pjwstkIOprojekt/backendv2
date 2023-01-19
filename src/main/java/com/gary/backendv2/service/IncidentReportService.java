@@ -64,11 +64,22 @@ public class IncidentReportService {
 		return IncidentReportResponse.of(incidentReport);
 	}
 
+
 	@Transactional
 	public void add(IncidentReportRequest incidentReportRequest) {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		add(incidentReportRequest, false);
+	}
+
+	@Transactional
+	public void add(IncidentReportRequest incidentReportRequest, boolean seeding) {
 		User reporter = null;
-		if (!principal.equals("anonymousUser")) {
+
+		Object principal = null;
+		try {
+			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		} catch (NullPointerException ignored) {}
+
+		if (principal != null && !principal.equals("anonymousUser")) {
 			UserPrincipal loggedPrincipal = (UserPrincipal) principal;
 			reporter = userRepository.getByEmail(loggedPrincipal.getUsername());
 		}
@@ -83,7 +94,7 @@ public class IncidentReportService {
 				.conscious(incidentReportRequest.getConcious())
 				.address(geoResponse.getFeatures().size() > 0 ? geoResponse.getFeatures().get(0).getPlaceName() : "UNKNOWN")
 				.date(LocalDateTime.now())
-        		.description(incidentReportRequest.getDescription())
+				.description(incidentReportRequest.getDescription())
 				.emergencyType(incidentReportRequest.getEmergencyType())
 				.victimCount(incidentReportRequest.getVictimCount())
 				.location(Location.of(incidentReportRequest.getLongitude(), incidentReportRequest.getLatitude()))
@@ -91,7 +102,7 @@ public class IncidentReportService {
 
 		try {
 			incidentReportRepository.save(incidentReport);
-			incidentService.addFromReport(incidentReport);
+			incidentService.addFromReport(incidentReport, seeding);
 		} catch (Exception e) {
 			log.error("Cannot create new incident {}", e.getMessage());
 			throw e;

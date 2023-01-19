@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class BackupAddRequest {
+public class BackupAddRequest extends BaseRequest {
 	@Email
 	private String requester;
 	@NotNull

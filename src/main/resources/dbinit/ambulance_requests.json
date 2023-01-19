@@ -1,0 +1,74 @@
+[
+  {
+    "ambulanceClass": "BASIC",
+    "ambulanceType": "A",
+    "licensePlate": "LBI 55362",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "BASIC",
+    "ambulanceType": "B",
+    "licensePlate": "WB 1337",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "BASIC",
+    "ambulanceType": "C",
+    "licensePlate": "WA 1337",
+    "seats": 8
+  },
+  {
+    "ambulanceClass": "TRANSPORT",
+    "ambulanceType": "A",
+    "licensePlate": "WC 1337",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "TRANSPORT",
+    "ambulanceType": "B",
+    "licensePlate": "WD 1337",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "TRANSPORT",
+    "ambulanceType": "C",
+    "licensePlate": "WF 1337",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "SPECIAL",
+    "ambulanceType": "A",
+    "licensePlate": "WE 1337",
+    "seats": 8
+  },
+  {
+    "ambulanceClass": "SPECIAL",
+    "ambulanceType": "B",
+    "licensePlate": "WG 1337 ",
+    "seats": 8
+  },
+  {
+    "ambulanceClass": "SPECIAL",
+    "ambulanceType": "C",
+    "licensePlate": "WH 1337",
+    "seats": 9
+  },
+  {
+    "ambulanceClass": "NEONATOLOGY ",
+    "ambulanceType": "A",
+    "licensePlate": "WI 1337",
+    "seats": 7
+  },
+  {
+    "ambulanceClass": "NEONATOLOGY ",
+    "ambulanceType": "B",
+    "licensePlate": "WJ 1337",
+    "seats": 8
+  },
+  {
+    "ambulanceClass": "NEONATOLOGY ",
+    "ambulanceType": "C",
+    "licensePlate": "WK 1337",
+    "seats": 9
+  }
+]

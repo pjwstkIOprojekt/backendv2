@@ -1,0 +1,75 @@
+package com.gary.backendv2.utils.demodata.impl;
+
+import com.gary.backendv2.model.Facility;
+import com.gary.backendv2.model.ambulance.Ambulance;
+import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
+import com.gary.backendv2.model.dto.request.BaseRequest;
+import com.gary.backendv2.model.dto.request.FacilityRequest;
+import com.gary.backendv2.model.dto.request.IncidentReportRequest;
+import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
+import com.gary.backendv2.model.dto.request.users.SignupRequest;
+import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.incident.IncidentReport;
+import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.users.employees.Dispatcher;
+import com.gary.backendv2.model.users.employees.Medic;
+import com.gary.backendv2.repository.AmbulanceRepository;
+import com.gary.backendv2.repository.FacilityRepository;
+import com.gary.backendv2.security.service.AuthService;
+import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.service.IncidentReportService;
+import com.gary.backendv2.utils.demodata.EntityVisitor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Entity;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class ObjectInitializationVisitor implements EntityVisitor {
+    private final FacilityRepository facilityRepository;
+    private final AmbulanceRepository ambulanceRepository;
+
+    @Override
+    public void visit(Facility facility, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            facilityRepository.save(facility.create((FacilityRequest) baseRequest));
+        }
+    }
+
+    @Override
+    public void visit(Ambulance ambulance, AmbulanceService ambulanceService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            ambulanceRepository.save(ambulance.create((AddAmbulanceRequest) baseRequest, ambulanceService));
+        }
+    }
+
+    @Override
+    public void visit(User user, AuthService authService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            authService.registerUser((SignupRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(Medic medic, AuthService authService, EmployeeType employeeType, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            authService.registerEmployee(employeeType, (RegisterEmployeeRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(Dispatcher dispatcher, AuthService authService, EmployeeType employeeType, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            authService.registerEmployee(employeeType, (RegisterEmployeeRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(IncidentReport incidentReport, IncidentReportService incidentReportService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            incidentReportService.add((IncidentReportRequest) baseRequest, true);
+        }
+    }
+}

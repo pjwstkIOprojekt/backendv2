@@ -1,5 +1,6 @@
 package com.gary.backendv2.model.dto.request.users;
 
+import com.gary.backendv2.model.dto.request.BaseRequest;
 import com.gary.backendv2.utils.annotations.ContainsKeys;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.Map;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateWorkScheduleRequest {
+public class UpdateWorkScheduleRequest extends BaseRequest {
     @ContainsKeys(
             allowedKeys = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
             message = "Work schedule keys must have keys from this set {allowedKeys}"
