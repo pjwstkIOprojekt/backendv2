@@ -31,6 +31,7 @@ public class FacilityService {
 					.name(facility.getName())
 					.facilityType(facility.getFacilityType())
 					.location(facility.getLocation())
+					.address(facility.getAddress())
 					.build());
 		}
 		return facilities;
@@ -48,6 +49,7 @@ public class FacilityService {
 				.name(facility.getName())
 				.facilityType(facility.getFacilityType())
 				.location(facility.getLocation())
+				.address(facility.getAddress())
 				.build();
 	}
 
