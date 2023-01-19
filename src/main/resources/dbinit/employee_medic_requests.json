@@ -58,5 +58,35 @@
       "end": "23:59"
     }
   }
-}
+},
+  {
+    "firstName": "Bartek",
+    "lastName": "Kajtek",
+    "email": "Kajbaj@gary.pl",
+    "phoneNumber": "11111111",
+    "password": "12345678",
+    "birthDate": "2000-01-19",
+    "workSchedule": {
+      "MONDAY": {
+        "start": "09:01",
+        "end": "18:01"
+      },
+      "TUESDAY": {
+        "start": "09:01",
+        "end": "18:01"
+      },
+      "WEDNESDAY": {
+        "start": "09:01",
+        "end": "18:01"
+      },
+      "THURSDAY": {
+        "start": "09:01",
+        "end": "18:01"
+      },
+      "FRIDAY": {
+        "start": "09:01",
+        "end": "18:01"
+      }
+    }
+  }
 ]
