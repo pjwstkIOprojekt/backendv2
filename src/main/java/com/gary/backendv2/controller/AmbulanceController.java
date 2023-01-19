@@ -3,11 +3,13 @@ package com.gary.backendv2.controller;
 import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.PostAmbulanceLocationRequest;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
+import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.service.AmbulanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +52,11 @@ public class AmbulanceController {
         return ResponseEntity.ok(ambulanceService.getItems(licensePlate));
     }
 
+    @GetMapping("/{licensePlate}/incident")
+    public ResponseEntity<?> currentIncident(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getCurrentIncident(licensePlate));
+    }
+
     @GetMapping("/{licensePlate}/crew")
     public ResponseEntity<?> getAllAssignedMedics(@PathVariable String licensePlate) {
         return ResponseEntity.ok(ambulanceService.getCrewMedics(licensePlate));
@@ -61,6 +68,12 @@ public class AmbulanceController {
         if (count != null && count > 1) {
             ambulanceService.addItems(licensePlate, itemId, count);
         } else ambulanceService.addItem(licensePlate, itemId);
+    }
+
+    @Operation(summary = "Change unit of an item")
+    @PutMapping("/{licensePlate}/items/add/{itemId}")
+    public void editItemUnit(@PathVariable String licensePlate, @PathVariable Integer itemId, @RequestParam(value = "unit", required = true) ItemContainer.Unit unit) {
+        ambulanceService.editItemUnit(licensePlate, itemId, unit);
     }
 
     @PostMapping("/{licensePlate}/state/{state}")
@@ -79,10 +92,15 @@ public class AmbulanceController {
     }
 
     @PostMapping("/{licensePlate}/crew")
-    public void addMedics(@PathVariable String licensePlate, Integer[] medicIds) {
-        ambulanceService.assignMedics(licensePlate, List.of(medicIds));
+    public void addMedics(@PathVariable String licensePlate, @RequestBody List<Integer> medicIds) {
+       ambulanceService.assignMedics(licensePlate, medicIds);
     }
 
+    @DeleteMapping("/{licensePlate}/crew")
+    public void removeMedics(@PathVariable String licensePlate, @RequestBody Integer[] medicIds) {
+        ambulanceService.removeMedics(licensePlate, List.of(medicIds));
+    }
+    
     @PutMapping
     public void updateAmbulance(@RequestBody @Valid AddAmbulanceRequest addAmbulanceRequest) {
         ambulanceService.updateAmbulance(addAmbulanceRequest);

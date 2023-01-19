@@ -1,14 +1,23 @@
 package com.gary.backendv2.model.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gary.backendv2.model.ambulance.Ambulance;
+import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
+import com.gary.backendv2.model.dto.request.BaseRequest;
+import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.Review;
 import com.gary.backendv2.model.TrustedPerson;
 import com.gary.backendv2.model.security.Role;
+import com.gary.backendv2.security.service.AuthService;
+import com.gary.backendv2.service.AmbulanceService;
+import com.gary.backendv2.utils.demodata.EntityVisitor;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -34,6 +43,7 @@ public class User {
     private LocalDate birthDate;
     private String phoneNumber;
 
+    private String bandCode;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -51,4 +61,14 @@ public class User {
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "reporter")
     private Set<IncidentReport> incidentReports;
+
+    public Optional<User> create(SignupRequest addRequest, AuthService authService) {
+        authService.registerUser(addRequest);
+
+        return Optional.empty();
+    }
+
+    public void accept(EntityVisitor ev, AuthService authService, List<BaseRequest> baseRequest) {
+        ev.visit(this, authService, baseRequest);
+    }
 }

@@ -12,6 +12,8 @@ import com.gary.backendv2.model.dto.response.*;
 import com.gary.backendv2.model.dto.response.items.AbstractItemResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
+import com.gary.backendv2.model.enums.IncidentStatusType;
+import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.model.inventory.items.Item;
@@ -23,15 +25,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AmbulanceService {
+    private final IncidentRepository incidentRepository;
     private final ItemService itemService;
 
     private final AmbulanceRepository ambulanceRepository;
@@ -85,6 +91,34 @@ public class AmbulanceService {
         return ambulanceStateResponse;
     }
 
+    public IncidentResponse getCurrentIncident(String licensePlate) {
+        List<Incident> incidents = incidentRepository.findAll();
+        List<Incident> incidentCandidates = new ArrayList<>();
+
+        for (Incident incident : incidents) {
+            Optional<Ambulance> ambulanceOptional = incident.getAmbulances().stream().filter(x -> x.getLicensePlate().equals(licensePlate)).findFirst();
+            if (ambulanceOptional.isEmpty()) {
+                continue;
+            }
+
+            incidentCandidates.add(incident);
+        }
+        Optional<Incident> incidentOptional = incidentCandidates.stream().max(Comparator.comparing(Incident::getCreatedAt));
+        if (incidentOptional.isEmpty()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, String.format("Ambulance %s seems to not be assigned to any incidents", licensePlate));
+        }
+        Incident incident = incidentOptional.get();
+
+        return IncidentResponse
+                .builder()
+                .incidentId(incident.getIncidentId())
+                .accidentReport(IncidentReportResponse.of(incident.getIncidentReport()))
+                .dangerScale(incident.getDangerScale())
+                .incidentStatusType(incident.getIncidentStatusType())
+                .reactionJustification(incident.getReactionJustification())
+                .build();
+    }
+
     public List<MedicResponse> getCrewMedics(String licensePlate) {
         Ambulance ambulance = getAmbulance(licensePlate);
 
@@ -106,6 +140,27 @@ public class AmbulanceService {
         });
 
         return medicResponses;
+    }
+
+    public void removeMedics(String licensePlate, List<Integer> medicIds) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
+        if (medics.isEmpty()) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, String.format(", User with ids of: %s are not medics", medicIds));
+        }
+
+        Crew crew = null;
+        if (ambulance.getCrew() == null) {
+            crew = crewRepository.save(new Crew());
+            ambulance.setCrew(crew);
+        }
+
+        crew = ambulance.getCrew();
+
+        crew.getMedics().removeAll(medics);
+
+        crewRepository.save(crew);
     }
 
     public void assignMedics(String licensePlate, List<Integer> medicIds) {
@@ -249,6 +304,15 @@ public class AmbulanceService {
         inventoryRepository.save(inventory);
     }
 
+    public void editItemUnit(String licensePlate, Integer itemId, ItemContainer.Unit unit) {
+        Ambulance ambulance = getAmbulance(licensePlate);
+
+        Inventory inventory = ambulance.getInventory();
+        inventory.getItems().get(itemId).setUnit(unit);
+
+        inventoryRepository.save(inventory);
+    }
+
     public List<EquipmentResponse> getItems(String licensePlate) {
         Ambulance ambulance = getAmbulance(licensePlate);
 
@@ -349,7 +413,7 @@ public class AmbulanceService {
         return responseSet;
     }
 
-    private Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
+    public Ambulance createAmbulance(AddAmbulanceRequest addRequest) {
         Inventory inventory = inventoryRepository.save(new Inventory());
 
 
@@ -363,6 +427,8 @@ public class AmbulanceService {
         ambulanceHistory.getAmbulanceStates().add(ambulanceState);
         ambulanceHistory = ambulanceHistoryRepository.save(ambulanceHistory);
 
+        Crew crew = crewRepository.save(new Crew());
+
         Ambulance ambulance = new Ambulance();
         ambulance.setAmbulanceClass(addRequest.getAmbulanceClass());
         ambulance.setAmbulanceType(addRequest.getAmbulanceType());
@@ -373,6 +439,7 @@ public class AmbulanceService {
         ambulance.setCurrentState(ambulanceState);
         ambulance.setAmbulanceHistory(ambulanceHistory);
         ambulance.setInventory(inventory);
+        ambulance.setCrew(crew);
 
         return ambulance;
     }

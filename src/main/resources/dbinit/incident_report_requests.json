@@ -1,0 +1,102 @@
+[
+  {
+    "emergencyType": "CAR_ACCIDENT",
+    "victimCount": 1,
+    "longitude": 21.00206971280936,
+    "latitude": 52.237266362302464,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "CAR_ACCIDENT",
+    "victimCount": 2,
+    "longitude": 20.984432354715256,
+    "latitude": 52.20079598303555,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "email": "test@test.pl",
+    "emergencyType": "CAR_ACCIDENT",
+    "victimCount": 3,
+    "longitude": 20.92764639504889,
+    "latitude": 52.203107137703896,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "FIRE",
+    "victimCount": 6,
+    "longitude": 20.988143337532918,
+    "latitude": 52.21652834582102,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "FIRE",
+    "victimCount": 0,
+    "longitude": 21.018113295224097,
+    "latitude": 52.22008287219697,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "FIRE",
+    "victimCount": 0,
+    "longitude": 21.025897925968984,
+    "latitude": 52.18084766598905,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "UNKNOWN",
+    "victimCount": 0,
+    "longitude": 21.000069796014362,
+    "latitude": 52.230347449666034,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "UNKNOWN",
+    "victimCount": 1,
+    "longitude": 20.995382640730817,
+    "latitude": 52.21053126561623,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "UNKNOWN",
+    "victimCount": 0,
+    "longitude": 20.97801315209438,
+    "latitude": 52.20189859789236,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "HEART_ATTACK",
+    "victimCount": 1,
+    "longitude": 21.019419253165516,
+    "latitude": 52.23337779680062,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  },
+  {
+    "emergencyType": "CAR_ACCIDENT",
+    "victimCount": 1,
+    "longitude": 20.885516463001057,
+    "latitude": 52.20604790402165,
+    "concious": true,
+    "breathing": true,
+    "description": "string"
+  }
+]

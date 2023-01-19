@@ -1,5 +1,8 @@
 package com.gary.backendv2.model.users.employees;
 
+import com.gary.backendv2.model.Backup;
+import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.enums.ItemType;
 import com.gary.backendv2.model.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +28,9 @@ public abstract class AbstractEmployee extends User {
     @OneToMany(mappedBy = "employee", orphanRemoval = true)
     private List<EmployeeShift> shifts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "requester")
+    private List<Backup> requestedBackup = new ArrayList<>();
+
 
     public EmployeeShift getCurrentShift() {
         if (shifts.isEmpty()) {
@@ -47,5 +53,10 @@ public abstract class AbstractEmployee extends User {
         }
 
         return getCurrentShift().getActualStartTime().isBefore(LocalDateTime.now()) && getCurrentShift().getActualEndTime() == null ;
+    }
+
+    @Transient
+    public EmployeeType getDiscriminatorValue() {
+        return EmployeeType.fromClass(this.getClass());
     }
 }

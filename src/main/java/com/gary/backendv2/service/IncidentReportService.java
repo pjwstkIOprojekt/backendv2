@@ -11,10 +11,13 @@ import com.gary.backendv2.model.security.UserPrincipal;
 import com.gary.backendv2.repository.IncidentReportRepository;
 import com.gary.backendv2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IncidentReportService {
 	private final IncidentReportRepository incidentReportRepository;
 	private final UserRepository userRepository;
@@ -59,11 +63,23 @@ public class IncidentReportService {
 
 		return IncidentReportResponse.of(incidentReport);
 	}
-	
+
+
+	@Transactional
 	public void add(IncidentReportRequest incidentReportRequest) {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		add(incidentReportRequest, false);
+	}
+
+	@Transactional
+	public void add(IncidentReportRequest incidentReportRequest, boolean seeding) {
 		User reporter = null;
-		if (!principal.equals("anonymousUser")) {
+
+		Object principal = null;
+		try {
+			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		} catch (NullPointerException ignored) {}
+
+		if (principal != null && !principal.equals("anonymousUser")) {
 			UserPrincipal loggedPrincipal = (UserPrincipal) principal;
 			reporter = userRepository.getByEmail(loggedPrincipal.getUsername());
 		}
@@ -78,14 +94,18 @@ public class IncidentReportService {
 				.conscious(incidentReportRequest.getConcious())
 				.address(geoResponse.getFeatures().size() > 0 ? geoResponse.getFeatures().get(0).getPlaceName() : "UNKNOWN")
 				.date(LocalDateTime.now())
-        		.description(incidentReportRequest.getDescription())
+				.description(incidentReportRequest.getDescription())
 				.emergencyType(incidentReportRequest.getEmergencyType())
 				.location(Location.of(incidentReportRequest.getLongitude(), incidentReportRequest.getLatitude()))
 				.build();
 
-		incidentReportRepository.save(incidentReport);
-
-		incidentService.addFromReport(incidentReport);
+		try {
+			incidentReportRepository.save(incidentReport);
+			incidentService.addFromReport(incidentReport, seeding);
+		} catch (Exception e) {
+			log.error("Cannot create new incident {}", e.getMessage());
+			throw e;
+		}
 
 	}
 

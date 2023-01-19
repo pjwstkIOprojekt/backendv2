@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class UpdateAmbulanceStateRequest {
+public class UpdateAmbulanceStateRequest extends BaseRequest {
     private AmbulanceStateType stateType;
     private LocalDateTime start;
     private LocalDateTime end;

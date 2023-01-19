@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class FacilityRequest {
+public class FacilityRequest extends BaseRequest{
 	@NotNull
 	private Double longitude;
 	@NotNull

@@ -1,6 +1,6 @@
 logging:
   file:
-    name: ${HOME}/spring.log
+    name: spring.log
 spring:
   jpa:
     hibernate:
@@ -13,6 +13,17 @@ spring:
   sql:
     init:
       mode: always
+  mail:
+    password: ${GMAIL_PASSWORD}
+    username: ${GMAIL_USERNAME}
+    host: "smtp.google.com"
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 maptiler:
   api:
     key: ${MAPTILER_API_KEY}
@@ -24,3 +35,6 @@ gary:
       credentials:
         email: "admin@gary.com"
         password: "admin"
+  feature_flags:
+    password_reset: ${FEATURE_PASSWORD_RESET}
+    seed: ${SEED}

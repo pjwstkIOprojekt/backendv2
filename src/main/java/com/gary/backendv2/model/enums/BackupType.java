@@ -1,0 +1,5 @@
+package com.gary.backendv2.model.enums;
+
+public enum BackupType {
+	POLICE, FIRE_FIGHTERS, AMBULANCE, POLICE_AMBULANCE, POLICE_FIRE, AMBULANCE_FIRE, POLICE_AMBULANCE_FIRE
+}

@@ -2,17 +2,15 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.ambulance.Ambulance;
-import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
-import com.gary.backendv2.model.dto.response.users.GenericEmployeeResponse;
+import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
+import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
-import com.gary.backendv2.repository.AmbulanceRepository;
-import com.gary.backendv2.repository.EmployeeShiftRepository;
-import com.gary.backendv2.repository.UserRepository;
+import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +23,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
     private final EmployeeShiftRepository employeeShiftRepository;
     private final UserRepository userRepository;
+    private final MedicRepository medicRepository;
 
     private final AmbulanceRepository ambulanceRepository;
     private final AuthService authService;
+    private final IncidentRepository incidentRepository;
 
     public void startShift(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
@@ -88,7 +86,7 @@ public class EmployeeService {
 
             employee = userRepository.save(employee);
 
-            return getWorkScheduleResponse(employee);
+            return Utils.createWorkScheduleResponse(employee);
         }
 
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
@@ -98,24 +96,33 @@ public class EmployeeService {
     public WorkScheduleResponse getSchedule(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
         if (currentUser instanceof AbstractEmployee employee) {
-            return getWorkScheduleResponse(employee);
+            return Utils.createWorkScheduleResponse(employee);
         }
 
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
     }
 
-    public List<GenericEmployeeResponse> getAllSchedules() {
-        List<GenericEmployeeResponse> responses = new ArrayList<>();
+    public Boolean amIWorking(Authentication authentication) {
+        User user = authService.getLoggedUserFromAuthentication(authentication);
+        if (user instanceof AbstractEmployee employee) {
+            return employee.getWorking();
+        }
+
+        throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
+    }
+
+    public List<GenericUserResponse> getAllSchedules() {
+        List<GenericUserResponse> responses = new ArrayList<>();
 
         List<AbstractEmployee> employees = userRepository.findAllEmployees();
         for (AbstractEmployee e : employees) {
-            GenericEmployeeResponse response = new GenericEmployeeResponse();
+            GenericUserResponse response = new GenericUserResponse();
 
             response.setEmail(e.getEmail());
             response.setId(e.getUserId());
             response.setName(e.getFirstName());
             response.setLastName(e.getLastName());
-            response.setWorkSchedule(getWorkScheduleResponse(e));
+            response.setWorkSchedule(Utils.createWorkScheduleResponse(e));
 
             if (e instanceof Dispatcher d) {
                 response.setEmployeeType(EmployeeType.DISPATCHER);
@@ -146,20 +153,51 @@ public class EmployeeService {
         }
     }
 
-    private WorkScheduleResponse getWorkScheduleResponse(AbstractEmployee employee) {
-        WorkSchedule newSchedule = employee.getWorkSchedule();
-        MappedSchedule mappedSchedule = newSchedule.getMappedSchedule();
-
-        WorkScheduleResponse response = new WorkScheduleResponse();
-
-        for (var kv : mappedSchedule.getTimeTable().entrySet()) {
-            response.getSchedule().put(
-                    String.valueOf(kv.getKey()),
-                    new RegisterEmployeeRequest.ScheduleDto(
-                            mappedSchedule.getWorkingHours(kv.getKey()).getLeft().toString(),
-                            mappedSchedule.getWorkingHours(kv.getKey()).getRight().toString()));
+    public List<MedicResponse> getAllMedics(){
+        List<MedicResponse> medicResponses = new ArrayList<>();
+        for(Medic m : medicRepository.findAll()) {
+            medicResponses.add(
+                  MedicResponse
+                          .builder()
+                          .email(m.getEmail())
+                          .firstName(m.getFirstName())
+                          .lastName(m.getLastName())
+                          .userId(m.getUserId())
+                          .build()
+            );
         }
-        return response;
+        return medicResponses;
+    }
+
+    public List<MedicResponse> getFreeMedics() {
+        List<Medic> allMedics = medicRepository.findAll();
+        List<Ambulance> allAmbulances = ambulanceRepository.findAll();
+
+        Set<Medic> assigendMedics = new HashSet<>();
+        for (Ambulance ambulance : allAmbulances) {
+           for (Medic assigend :  ambulance.getCrew().getMedics()) {
+               if (allMedics.contains(assigend)) {
+                   assigendMedics.add(assigend);
+               }
+           }
+        }
+
+        Set<Medic> freeMedics = new HashSet<>(allMedics);
+        freeMedics.removeAll(assigendMedics);
+        List<MedicResponse> medicResponses = new ArrayList<>();
+        for (Medic m : freeMedics) {
+            medicResponses.add(
+                    MedicResponse
+                            .builder()
+                            .email(m.getEmail())
+                            .firstName(m.getFirstName())
+                            .lastName(m.getLastName())
+                            .userId(m.getUserId())
+                            .build()
+            );
+        }
+
+        return medicResponses;
     }
 
     private EmployeeShift startNewShift(AbstractEmployee e) {

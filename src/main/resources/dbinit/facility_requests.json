@@ -1,0 +1,50 @@
+[
+  {
+    "longitude": 20.9737013051722,
+    "latitude": 52.21078875416914,
+    "name": "Komenda Rejonowa Policji Warszawa III",
+    "facilityType": "POLICE_STATION"
+  },
+  {
+    "longitude": 21.023054411324274,
+    "latitude": 52.194400636349286,
+    "name": "Komenda Rejonowa Policji Warszawa II",
+    "facilityType": "POLICE_STATION"
+  },
+  {
+    "longitude": 20.984889661502184,
+    "latitude": 52.209732145592824,
+    "name": "Uniwersyteckie Centrum Kliniczne Warszawskiego Uniwersytetu Medycznego",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 20.998036846965046,
+    "latitude": 52.22447893708424,
+    "name": "Szpital Kliniczny Dzieciątka Jezus",
+    "facilityType": "HOSPITAL"
+  },
+  {
+    "longitude": 21.02157349935089,
+    "latitude": 52.214262495680316,
+    "name": "Komenda Miejska Państwowej Straży Pożarnej m. st. Warszaw",
+    "facilityType": "FIRE_UNIT"
+  },
+  {
+    "longitude": 20.999018997309374,
+    "latitude": 52.293086458021826,
+    "name": "Jednostka Ratowniczo-Gaśnicza nr 1 Grupa Ratownictwa Wodno-Nurkowego",
+    "facilityType": "FIRE_UNIT"
+  },
+  {
+    "longitude": 21.011011104957504,
+    "latitude": 52.23058626723757,
+    "name": "Metro Centrum",
+    "facilityType": "AED"
+  },
+  {
+    "longitude": 21.00898116660908,
+    "latitude": 52.23495734296105,
+    "name": "Metro Świętokrzyska",
+    "facilityType": "AED"
+  }
+]
