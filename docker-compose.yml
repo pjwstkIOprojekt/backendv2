@@ -16,6 +16,7 @@ services:
       GMAIL_USERNAME: ${GMAIL_USERNAME}
       GMAIL_PASSWORD: ${GMAIL_PASSWORD}
       FEATURE_PASSWORD_RESET: ${FEATURE_PASSWORD_RESET}
+      SEED: ${SEED}
     build:
       context: .
       dockerfile: Dockerfile
