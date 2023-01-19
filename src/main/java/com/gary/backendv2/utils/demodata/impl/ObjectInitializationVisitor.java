@@ -6,18 +6,25 @@ import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.BaseRequest;
 import com.gary.backendv2.model.dto.request.FacilityRequest;
 import com.gary.backendv2.model.dto.request.IncidentReportRequest;
+import com.gary.backendv2.model.dto.request.items.AbstractCreateItemRequest;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.incident.IncidentReport;
+import com.gary.backendv2.model.inventory.items.AmbulanceEquipmentItem;
+import com.gary.backendv2.model.inventory.items.MedicineItem;
+import com.gary.backendv2.model.inventory.items.MultiUseItem;
+import com.gary.backendv2.model.inventory.items.SingleUseItem;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.AmbulanceRepository;
 import com.gary.backendv2.repository.FacilityRepository;
+import com.gary.backendv2.repository.ItemRepository;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
 import com.gary.backendv2.service.IncidentReportService;
+import com.gary.backendv2.service.ItemService;
 import com.gary.backendv2.utils.demodata.EntityVisitor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -72,4 +79,33 @@ public class ObjectInitializationVisitor implements EntityVisitor {
             incidentReportService.add((IncidentReportRequest) baseRequest, true);
         }
     }
+
+    @Override
+    public void visit(SingleUseItem singleUseItem, ItemService itemService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            itemService.createItem((AbstractCreateItemRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(MultiUseItem multiUseItem, ItemService itemService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            itemService.createItem((AbstractCreateItemRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(AmbulanceEquipmentItem multiUseItem, ItemService itemService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            itemService.createItem((AbstractCreateItemRequest) baseRequest);
+        }
+    }
+
+    @Override
+    public void visit(MedicineItem multiUseItem, ItemService itemService, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            itemService.createItem((AbstractCreateItemRequest) baseRequest);
+        }
+    }
+
 }

@@ -1,0 +1,8 @@
+[
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "string",
+    "manufacturer": "string",
+    "description": "string"
+  }
+]

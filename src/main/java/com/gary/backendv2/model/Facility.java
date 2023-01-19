@@ -25,6 +25,8 @@ public class Facility  {
 	@Embedded
 	private Location location;
 
+	private String address;
+
 	@Enumerated(EnumType.STRING)
 	private FacilityType facilityType;
 

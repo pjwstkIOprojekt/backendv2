@@ -10,13 +10,12 @@ import com.gary.backendv2.model.dto.request.AddAmbulanceRequest;
 import com.gary.backendv2.model.dto.request.BaseRequest;
 import com.gary.backendv2.model.dto.request.FacilityRequest;
 import com.gary.backendv2.model.dto.request.IncidentReportRequest;
+import com.gary.backendv2.model.dto.request.items.*;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.enums.*;
 import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.incident.IncidentReport;
-import com.gary.backendv2.model.inventory.items.MedicineItem;
-import com.gary.backendv2.model.inventory.items.MultiUseItem;
-import com.gary.backendv2.model.inventory.items.SingleUseItem;
+import com.gary.backendv2.model.inventory.items.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.security.Role;
@@ -26,6 +25,7 @@ import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.AmbulanceService;
 import com.gary.backendv2.service.IncidentReportService;
+import com.gary.backendv2.service.ItemService;
 import com.gary.backendv2.utils.DictionaryIndexer;
 import com.gary.backendv2.utils.Utils;
 import com.gary.backendv2.utils.demodata.impl.ObjectInitializationVisitor;
@@ -76,6 +76,9 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     IncidentReportService incidentReportService;
 
     @Autowired
+    ItemService itemService;
+
+    @Autowired
     ObjectInitializationVisitor objectInitializationVisitor;
 
     @Value("${gary.app.admin.credentials.email}")
@@ -93,7 +96,11 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
             User.class,
             Medic.class,
             Dispatcher.class,
-            Ambulance.class
+            Ambulance.class,
+            SingleUseItem.class,
+            MultiUseItem.class,
+            MedicineItem.class,
+            AmbulanceEquipmentItem.class
     };
 
     private final Map<Class<?>, String> requestsFile = new HashMap<>(){{
@@ -103,6 +110,10 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         put(Medic.class, "employee_medic_requests.json");
         put(Dispatcher.class, "employee_dispatcher_requests.json");
         put(IncidentReport.class, "incident_report_requests.json");
+        put(SingleUseItem.class, "item_single_use_requests.json");
+        put(MultiUseItem.class, "item_multi_use_requests.json");
+        put(AmbulanceEquipmentItem.class, "item_ambulance_equipment_requests.json");
+        put(MedicineItem.class, "item_medicine_requests.json");
     }};
 
     @Override
@@ -130,6 +141,10 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
            new Medic().accept(objectInitializationVisitor, authService, EmployeeType.MEDIC, databaseInitializationMap.get(Medic.class));
            new Dispatcher().accept(objectInitializationVisitor, authService, EmployeeType.DISPATCHER, databaseInitializationMap.get(Dispatcher.class));
            new IncidentReport().accept(objectInitializationVisitor, incidentReportService, databaseInitializationMap.get(IncidentReport.class));
+           new SingleUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(SingleUseItem.class));
+           new MultiUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MultiUseItem.class));
+           new AmbulanceEquipmentItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(AmbulanceEquipmentItem.class));
+           new MedicineItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MedicineItem.class));
        }
     }
 
@@ -159,6 +174,18 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
             }
             if (clazz.equals(IncidentReport.class)) {
                 dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, IncidentReportRequest.class)));
+            }
+            if (clazz.equals(SingleUseItem.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateSingleUseItemRequest.class)));
+            }
+            if (clazz.equals(MultiUseItem.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateMultiUseItemRequest.class)));
+            }
+            if (clazz.equals(AmbulanceEquipmentItem.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateAmbulanceEquipmentItemRequest.class)));
+            }
+            if (clazz.equals(MedicineItem.class)) {
+                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateMedicineItemRequest.class)));
             }
         }
 
