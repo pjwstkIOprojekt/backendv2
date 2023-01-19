@@ -85,7 +85,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
     private String adminEmail;
     @Value("${gary.app.admin.credentials.password}")
     private String adminPassword;
-    @Value("#{environment.SEED}")
+    @Value("${gary.feature_flags.seed}")
     private boolean seed;
 
     private final String DB_INIT_BASE = "classpath:dbinit/";
