@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AmbulanceServiceTest {
+    private final IncidentRepository incidentRepository = mock(IncidentRepository.class);
     private final ItemService itemService = mock(ItemService.class);
     private final AmbulanceRepository ambulanceRepository = mock(AmbulanceRepository.class);
     private final AmbulanceStateRepository ambulanceStateRepository = mock(AmbulanceStateRepository.class);
@@ -32,7 +33,7 @@ class AmbulanceServiceTest {
     private final InventoryRepository inventoryRepository = mock(InventoryRepository.class);
     private final CrewRepository crewRepository = mock(CrewRepository.class);
     private final MedicRepository medicRepository = mock(MedicRepository.class);
-    private final AmbulanceService ambulanceService = new AmbulanceService(
+    private final AmbulanceService ambulanceService = new AmbulanceService(incidentRepository,
             itemService,
             ambulanceRepository,
             ambulanceStateRepository,
