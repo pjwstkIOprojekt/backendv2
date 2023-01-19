@@ -2,7 +2,6 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.ambulance.Ambulance;
-import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
@@ -11,10 +10,7 @@ import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
 import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
-import com.gary.backendv2.repository.AmbulanceRepository;
-import com.gary.backendv2.repository.EmployeeShiftRepository;
-import com.gary.backendv2.repository.MedicRepository;
-import com.gary.backendv2.repository.UserRepository;
+import com.gary.backendv2.repository.*;
 import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +34,7 @@ public class EmployeeService {
 
     private final AmbulanceRepository ambulanceRepository;
     private final AuthService authService;
+    private final IncidentRepository incidentRepository;
 
     public void startShift(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
@@ -107,6 +102,15 @@ public class EmployeeService {
         throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
     }
 
+    public Boolean amIWorking(Authentication authentication) {
+        User user = authService.getLoggedUserFromAuthentication(authentication);
+        if (user instanceof AbstractEmployee employee) {
+            return employee.getWorking();
+        }
+
+        throw new HttpException(HttpStatus.I_AM_A_TEAPOT);
+    }
+
     public List<GenericUserResponse> getAllSchedules() {
         List<GenericUserResponse> responses = new ArrayList<>();
 
@@ -115,7 +119,7 @@ public class EmployeeService {
             GenericUserResponse response = new GenericUserResponse();
 
             response.setEmail(e.getEmail());
-            response.setId(e.getUserId());
+            response.setUserId(e.getUserId());
             response.setName(e.getFirstName());
             response.setLastName(e.getLastName());
             response.setWorkSchedule(Utils.createWorkScheduleResponse(e));
@@ -151,7 +155,7 @@ public class EmployeeService {
 
     public List<MedicResponse> getAllMedics(){
         List<MedicResponse> medicResponses = new ArrayList<>();
-        for(Medic m : medicRepository.findAll()){
+        for(Medic m : medicRepository.findAll()) {
             medicResponses.add(
                   MedicResponse
                           .builder()
@@ -162,6 +166,37 @@ public class EmployeeService {
                           .build()
             );
         }
+        return medicResponses;
+    }
+
+    public List<MedicResponse> getFreeMedics() {
+        List<Medic> allMedics = medicRepository.findAll();
+        List<Ambulance> allAmbulances = ambulanceRepository.findAll();
+
+        Set<Medic> assigendMedics = new HashSet<>();
+        for (Ambulance ambulance : allAmbulances) {
+           for (Medic assigend :  ambulance.getCrew().getMedics()) {
+               if (allMedics.contains(assigend)) {
+                   assigendMedics.add(assigend);
+               }
+           }
+        }
+
+        Set<Medic> freeMedics = new HashSet<>(allMedics);
+        freeMedics.removeAll(assigendMedics);
+        List<MedicResponse> medicResponses = new ArrayList<>();
+        for (Medic m : freeMedics) {
+            medicResponses.add(
+                    MedicResponse
+                            .builder()
+                            .email(m.getEmail())
+                            .firstName(m.getFirstName())
+                            .lastName(m.getLastName())
+                            .userId(m.getUserId())
+                            .build()
+            );
+        }
+
         return medicResponses;
     }
 

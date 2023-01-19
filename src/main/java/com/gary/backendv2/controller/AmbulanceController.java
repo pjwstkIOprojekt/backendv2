@@ -93,11 +93,11 @@ public class AmbulanceController {
 
     @PostMapping("/{licensePlate}/crew")
     public void addMedics(@PathVariable String licensePlate, @RequestBody List<Integer> medicIds) {
-        ambulanceService.assignMedics(licensePlate, medicIds);
+       ambulanceService.assignMedics(licensePlate, medicIds);
     }
 
     @DeleteMapping("/{licensePlate}/crew")
-    public void removeMedics(@PathVariable String licensePlate, Integer[] medicIds) {
+    public void removeMedics(@PathVariable String licensePlate, @RequestBody Integer[] medicIds) {
         ambulanceService.removeMedics(licensePlate, List.of(medicIds));
     }
     

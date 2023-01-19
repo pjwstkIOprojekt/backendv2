@@ -5,6 +5,7 @@ import com.gary.backendv2.model.Facility;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.dto.request.FacilityRequest;
 import com.gary.backendv2.model.dto.response.FacilityResponse;
+import com.gary.backendv2.model.dto.response.geocoding.MaptilerResponse;
 import com.gary.backendv2.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FacilityService {
 	private final FacilityRepository facilityRepository;
+
+	private final GeocodingService geocodingService;
 
 	public List<FacilityResponse> getAll() {
 		List<FacilityResponse> facilities = new ArrayList<>();
@@ -48,12 +51,15 @@ public class FacilityService {
 				.build();
 	}
 
-	public void add(FacilityRequest facilityRequest){
+	public void add(FacilityRequest facilityRequest) {
+		MaptilerResponse geoResponse = geocodingService.getAddressFromCoordinates(Location.of(facilityRequest.getLongitude(), facilityRequest.getLatitude()));
+
 		facilityRepository.save(
 				Facility
 						.builder()
 						.facilityType(facilityRequest.getFacilityType())
 						.name(facilityRequest.getName())
+						.address(geoResponse.getFeatures().size() > 0 ? geoResponse.getFeatures().get(0).getPlaceName() : "UNKNOWN")
 						.location(Location.of(facilityRequest.getLongitude(), facilityRequest.getLatitude()))
 						.build()
 		);

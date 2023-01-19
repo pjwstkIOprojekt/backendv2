@@ -46,6 +46,11 @@ public class LoggedEmployeeController {
         return ResponseEntity.ok(employeeService.getSchedule(authentication));
     }
 
+    @GetMapping("/schedule/is-working")
+    public ResponseEntity<?> getShiftStatus(Authentication authentication) {
+        return ResponseEntity.ok(employeeService.amIWorking(authentication));
+    }
+
     @GetMapping("/medic/assigned-to")
     @Operation(summary = "Find to which ambulance you are assigned to", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> findAssignedAmbulance(Authentication authentication) {

@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GenericUserResponse {
-    private Integer id;
+    private Integer userId;
     private String name;
     private String lastName;
     private String email;
@@ -31,7 +31,7 @@ public class GenericUserResponse {
 
     public static GenericUserResponse of(User user) {
         GenericUserResponse r = new GenericUserResponse();
-        r.setId(user.getUserId());
+        r.setUserId(user.getUserId());
         r.setPhone(user.getPhoneNumber());
         r.setEmail(user.getEmail());
         r.setName(user.getFirstName());

@@ -25,7 +25,6 @@ import com.gary.backendv2.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.users.GenericUser;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -41,7 +40,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -181,7 +179,7 @@ public class AuthService {
             throw new HttpException(HttpStatus.BAD_REQUEST, "Invalid token, probably been used already. Try to generate a new one");
         }
         if (LocalDateTime.now().isAfter(t.getCreatedAt().plusMinutes(t.getValidFor()))) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, "Expired token, please generate a new one");
+            throw new HttpException(HttpStatus.FORBIDDEN, "Expired token, please generate a new one");
         }
 
         User user = t.getUser();
@@ -211,7 +209,6 @@ public class AuthService {
             throw new HttpException(HttpStatus.FORBIDDEN);
         }
 
-        user.setEmail(editUserRequest.getEmail());
         user.setBirthDate(editUserRequest.getBirthDate());
         user.setFirstName(editUserRequest.getFirstName());
         user.setLastName(editUserRequest.getLastName());
@@ -227,7 +224,7 @@ public class AuthService {
         }
 
         GenericUserResponse response = new GenericUserResponse();
-        response.setId(user.getUserId());
+        response.setUserId(user.getUserId());
         response.setName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
