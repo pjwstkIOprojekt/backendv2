@@ -198,6 +198,23 @@ public class EmployeeService {
         return responses;
     }
 
+    private final AmbulanceManagerRepository ambulanceManagerRepository;
+    public List<GenericUserResponse> getAllAmbulanceManagers() {
+        List<GenericUserResponse> responses = new ArrayList<>();
+
+        for (AmbulanceManager m : ambulanceManagerRepository.findAll()) {
+            GenericUserResponse userResponse = new GenericUserResponse();
+            userResponse.setEmployeeType(EmployeeType.AMBULANCE_MANAGER);
+            userResponse.setName(m.getFirstName());
+            userResponse.setLastName(m.getLastName());
+            userResponse.setEmail(m.getEmail());
+
+            responses.add(userResponse);
+        }
+
+        return responses;
+    }
+
     public List<MedicResponse> getFreeMedics() {
         List<Medic> allMedics = medicRepository.findAll();
         List<Ambulance> allAmbulances = ambulanceRepository.findAll();

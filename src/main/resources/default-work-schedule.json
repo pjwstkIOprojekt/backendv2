@@ -18,13 +18,5 @@
   "FRIDAY" : {
     "start" : "8:00",
     "end" : "16:00"
-  },
-  "SATURDAY" : {
-    "start" : "8:00",
-    "end" : "16:00"
-  },
-  "SUNDAY" : {
-    "start" : "8:00",
-    "end" : "16:00"
   }
 }
