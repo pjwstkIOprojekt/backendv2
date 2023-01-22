@@ -61,4 +61,7 @@ public class EnumController {
 
 	@GetMapping("/item_unit_types")
 	public List<String> getUnitTypes() {return EnumUtils.getEnumValues(ItemContainer.Unit.class);}
+
+	@GetMapping("/employee_types")
+	public List<String> getEmployeeTypes() {return EnumUtils.getEnumValues(EmployeeType.class);}
 }

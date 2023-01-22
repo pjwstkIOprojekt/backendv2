@@ -14,6 +14,8 @@ import com.gary.backendv2.service.AmbulanceService;
 import com.gary.backendv2.utils.demodata.EntityVisitor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -56,8 +58,11 @@ public class Ambulance {
     @ManyToMany
     @JoinTable(name = "ambulances_incidents",
             joinColumns = @JoinColumn(name = "ambulance"),
-            inverseJoinColumns = @JoinColumn(name = "disease"))
+            inverseJoinColumns = @JoinColumn(name = "incident"))
     private Set<Incident> incidents = new LinkedHashSet<>();
+
+    @OneToOne
+    private AmbulanceIncidentHistory incidentHistory;
 
     @Transient
     private AmbulanceState currentState;

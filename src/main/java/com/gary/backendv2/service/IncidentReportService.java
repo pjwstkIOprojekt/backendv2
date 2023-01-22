@@ -2,6 +2,7 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.incident.IncidentReport;
+import com.gary.backendv2.model.security.ResetPasswordTokenRepository;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.*;
 import com.gary.backendv2.model.Location;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class IncidentReportService {
+	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 	private final IncidentReportRepository incidentReportRepository;
 	private final UserRepository userRepository;
 	private final IncidentService incidentService;
@@ -67,28 +69,13 @@ public class IncidentReportService {
 
 	@Transactional
 	public void add(IncidentReportRequest incidentReportRequest) {
-		add(incidentReportRequest, false);
-	}
-
-	@Transactional
-	public void add(IncidentReportRequest incidentReportRequest, boolean seeding) {
-		User reporter = null;
-
-		Object principal = null;
-		try {
-			principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		} catch (NullPointerException ignored) {}
-
-		if (principal != null && !principal.equals("anonymousUser")) {
-			UserPrincipal loggedPrincipal = (UserPrincipal) principal;
-			reporter = userRepository.getByEmail(loggedPrincipal.getUsername());
-		}
+		Optional<User> reporterOptional = userRepository.findByEmail(incidentReportRequest.getEmail());
 
 		MaptilerResponse geoResponse = geocodingService.getAddressFromCoordinates(Location.of(incidentReportRequest.getLongitude(), incidentReportRequest.getLatitude()));
 
 		IncidentReport incidentReport = IncidentReport
 				.builder()
-				.reporter(reporter)
+				.reporter(reporterOptional.orElse(null))
 				.bandCode(incidentReportRequest.getBandCode())
 				.breathing(incidentReportRequest.getBreathing())
 				.conscious(incidentReportRequest.getConcious())
@@ -101,8 +88,14 @@ public class IncidentReportService {
 				.build();
 
 		try {
+			if (reporterOptional.isPresent()) {
+				User reporter = reporterOptional.get();
+				reporter.getIncidentReports().add(incidentReport);
+				userRepository.save(reporter);
+			}
+
 			incidentReportRepository.save(incidentReport);
-			incidentService.addFromReport(incidentReport, seeding);
+			incidentService.addFromReport(incidentReport);
 		} catch (Exception e) {
 			log.error("Cannot create new incident {}", e.getMessage());
 			throw e;

@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -16,6 +17,6 @@ public class AmbulanceHistory {
     private Integer historyId;
 
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<AmbulanceState> ambulanceStates = new ArrayList<>();
+    private List<AmbulanceState> ambulanceStates = new LinkedList<>();
 
 }

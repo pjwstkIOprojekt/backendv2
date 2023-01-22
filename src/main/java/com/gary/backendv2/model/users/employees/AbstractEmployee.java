@@ -25,7 +25,7 @@ public abstract class AbstractEmployee extends User {
     @JoinColumn(name = "schedule_id")
     protected WorkSchedule workSchedule;
 
-    @OneToMany(mappedBy = "employee", orphanRemoval = true)
+    @OneToMany(mappedBy = "employee", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<EmployeeShift> shifts = new ArrayList<>();
 
     @OneToMany(mappedBy = "requester")

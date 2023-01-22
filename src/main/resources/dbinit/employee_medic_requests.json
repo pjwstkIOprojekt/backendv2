@@ -30,32 +30,24 @@
   "birthDate": "2011-01-19",
   "workSchedule": {
     "MONDAY": {
-      "start": "00:01",
-      "end": "23:59"
+      "start": "08:00",
+      "end": "16:00"
     },
     "TUESDAY": {
-      "start": "00:01",
-      "end": "23:59"
+      "start": "08:00",
+      "end": "16:00"
     },
     "WEDNESDAY": {
-      "start": "00:01",
-      "end": "23:59"
+      "start": "08:00",
+      "end": "16:00"
     },
     "THURSDAY": {
-      "start": "00:01",
-      "end": "23:59"
+      "start": "08:00",
+      "end": "16:00"
     },
     "FRIDAY": {
-      "start": "00:01",
-      "end": "23:59"
-    },
-    "SATURDAY": {
-      "start": "00:01",
-      "end": "23:59"
-    },
-    "SUNDAY": {
-      "start": "00:01",
-      "end": "23:59"
+      "start": "08:00",
+      "end": "16:00"
     }
   }
 }

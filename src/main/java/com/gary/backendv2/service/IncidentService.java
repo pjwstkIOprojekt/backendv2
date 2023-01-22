@@ -1,6 +1,9 @@
 package com.gary.backendv2.service;
 
+import com.gary.backendv2.AmbulanceIncidentHistoryElementRepository;
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.ambulance.AmbulanceIncidentHistoryElement;
+import com.gary.backendv2.model.ambulance.AmbulanceState;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.users.employees.Dispatcher;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -88,14 +92,15 @@ public class IncidentService {
 		return incidentResponses;
 	}
 
-	public void addFromReport(IncidentReport incidentReport, boolean seeding){
+	public void addFromReport(IncidentReport incidentReport){
 		Incident incident = Incident
 				.builder()
 				.incidentReport(incidentReport)
+				.dangerScale(calculateDangerScale(incidentReport))
 				.incidentStatusType(IncidentStatusType.NEW)
 				.createdAt(LocalDateTime.now())
 				.build();
-		assignDispatcher(incident, seeding);
+		assignDispatcher(incident);
 		incidentRepository.save(incident);
 		incidentReport.setIncident(incident);
 		incidentReportRepository.save(incidentReport);
@@ -120,6 +125,7 @@ public class IncidentService {
 		incidentRepository.delete(accidentReportOptional.get());
 	}
 
+	private final AmbulanceIncidentHistoryElementRepository elementRepository;
 	public Map<String, String> addAmbulances(Integer id, List<String> ambulancesLicencePlates){
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
@@ -132,7 +138,12 @@ public class IncidentService {
 			infoMap.put(a.getLicensePlate(), null);
 			if (a.getCurrentState().getStateType() == AmbulanceStateType.AVAILABLE) {
 				a.getIncidents().add(incident);
+				AmbulanceIncidentHistoryElement historyElement = elementRepository.save(new AmbulanceIncidentHistoryElement());
+				historyElement.setIncident(incident);
+				historyElement.setUpdatedAt(LocalDateTime.now());
+				a.getIncidentHistory().getIncidents().add(historyElement);
 				incident.getAmbulances().add(a);
+
 				ambulanceService.changeAmbulanceState(a.getLicensePlate(), AmbulanceStateType.ON_ACTION);
 				ambulanceRepository.save(a);
 
@@ -146,6 +157,7 @@ public class IncidentService {
 		return infoMap;
 	}
 
+	@Transactional
 	public void changeIncidentStatus(Integer id, IncidentStatusType incidentStatusType){
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
@@ -153,11 +165,11 @@ public class IncidentService {
 		switch (incidentStatusType){
 			case NEW -> throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.NEW.toString().toLowerCase());
 			case CLOSED -> {
-				if (incident.getIncidentStatusType() != IncidentStatusType.ACCEPTED) {
-					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.CLOSED.toString().toLowerCase());
-				}else{
-					incident.getDispatcher().setOpenIncidents(incident.getDispatcher().getOpenIncidents()-1);
-				}
+				incident.getDispatcher().setOpenIncidents(incident.getDispatcher().getOpenIncidents()-1);
+				incident.getAmbulances().forEach(x -> {
+					x.getIncidents().remove(incident);
+					ambulanceService.changeAmbulanceState(x.getLicensePlate(), AmbulanceStateType.AVAILABLE);
+				});
 			}
 			case ASSIGNED -> {
 				if (incident.getIncidentStatusType() != IncidentStatusType.NEW){
@@ -194,24 +206,7 @@ public class IncidentService {
 
 
 	private void assignDispatcher(Incident incident) {
-		assignDispatcher(incident, false);
-	}
-
-	private void assignDispatcher(Incident incident, boolean seeding){
 		List<Dispatcher> dispatchers = getAllByWorking();
-
-		if (seeding) {
-			Dispatcher d = dispatcherRepository.findByEmail("dispatch@test.pl").orElseThrow(() -> new RuntimeException("Exception during seeding, cannot assign a dispatcher to an Incident report skipping.."));
-
-			d.setOpenIncidents(d.getOpenIncidents()+1);
-			d.getIncidents().add(incident);
-			incident.setDispatcher(d);
-			incident = incidentRepository.save(incident);
-			changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
-			dispatcherRepository.save(d);
-
-			return;
-		}
 
 		if(dispatchers.size() == 0) {
 			throw new HttpException(HttpStatus.NOT_ACCEPTABLE, "No dispatchers currently available");
@@ -242,6 +237,18 @@ public class IncidentService {
 		incident = incidentRepository.save(incident);
 		changeIncidentStatus(incident.getIncidentId(), IncidentStatusType.ASSIGNED);
 		dispatcherRepository.save(dispatcher);
+	}
+
+	private int calculateDangerScale(IncidentReport incidentReport) {
+		int breathingValue = incidentReport.isBreathing() ? 1 : 0;
+		int consciousValue = incidentReport.isConscious() ? 1 : 0;
+
+		int dangerScale = (int) (incidentReport.getVictimCount() * (0.75 * breathingValue + 0.55 * consciousValue));
+		if (dangerScale > 10) {
+			dangerScale = 10;
+		}
+
+		return Math.max(dangerScale, 1);
 	}
 
 	private List<Dispatcher> getAllByWorking(){

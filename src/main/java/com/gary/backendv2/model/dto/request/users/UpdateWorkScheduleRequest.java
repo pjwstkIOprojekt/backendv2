@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class UpdateWorkScheduleRequest extends BaseRequest {
     @ContainsKeys(
-            allowedKeys = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
+            allowedKeys = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"},
             message = "Work schedule keys must have keys from this set {allowedKeys}"
     )
     Map<String, RegisterEmployeeRequest.ScheduleDto> workSchedule = new LinkedHashMap<>();
