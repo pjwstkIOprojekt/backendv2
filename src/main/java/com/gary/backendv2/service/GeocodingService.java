@@ -22,17 +22,10 @@ public class GeocodingService {
     public MaptilerResponse getAddressFromCoordinates(Location location) {
         ResponseEntity<MaptilerResponse> response = restTemplate.getForEntity(maptiler.createGeoCodingURL(location.getLatitude(), location.getLongitude()), MaptilerResponse.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
-            log.error("Maptiler api response {}", Objects.requireNonNull(response.getBody()));
             throw new RuntimeException("Failed to call an external api");
         }
 
-        // return response.getBody();
-
-        var a = new MaptilerResponse();
-        a.setType("test");
-        a.setFeatures(new ArrayList<>());
-
-        return a;
+        return response.getBody();
     }
 
 }
