@@ -16,6 +16,7 @@ import com.gary.backendv2.model.inventory.items.MedicineItem;
 import com.gary.backendv2.model.inventory.items.MultiUseItem;
 import com.gary.backendv2.model.inventory.items.SingleUseItem;
 import com.gary.backendv2.model.users.User;
+import com.gary.backendv2.model.users.employees.AmbulanceManager;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.AmbulanceRepository;
@@ -75,9 +76,16 @@ public class ObjectInitializationVisitor implements EntityVisitor {
     }
 
     @Override
+    public void visit(AmbulanceManager ambulanceManager, AuthService authService, EmployeeType employeeType, List<BaseRequest> baseRequests) {
+        for (BaseRequest baseRequest : baseRequests) {
+            authService.registerEmployee(employeeType, (RegisterEmployeeRequest) baseRequest);
+        }
+    }
+
+    @Override
     public void visit(IncidentReport incidentReport, IncidentReportService incidentReportService, List<BaseRequest> baseRequests) {
         for (BaseRequest baseRequest : baseRequests) {
-            incidentReportService.add((IncidentReportRequest) baseRequest, true);
+            incidentReportService.add((IncidentReportRequest) baseRequest);
         }
     }
 

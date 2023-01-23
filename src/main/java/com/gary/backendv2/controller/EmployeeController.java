@@ -20,6 +20,18 @@ public class EmployeeController {
     @Operation(summary = "Get all medics", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getMedics() { return ResponseEntity.ok(employeeService.getAllMedics()); }
 
+    @GetMapping("/dispatcher")
+    @Operation(summary = "Get all dispatchers", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> getDispatchers() {
+        return ResponseEntity.ok(employeeService.getAllDispatchers());
+    }
+
+    @GetMapping("/ambulance-manager")
+    @Operation(summary = "Get all ambulance mangers", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> getAmbulanceManagers() {
+        return ResponseEntity.ok(employeeService.getAllAmbulanceManagers());
+    }
+
     @GetMapping("/medic/free")
     @Operation(summary = "Get all unassigned medics", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getFreeMedics() {

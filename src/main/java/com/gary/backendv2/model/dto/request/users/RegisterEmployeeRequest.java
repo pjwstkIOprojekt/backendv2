@@ -31,7 +31,7 @@ public class RegisterEmployeeRequest extends SignupRequest {
     }
 
     @ContainsKeys(
-            allowedKeys = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
+            allowedKeys = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"},
             message = "Work schedule keys must have keys from this set {allowedKeys}"
     )
     Map<String, ScheduleDto> workSchedule = new LinkedHashMap<>();

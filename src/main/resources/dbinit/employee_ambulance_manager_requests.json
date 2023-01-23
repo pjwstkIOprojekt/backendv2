@@ -1,0 +1,18 @@
+[
+  {
+    "firstName": "Tomasz",
+    "lastName": "Niemasz",
+    "email": "am@test.pl",
+    "phoneNumber": "133723456",
+    "password": "test123",
+    "birthDate": "2000-01-19"
+  },
+  {
+    "firstName": "Paweł",
+    "lastName": "Gaweł",
+    "email": "am2@test.pl",
+    "phoneNumber": "133723456",
+    "password": "test123",
+    "birthDate": "2000-01-20"
+  }
+]

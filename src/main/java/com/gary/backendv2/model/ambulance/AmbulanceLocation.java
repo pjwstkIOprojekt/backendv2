@@ -1,6 +1,7 @@
 package com.gary.backendv2.model.ambulance;
 
 import com.gary.backendv2.model.Location;
+import com.gary.backendv2.model.incident.Incident;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,8 @@ public class AmbulanceLocation implements Comparable<AmbulanceLocation> {
     @ManyToOne
     @JoinColumn(name = "ambulance_id")
     private Ambulance ambulance;
+
+    private int incident;
 
     @Override
     public int compareTo(AmbulanceLocation a) {

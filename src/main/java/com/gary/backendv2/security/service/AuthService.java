@@ -12,10 +12,7 @@ import com.gary.backendv2.model.security.UserPrincipal;
 import com.gary.backendv2.model.dto.response.JwtResponse;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.users.*;
-import com.gary.backendv2.model.users.employees.AbstractEmployee;
-import com.gary.backendv2.model.users.employees.Dispatcher;
-import com.gary.backendv2.model.users.employees.Medic;
-import com.gary.backendv2.model.users.employees.WorkSchedule;
+import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.repository.MedicalInfoRepository;
 import com.gary.backendv2.repository.RoleRepository;
 import com.gary.backendv2.repository.UserRepository;
@@ -200,6 +197,7 @@ public class AuthService {
         switch (employeeType) {
             case DISPATCHER -> registerDispatcher(signupRequest);
             case MEDIC -> registerMedic(signupRequest);
+            case AMBULANCE_MANAGER -> registerAmbulanceManager(signupRequest);
         }
     }
 
@@ -266,6 +264,33 @@ public class AuthService {
 
         dispatcher.setRoles(Set.of(userRole));
         userRepository.save(dispatcher);
+    }
+
+    @SneakyThrows
+    private void registerAmbulanceManager(SignupRequest signupRequest) {
+        RegisterEmployeeRequest employeeRequest = (RegisterEmployeeRequest) signupRequest;
+
+        WorkSchedule workSchedule = getWorkScheduleFromRequest(employeeRequest);
+
+        workSchedule = workScheduleRepository.save(workSchedule);
+
+        AmbulanceManager ambulanceManager = new AmbulanceManager();
+        ambulanceManager.setFirstName(employeeRequest.getFirstName());
+        ambulanceManager.setLastName(employeeRequest.getLastName());
+        ambulanceManager.setEmail(employeeRequest.getEmail());
+        ambulanceManager.setPhoneNumber(employeeRequest.getPhoneNumber());
+        ambulanceManager.setWorkSchedule(workSchedule);
+        ambulanceManager.setBirthDate(employeeRequest.getBirthDate());
+        ambulanceManager.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
+        ambulanceManager.setBandCode(Utils.generateBandCode());
+
+
+        Role userRole = Optional.ofNullable(
+                roleRepository.findByName(RoleName.AMBULANCE_MANAGER.getPrefixedName())
+        ).orElseThrow(() -> new RuntimeException("Role " + RoleName.AMBULANCE_MANAGER + " not found!"));
+
+        ambulanceManager.setRoles(Set.of(userRole));
+        userRepository.save(ambulanceManager);
     }
 
     @SneakyThrows

@@ -2,6 +2,7 @@ package com.gary.backendv2.event.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.gary.backendv2.event.publisher.PrimitiveEntitiesCreatedEventPublisher;
 import com.gary.backendv2.model.Facility;
 import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.Tutorial;
@@ -19,6 +20,7 @@ import com.gary.backendv2.model.inventory.items.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.security.Role;
+import com.gary.backendv2.model.users.employees.AmbulanceManager;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
@@ -57,7 +59,7 @@ import java.util.regex.Pattern;
 @Component
 public class ApplicationStartupListener implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
-    private FacilityRepository facilityRepository;
+    PrimitiveEntitiesCreatedEventPublisher eventPublisher;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -96,7 +98,6 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
     private final Class<?>[] ENTITIES_TO_SEED = {
             Facility.class,
-            IncidentReport.class,
             User.class,
             Medic.class,
             Dispatcher.class,
@@ -104,7 +105,8 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
             SingleUseItem.class,
             MultiUseItem.class,
             MedicineItem.class,
-            AmbulanceEquipmentItem.class
+            AmbulanceEquipmentItem.class,
+            AmbulanceManager.class
     };
 
     private final Map<Class<?>, String> requestsFile = new HashMap<>(){{
@@ -113,11 +115,24 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         put(User.class, "regular_users_requests.json");
         put(Medic.class, "employee_medic_requests.json");
         put(Dispatcher.class, "employee_dispatcher_requests.json");
-        put(IncidentReport.class, "incident_report_requests.json");
         put(SingleUseItem.class, "item_single_use_requests.json");
         put(MultiUseItem.class, "item_multi_use_requests.json");
         put(AmbulanceEquipmentItem.class, "item_ambulance_equipment_requests.json");
         put(MedicineItem.class, "item_medicine_requests.json");
+        put(AmbulanceManager.class, "employee_ambulance_manager_requests.json");
+    }};
+
+    private final Map<Class<?>, Class<?>> requestClassFor = new HashMap<>(){{
+        put(Facility.class, FacilityRequest.class);
+        put(Ambulance.class, AddAmbulanceRequest.class);
+        put(User.class, SignupRequest.class);
+        put(Medic.class, RegisterEmployeeRequest.class);
+        put(Dispatcher.class, RegisterEmployeeRequest.class);
+        put(SingleUseItem.class, CreateSingleUseItemRequest.class);
+        put(MultiUseItem.class, CreateMultiUseItemRequest.class);
+        put(AmbulanceEquipmentItem.class, CreateAmbulanceEquipmentItemRequest.class);
+        put(MedicineItem.class, CreateMedicineItemRequest.class);
+        put(AmbulanceManager.class, RegisterEmployeeRequest.class);
     }};
 
     @Override
@@ -132,24 +147,31 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
 
        log.info("Database seeding enabled? {}", seed);
        if (seed) {
-           // System constants
-           createRoles();
-           createAdminAccount();
-           createTutorials();
+           seed();
 
-           // Sample user generated data
-           Map<Class<?>, List<BaseRequest>> databaseInitializationMap = prepareSampleDataRequests();
-           new Facility().accept(objectInitializationVisitor, geocodingService, databaseInitializationMap.get(Facility.class));
-           new Ambulance().accept(objectInitializationVisitor, ambulanceService, databaseInitializationMap.get(Ambulance.class));
-           new User().accept(objectInitializationVisitor, authService, databaseInitializationMap.get(User.class));
-           new Medic().accept(objectInitializationVisitor, authService, EmployeeType.MEDIC, databaseInitializationMap.get(Medic.class));
-           new Dispatcher().accept(objectInitializationVisitor, authService, EmployeeType.DISPATCHER, databaseInitializationMap.get(Dispatcher.class));
-           new IncidentReport().accept(objectInitializationVisitor, incidentReportService, databaseInitializationMap.get(IncidentReport.class));
-           new SingleUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(SingleUseItem.class));
-           new MultiUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MultiUseItem.class));
-           new AmbulanceEquipmentItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(AmbulanceEquipmentItem.class));
-           new MedicineItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MedicineItem.class));
+           eventPublisher.publish(objectInitializationVisitor);
        }
+    }
+
+    @Transactional
+    public void seed() {
+        // System constants
+        createRoles();
+        createAdminAccount();
+        createTutorials();
+
+        // Sample user generated data
+        Map<Class<?>, List<BaseRequest>> databaseInitializationMap = prepareSampleDataRequests();
+        new Facility().accept(objectInitializationVisitor, geocodingService, databaseInitializationMap.get(Facility.class));
+        new Ambulance().accept(objectInitializationVisitor, ambulanceService, databaseInitializationMap.get(Ambulance.class));
+        new User().accept(objectInitializationVisitor, authService, databaseInitializationMap.get(User.class));
+        new Medic().accept(objectInitializationVisitor, authService, EmployeeType.MEDIC, databaseInitializationMap.get(Medic.class));
+        new Dispatcher().accept(objectInitializationVisitor, authService, EmployeeType.DISPATCHER, databaseInitializationMap.get(Dispatcher.class));
+        new AmbulanceManager().accept(objectInitializationVisitor, authService, EmployeeType.AMBULANCE_MANAGER, databaseInitializationMap.get(AmbulanceManager.class));
+        new SingleUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(SingleUseItem.class));
+        new MultiUseItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MultiUseItem.class));
+        new AmbulanceEquipmentItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(AmbulanceEquipmentItem.class));
+        new MedicineItem().accept(objectInitializationVisitor, itemService, databaseInitializationMap.get(MedicineItem.class));
     }
 
     @SneakyThrows
@@ -161,36 +183,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         for (Class<?> clazz : ENTITIES_TO_SEED) {
             String requestsPath = DB_INIT_BASE + requestsFile.get(clazz);
 
-            if (clazz.equals(Facility.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, FacilityRequest.class)));
-            }
-            if (clazz.equals(Ambulance.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, AddAmbulanceRequest.class)));
-            }
-            if (clazz.equals(User.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, SignupRequest.class)));
-            }
-            if (clazz.equals(Medic.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, RegisterEmployeeRequest.class)));
-            }
-            if (clazz.equals(Dispatcher.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, RegisterEmployeeRequest.class)));
-            }
-            if (clazz.equals(IncidentReport.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, IncidentReportRequest.class)));
-            }
-            if (clazz.equals(SingleUseItem.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateSingleUseItemRequest.class)));
-            }
-            if (clazz.equals(MultiUseItem.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateMultiUseItemRequest.class)));
-            }
-            if (clazz.equals(AmbulanceEquipmentItem.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateAmbulanceEquipmentItemRequest.class)));
-            }
-            if (clazz.equals(MedicineItem.class)) {
-                dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, CreateMedicineItemRequest.class)));
-            }
+            dbMap.put(clazz, mapper.readValue(Utils.loadClasspathResource(requestsPath), mapper.getTypeFactory().constructCollectionType(List.class, requestClassFor.get(clazz))));
         }
 
         return dbMap;

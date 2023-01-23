@@ -204,8 +204,6 @@ public class TutorialService {
         }
         Review review = optionalReview.get();
 
-        System.out.println(review.getId());
-
         return ReviewResponse.builder()
                 .reviewId(review.getId())
                 .tutorial(TutorialResponse.of(review.getTutorial()))

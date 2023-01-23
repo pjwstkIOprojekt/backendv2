@@ -4,10 +4,13 @@ import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.AmbulanceResponse;
+import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
+import com.gary.backendv2.model.dto.response.users.DispatcherResponse;
 import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.*;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,45 +39,53 @@ public class EmployeeService {
     private final AmbulanceRepository ambulanceRepository;
     private final AuthService authService;
     private final IncidentRepository incidentRepository;
+    private final DispatcherRepository dispatcherRepository;
 
     public void startShift(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
 
         if (currentUser instanceof AbstractEmployee e) {
-            List<EmployeeShift> allShifts = e.getShifts();
-            if (allShifts.size() > 0) {
-                EmployeeShift mostRecentShift = allShifts.get(allShifts.size() - 1);
-
-                if (
-                        (mostRecentShift.getActualStartTime() != null) &&
-                        (mostRecentShift.getActualStartTime().getDayOfMonth() == LocalDate.now().getDayOfMonth()) &&
-                        (mostRecentShift.getActualStartTime().getMonthValue() == LocalDate.now().getMonthValue()) &&
-                        (mostRecentShift.getActualStartTime().getDayOfWeek() == LocalDate.now().getDayOfWeek())
-                )
-                    throw new HttpException(
-                            HttpStatus.BAD_REQUEST,
-                            String.format("You've already started a shift for: %s %s", LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue()));
-            }
-
-            EmployeeShift newShift = startNewShift(e);
-
-            allShifts.add(newShift);
-            e.setShifts(allShifts);
-
-            userRepository.save(e);
-
+            startShift(e);
         }
         else throw new HttpException(HttpStatus.FORBIDDEN, "Logged user seems not to be an Employee");
+    }
+
+    public void startShift(AbstractEmployee employee) {
+        List<EmployeeShift> allShifts = employee.getShifts();
+//        if (allShifts.size() > 0) {
+//            EmployeeShift mostRecentShift = allShifts.get(allShifts.size() - 1);
+//
+//            if (
+//                    (mostRecentShift.getActualStartTime() != null) &&
+//                            (mostRecentShift.getActualStartTime().getDayOfMonth() == LocalDate.now().getDayOfMonth()) &&
+//                            (mostRecentShift.getActualStartTime().getMonthValue() == LocalDate.now().getMonthValue()) &&
+//                            (mostRecentShift.getActualStartTime().getDayOfWeek() == LocalDate.now().getDayOfWeek())
+//            )
+//                throw new HttpException(
+//                        HttpStatus.BAD_REQUEST,
+//                        String.format("You've already started a shift for: %s %s", LocalDate.now().getDayOfMonth(), LocalDate.now().getMonth().toString()));
+//        }
+
+        EmployeeShift newShift = startNewShift(employee);
+
+        allShifts.add(newShift);
+        employee.setShifts(allShifts);
+
+        userRepository.save(employee);
     }
 
     public void endShift(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
         if (currentUser instanceof AbstractEmployee e) {
-            EmployeeShift currentShift = e.getCurrentShift();
-            currentShift.setActualEndTime(LocalDateTime.now());
-
-            employeeShiftRepository.save(currentShift);
+           endShift(e);
         }
+    }
+
+    public void endShift(AbstractEmployee employee) {
+        EmployeeShift currentShift = employee.getCurrentShift();
+        currentShift.setActualEndTime(LocalDateTime.now());
+
+        employeeShiftRepository.save(currentShift);
     }
 
     public WorkScheduleResponse updateWorkSchedule(UpdateWorkScheduleRequest workSchedule, Authentication authentication) {
@@ -153,7 +165,7 @@ public class EmployeeService {
         }
     }
 
-    public List<MedicResponse> getAllMedics(){
+    public List<MedicResponse> getAllMedics() {
         List<MedicResponse> medicResponses = new ArrayList<>();
         for(Medic m : medicRepository.findAll()) {
             medicResponses.add(
@@ -167,6 +179,40 @@ public class EmployeeService {
             );
         }
         return medicResponses;
+    }
+
+    public List<DispatcherResponse> getAllDispatchers() {
+        List<DispatcherResponse> responses = new ArrayList<>();
+        for(Dispatcher d : dispatcherRepository.findAll()) {
+            DispatcherResponse response = new DispatcherResponse();
+            response.setFirstName(d.getFirstName());
+            response.setLastName(d.getLastName());
+            response.setUserId(d.getUserId());
+            response.setEmail(d.getEmail());
+
+            Set<IncidentResponse> incidentResponses = d.getIncidents().stream().map(IncidentResponse::new).collect(Collectors.toSet());
+
+            response.getAssignedIncidents().addAll(incidentResponses);
+        }
+
+        return responses;
+    }
+
+    private final AmbulanceManagerRepository ambulanceManagerRepository;
+    public List<GenericUserResponse> getAllAmbulanceManagers() {
+        List<GenericUserResponse> responses = new ArrayList<>();
+
+        for (AmbulanceManager m : ambulanceManagerRepository.findAll()) {
+            GenericUserResponse userResponse = new GenericUserResponse();
+            userResponse.setEmployeeType(EmployeeType.AMBULANCE_MANAGER);
+            userResponse.setName(m.getFirstName());
+            userResponse.setLastName(m.getLastName());
+            userResponse.setEmail(m.getEmail());
+
+            responses.add(userResponse);
+        }
+
+        return responses;
     }
 
     public List<MedicResponse> getFreeMedics() {
@@ -203,6 +249,10 @@ public class EmployeeService {
     private EmployeeShift startNewShift(AbstractEmployee e) {
         MappedSchedule workSchedule = e.getWorkSchedule().getMappedSchedule();
         Pair<LocalTime, LocalTime> todaysWorkingHours = workSchedule.getWorkingHours(LocalDate.now().getDayOfWeek());
+        if (todaysWorkingHours == null) {
+            throw new HttpException(HttpStatus.NO_CONTENT, "Your work schedule doesn't have entry for " + LocalDate.now().getDayOfWeek());
+        }
+
         long shiftDuration = todaysWorkingHours.getLeft().until(todaysWorkingHours.getRight(), ChronoUnit.MINUTES);
 
         LocalTime currentTime = LocalTime.now();

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,14 +48,25 @@ public class AmbulanceController {
         return ResponseEntity.ok(ambulanceService.getAmbulancePath(licensePlate));
     }
 
+    @GetMapping("/{licensePlate}/location/path/{incidentId}")
+    public ResponseEntity<?> getAmbulanceIncidentPath(@PathVariable String licensePlate, @PathVariable Integer incidentId) {
+        return ResponseEntity.ok(ambulanceService.getAmbulancePath(licensePlate, incidentId));
+    }
+
     @GetMapping("/{licensePlate}/equipment")
     public ResponseEntity<?> getItems(@PathVariable String licensePlate) {
         return ResponseEntity.ok(ambulanceService.getItems(licensePlate));
     }
 
     @GetMapping("/{licensePlate}/incident")
+    @Operation(summary = "Returns currently assigned incident, HTTP 204 if not assigned")
     public ResponseEntity<?> currentIncident(@PathVariable String licensePlate) {
         return ResponseEntity.ok(ambulanceService.getCurrentIncident(licensePlate));
+    }
+
+    @GetMapping("/{licensePlate}/incident/all")
+    public ResponseEntity<?> getAllIncidents(@PathVariable String licensePlate) {
+        return ResponseEntity.ok(ambulanceService.getAllIncidents(licensePlate));
     }
 
     @GetMapping("/{licensePlate}/crew")
