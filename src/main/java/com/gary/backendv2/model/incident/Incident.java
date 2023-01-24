@@ -1,6 +1,7 @@
 package com.gary.backendv2.model.incident;
 
 import com.gary.backendv2.model.Backup;
+import com.gary.backendv2.model.VictimInfo;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.model.users.employees.Dispatcher;
@@ -8,7 +9,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -33,6 +36,9 @@ public class Incident {
 	private Set<Ambulance> ambulances;
 	@OneToMany
 	private Set<Backup> backups;
+
+	@OneToMany
+	private List<VictimInfo> victims = new ArrayList<>();
 
 	private LocalDateTime createdAt;
 }
