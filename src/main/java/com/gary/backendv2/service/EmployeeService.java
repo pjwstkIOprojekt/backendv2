@@ -183,7 +183,7 @@ public class EmployeeService {
 
     public List<DispatcherResponse> getAllDispatchers() {
         List<DispatcherResponse> responses = new ArrayList<>();
-        for(Dispatcher d : dispatcherRepository.findAll()) {
+        for (Dispatcher d : dispatcherRepository.findAll()) {
             DispatcherResponse response = new DispatcherResponse();
             response.setFirstName(d.getFirstName());
             response.setLastName(d.getLastName());
@@ -193,6 +193,8 @@ public class EmployeeService {
             Set<IncidentResponse> incidentResponses = d.getIncidents().stream().map(IncidentResponse::new).collect(Collectors.toSet());
 
             response.getAssignedIncidents().addAll(incidentResponses);
+
+            responses.add(response);
         }
 
         return responses;
