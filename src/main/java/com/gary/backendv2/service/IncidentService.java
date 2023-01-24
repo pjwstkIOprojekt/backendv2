@@ -215,7 +215,6 @@ public class IncidentService {
 		int activeIncidents = Integer.MAX_VALUE;
 
 		for (Dispatcher dispatcher : dispatchers) {
-			log.info("ACTIVE INCIDENTS: {}", activeIncidents);
 			if(dispatcher.getOpenIncidents() < activeIncidents){
 				possibleAssigments.clear();
 				activeIncidents = dispatcher.getOpenIncidents();
