@@ -64,4 +64,10 @@ public class EnumController {
 
 	@GetMapping("/employee_types")
 	public List<String> getEmployeeTypes() {return EnumUtils.getEnumValues(EmployeeType.class);}
+
+	@GetMapping("/victim_statuses")
+	public List<String> getVictimsStatuses() {return EnumUtils.getEnumValues(VictimStatus.class);}
+	@GetMapping("/genders")
+	public List<String> getGenders() {return EnumUtils.getEnumValues(Gender.class);}
+
 }

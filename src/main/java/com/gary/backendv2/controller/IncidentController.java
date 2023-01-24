@@ -1,12 +1,15 @@
 package com.gary.backendv2.controller;
 
 import com.gary.backendv2.model.dto.request.IncidentRequest;
+import com.gary.backendv2.model.dto.request.VictimInfoRequest;
 import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.service.IncidentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,6 +44,25 @@ public class IncidentController {
 	public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid IncidentRequest incidentRequest){
 		incidentService.update(id, incidentRequest);
 		return ResponseEntity.ok("Incident updated successfully");
+	}
+
+	@GetMapping("/{id}/casualties")
+	@Operation(summary = "Gets victims in an incident", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<?> getVictimsByIncidentId(Integer id) {
+		return ResponseEntity.ok(incidentService.getVictimsInformation(id));
+	}
+
+	@PostMapping("/{id}/casualties")
+	@Operation(summary = "Add casualty victim info", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<?> addVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, Integer id, Authentication authentication) {
+		incidentService.addVictimInfo(id, victimInfoRequest, authentication);
+		return ResponseEntity.ok().build();
+	}
+
+	@PutMapping("/{id}/casualties/{victimInfoId}")
+	@Operation(summary = "Edit casualty victim info", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<?> editVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, Integer id, Integer victimInfoId, Authentication authentication) {
+		return ResponseEntity.ok(incidentService.updateVictimsInfo(id, victimInfoId, victimInfoRequest, authentication));
 	}
 
 	@DeleteMapping("/{id}")

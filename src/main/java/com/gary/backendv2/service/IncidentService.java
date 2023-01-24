@@ -2,10 +2,16 @@ package com.gary.backendv2.service;
 
 import com.gary.backendv2.AmbulanceIncidentHistoryElementRepository;
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.VictimInfo;
 import com.gary.backendv2.model.ambulance.AmbulanceIncidentHistoryElement;
 import com.gary.backendv2.model.ambulance.AmbulanceState;
+import com.gary.backendv2.model.dto.request.VictimInfoRequest;
+import com.gary.backendv2.model.dto.response.VictimInfoResponse;
+import com.gary.backendv2.model.dto.response.users.MedicResponse;
+import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.ambulance.Ambulance;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.dto.request.IncidentRequest;
@@ -13,10 +19,14 @@ import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
+import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
+import com.gary.backendv2.repository.projections.IncidentInfo;
+import com.gary.backendv2.security.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,8 +42,11 @@ public class IncidentService {
 	private final IncidentRepository incidentRepository;
 	private final IncidentReportRepository incidentReportRepository;
 	private final AmbulanceRepository ambulanceRepository;
-	private final AmbulanceService ambulanceService;
 	private final DispatcherRepository dispatcherRepository;
+	private final VictimInfoRepository victimInfoRepository;
+
+	private final AmbulanceService ambulanceService;
+	private final AuthService authService;
 
 	public List<IncidentResponse> getAll(){
 		List<IncidentResponse> incidentResponses = new ArrayList<>();
@@ -106,7 +119,7 @@ public class IncidentService {
 		incidentReportRepository.save(incidentReport);
 	}
 
-	public void update (Integer id, IncidentRequest incidentRequest){
+	public void update (Integer id, IncidentRequest incidentRequest) {
 		Optional<Incident> accidentReportOptional = incidentRepository.findByIncidentId(id);
 		if (accidentReportOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
 		Incident incident = accidentReportOptional.get();
@@ -155,6 +168,94 @@ public class IncidentService {
 		incidentRepository.save(incident);
 
 		return infoMap;
+	}
+
+	public List<VictimInfoResponse> getVictimsInformation(Integer incidentId) {
+		Optional<Incident> incidentOptional = incidentRepository.findByIncidentId(incidentId);
+		if (incidentOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", incidentId));
+
+		IncidentInfo incidentInfo = incidentRepository.getVictimsInfoByIncidentId(incidentId);
+
+		List<VictimInfoResponse> responses = new ArrayList<>();
+		for (IncidentInfo.VictimInfoInfo victim : incidentInfo.getVictims()) {
+			MedicResponse medicResponse = new MedicResponse();
+			medicResponse.setFirstName(victim.getMedic().getFirstName());
+			medicResponse.setLastName(victim.getMedic().getLastName());
+			medicResponse.setEmail(victim.getMedic().getEmail());
+			medicResponse.setUserId(victim.getMedic().getUserId());
+
+			VictimInfoResponse response = new VictimInfoResponse();
+			response.setVictimInfoId(victim.getVictimInfoId());
+			response.setFirstName(victim.getFirstName());
+			response.setLastName(victim.getLastName());
+			response.setGender(victim.getGender());
+			response.setStatus(victim.getVictimStatus());
+			response.setMedic(medicResponse);
+
+			responses.add(response);
+		}
+
+
+		return responses;
+	}
+
+	public VictimInfoResponse updateVictimsInfo(Integer incidentId, Integer victimInfoId, VictimInfoRequest request, Authentication authentication) {
+		Optional<Incident> incidentOptional = incidentRepository.findByIncidentId(incidentId);
+		if (incidentOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", incidentId));
+
+		Incident incident = incidentOptional.get();
+		List<VictimInfo> victims = incident.getVictims();
+		VictimInfo info = victims
+				.stream()
+				.filter(x -> x.getVictimInfoId().equals(victimInfoId))
+				.findFirst()
+				.orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Cannot find VictimInfo entity with given ID (" + victimInfoId +  ") in an Incident of ID: " + incidentId));
+
+		info.setVictimStatus(request.getStatus());
+		info.setFirstName(request.getFirstName());
+		info.setLastName(request.getLastName());
+		info.setGender(request.getGender());
+
+		info = victimInfoRepository.save(info);
+
+		MedicResponse medicResponse = new MedicResponse();
+		medicResponse.setFirstName(info.getMedic().getFirstName());
+		medicResponse.setLastName(info.getMedic().getLastName());
+		medicResponse.setEmail(info.getMedic().getEmail());
+		medicResponse.setUserId(info.getMedic().getUserId());
+
+		VictimInfoResponse response = new VictimInfoResponse();
+		response.setVictimInfoId(info.getVictimInfoId());
+		response.setFirstName(info.getFirstName());
+		response.setLastName(info.getLastName());
+		response.setGender(info.getGender());
+		response.setStatus(info.getVictimStatus());
+		response.setMedic(medicResponse);
+
+		return response;
+	}
+
+	public void addVictimInfo(Integer id, VictimInfoRequest request, Authentication authentication) {
+		Optional<Incident> incidentOptional = incidentRepository.findByIncidentId(id);
+		if (incidentOptional.isEmpty()) throw new HttpException(HttpStatus.NOT_FOUND, String.format("Incident with id %s not found", id));
+
+		User user = authService.getLoggedUserFromAuthentication(authentication);
+		if (user == null) {
+			throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting user information from the JWT token");
+		}
+
+		VictimInfo victimInfo = new VictimInfo();
+		victimInfo.setFirstName(request.getFirstName());
+		victimInfo.setLastName(request.getLastName());
+		victimInfo.setVictimStatus(request.getStatus());
+		victimInfo.setGender(request.getGender());
+		victimInfo.setMedic(user);
+		victimInfo = victimInfoRepository.save(victimInfo);
+
+		Incident incident = incidentOptional.get();
+		incident.getVictims().add(victimInfo);
+
+		incidentRepository.save(incident);
 	}
 
 	@Transactional
