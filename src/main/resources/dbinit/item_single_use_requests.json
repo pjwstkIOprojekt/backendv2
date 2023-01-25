@@ -1,7 +1,47 @@
 [
   {
     "type": "SINGLE_USE",
-    "name": "TEST",
-    "description": "TEST"
+    "name": "Strzykawka",
+    "description": "Do injekcji"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Rękawiczki",
+    "description": "Rękawiczki Nitrylowe"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Rękawiczki",
+    "description": "Rękawiczki Lateksowe"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Rękawiczki",
+    "description": "Rękawiczki Gumowe"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Rękawiczki",
+    "description": "Rękawiczki Foliowe"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Plastry",
+    "description": "do małych ran"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Bandaż",
+    "description": "Taśma 50 metrów"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Bandaż",
+    "description": "Taśma 20 metrów"
+  },
+  {
+    "type": "SINGLE_USE",
+    "name": "Igły",
+    "description": "Do strzykawek"
   }
 ]

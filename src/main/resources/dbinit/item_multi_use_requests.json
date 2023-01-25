@@ -1,6 +1,22 @@
 [
   {
     "type": "MULTI_USE",
-    "name": "string"
+    "name": "Stetoskop"
+  },
+  {
+    "type": "MULTI_USE",
+    "name": "Termometr"
+  },
+  {
+    "type": "MULTI_USE",
+    "name": "Nożyczki"
+  },
+  {
+    "type": "MULTI_USE",
+    "name": "Taśma"
+  },
+  {
+    "type": "MULTI_USE",
+    "name": "Woda Utleniona"
   }
 ]

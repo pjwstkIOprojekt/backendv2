@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.gary.backendv2.event.PrimitiveEntitiesCreatedEvent;
 import com.gary.backendv2.exception.HttpException;
+import com.gary.backendv2.model.Location;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.dto.request.BaseRequest;
 import com.gary.backendv2.model.dto.request.IncidentReportRequest;
@@ -23,6 +24,7 @@ import lombok.SneakyThrows;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -41,13 +43,15 @@ public class PrimitiveEntitiesCreatedEventListener implements ApplicationListene
     }
 
     private void prepareIncidents(ObjectInitializationVisitor visitor) {
-        setDispatchersStateToWorking();
-        createSampleIncidents(visitor);
-        setDispatchersStateToNotWorking();
+        try {
+            setDispatchersStateToWorking();
+            createSampleIncidents(visitor);
+            setDispatchersStateToNotWorking();
+        } catch (Exception ignored) {}
+
 
 
     }
-
 
 
     private void setDispatchersStateToWorking() {
