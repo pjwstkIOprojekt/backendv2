@@ -1,9 +1,93 @@
 [
   {
     "type": "MEDICAL",
-    "name": "string",
-    "manufacturer": "string",
-    "description": "string",
-    "expiration_date": "2023-01-01"
+    "name": "Amlodipine and Valsartan",
+    "manufacturer": "Par Pharmaceutical, Inc.",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2024-02-01"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "EMADINE",
+    "manufacturer": "Alcon Laboratories, Inc.",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-08-28"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "equate nicotine",
+    "manufacturer": "Wal-Mart Stores Inc",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2024-01-24"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Softlips",
+    "manufacturer": "The Mentholatum Company",
+    "description": "produkt leczniczy",
+    "expiration_date": "2023-10-27"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Pain Relief",
+    "manufacturer": "Shopko Stores Operating Co., LLC",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-05-31"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Lisinopril",
+    "manufacturer": "REMEDYREPACK INC.",
+    "description": "produkt leczniczy",
+    "expiration_date": "2023-09-28"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Primidone",
+    "manufacturer": "American Health Packaging",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-05-16"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Anti-Bacterial Hand",
+    "manufacturer": "Bath & Body Works, Inc.",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-06-19"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Tobramycin",
+    "manufacturer": "Preferred Pharmaceuticals, Inc",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-05-23"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "COLGATE SPARKLING WHITE CINNAMINT",
+    "manufacturer": "Mission Hills S.A de C.V",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2024-01-22"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "DiorSkin Nude 012 Porcelain",
+    "manufacturer": "Parfums Christian Dior",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2023-05-03"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Carvedilol",
+    "manufacturer": "Preferred Pharmaceuticals, Inc",
+    "description": "lek przeciwbólowy",
+    "expiration_date": "2024-02-01"
+  },
+  {
+    "type": "MEDICAL",
+    "name": "Metformin Hydrochloride",
+    "manufacturer": "Mylan Institutional Inc.",
+    "description": "produkt leczniczy",
+    "expiration_date": "2024-04-19"
   }
 ]
