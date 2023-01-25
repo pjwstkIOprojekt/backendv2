@@ -4,5 +4,35 @@
     "name": "string",
     "manufacturer": "string",
     "description": "string"
+  },
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "Defibrylator",
+    "manufacturer": "LIFEPAK",
+    "description": "AED"
+  },
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "Nosze",
+    "manufacturer": "FERNO",
+    "description": "Nosze transportowe"
+  },
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "Deska ortopedyczna",
+    "manufacturer": "FERNO",
+    "description": "Deska ortopedyczna do unieruchamiania poszkodowanych"
+  },
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "Respirator",
+    "manufacturer": "LIFEPAK",
+    "description": "Respirator transportowy"
+  },
+  {
+    "type": "AMBULANCE_EQUIPMENT",
+    "name": "Respirator",
+    "manufacturer": "LIFEPAK",
+    "description": "Respirator transportowy"
   }
 ]

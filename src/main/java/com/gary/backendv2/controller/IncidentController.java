@@ -48,20 +48,20 @@ public class IncidentController {
 
 	@GetMapping("/{id}/casualties")
 	@Operation(summary = "Gets victims in an incident", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<?> getVictimsByIncidentId(Integer id) {
+	public ResponseEntity<?> getVictimsByIncidentId(@PathVariable Integer id) {
 		return ResponseEntity.ok(incidentService.getVictimsInformation(id));
 	}
 
 	@PostMapping("/{id}/casualties")
 	@Operation(summary = "Add casualty victim info", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<?> addVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, Integer id, Authentication authentication) {
+	public ResponseEntity<?> addVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, @PathVariable Integer id, Authentication authentication) {
 		incidentService.addVictimInfo(id, victimInfoRequest, authentication);
 		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping("/{id}/casualties/{victimInfoId}")
 	@Operation(summary = "Edit casualty victim info", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<?> editVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, Integer id, Integer victimInfoId, Authentication authentication) {
+	public ResponseEntity<?> editVictimInfo(@Valid @RequestBody VictimInfoRequest victimInfoRequest, @PathVariable Integer id, @PathVariable Integer victimInfoId, Authentication authentication) {
 		return ResponseEntity.ok(incidentService.updateVictimsInfo(id, victimInfoId, victimInfoRequest, authentication));
 	}
 
