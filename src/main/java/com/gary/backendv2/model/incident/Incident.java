@@ -9,10 +9,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -33,9 +30,9 @@ public class Incident {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Dispatcher dispatcher;
 	@ManyToMany(mappedBy = "incidents")
-	private Set<Ambulance> ambulances;
+	private Set<Ambulance> ambulances = new HashSet<>();
 	@OneToMany
-	private Set<Backup> backups;
+	private Set<Backup> backups = new HashSet<>();
 
 	@OneToMany
 	private List<VictimInfo> victims = new ArrayList<>();

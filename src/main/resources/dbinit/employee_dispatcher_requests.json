@@ -14,5 +14,45 @@
       "phoneNumber": "123456789",
       "password": "test123",
       "birthDate": "1999-01-01"
-    }
+    },
+  {
+    "firstName": "Gale",
+    "lastName": "Hutchason",
+    "email": "ghutchason0@bluehost.com",
+    "phoneNumber": "3094579457",
+    "password": "test123",
+    "birthDate": "2001-11-12"
+  },
+  {
+    "firstName": "Kaja",
+    "lastName": "Pridham",
+    "email": "kpridham1@unicef.org",
+    "phoneNumber": "7526228541",
+    "password": "test123",
+    "birthDate": "1993-03-30"
+  },
+  {
+    "firstName": "Bettine",
+    "lastName": "Kabsch",
+    "email": "bkabsch2@cpanel.net",
+    "phoneNumber": "2119892629",
+    "password": "test123",
+    "birthDate": "1981-11-26"
+  },
+  {
+    "firstName": "Gan",
+    "lastName": "Peiser",
+    "email": "gpeiser3@ibm.com",
+    "phoneNumber": "1172012119",
+    "password": "test123",
+    "birthDate": "1980-03-05"
+  },
+  {
+    "firstName": "Torr",
+    "lastName": "Vardey",
+    "email": "tvardey4@google.co.jp",
+    "phoneNumber": "6055707470",
+    "password": "test123",
+    "birthDate": "1980-08-27"
+  }
 ]

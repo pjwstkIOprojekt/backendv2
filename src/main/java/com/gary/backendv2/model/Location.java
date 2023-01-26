@@ -23,6 +23,10 @@ public class Location {
 		return new Location(longitude, latitude);
 	}
 
+	public static Location ofReversed(double latitude, double longitude) {
+		return new Location(latitude, longitude);
+	}
+
 	public static Location undefined() {
 		return new Location(0, 0);
 	}

@@ -14,5 +14,45 @@
     "phoneNumber": "133723456",
     "password": "test123",
     "birthDate": "2000-01-20"
+  },
+  {
+    "firstName": "Porty",
+    "lastName": "Scudamore",
+    "email": "pscudamore0@homestead.com",
+    "phoneNumber": "1286992197",
+    "password": "test123",
+    "birthDate": "1984-08-06"
+  },
+  {
+    "firstName": "Osmund",
+    "lastName": "Worsall",
+    "email": "oworsall1@wisc.edu",
+    "phoneNumber": "7844222736",
+    "password": "test123",
+    "birthDate": "2002-07-27"
+  },
+  {
+    "firstName": "Gardener",
+    "lastName": "Sloss",
+    "email": "gsloss2@mediafire.com",
+    "phoneNumber": "7917422195",
+    "password": "test123",
+    "birthDate": "1990-06-25"
+  },
+  {
+    "firstName": "Keen",
+    "lastName": "Brinsden",
+    "email": "kbrinsden3@simplemachines.org",
+    "phoneNumber": "2834932010",
+    "password": "test123",
+    "birthDate": "2000-12-09"
+  },
+  {
+    "firstName": "Mercy",
+    "lastName": "todor",
+    "email": "mtodor4@posterous.com",
+    "phoneNumber": "6586428899",
+    "password": "test123",
+    "birthDate": "1988-01-11"
   }
 ]
