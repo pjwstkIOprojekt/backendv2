@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -116,14 +117,17 @@ public class TutorialService {
             throw new HttpException(HttpStatus.NOT_FOUND, String.format("Cannot find tutorial with %s", tutorialId));
         }
         Tutorial t = optionalTutorial.get();
-        if (t.getReviewSet().stream().anyMatch(x -> x.getReviewer().equals(u))) {
-            // This tutorial had been already reviewed by this user, so update the score
-            Review r = t.getReviewSet().stream().filter(x -> x.getReviewer().equals(u)).findFirst().orElseThrow(() -> {throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Unidentified error whilst editing the review");});
-            r.setValue(reviewRequest.getValue());
 
-            reviewRepository.save(r);
-            return;
-        }
+        try {
+            if (t.getReviewSet().stream().anyMatch(x -> x.getReviewer().equals(u))) {
+                // This tutorial had been already reviewed by this user, so update the score
+                Review r = t.getReviewSet().stream().filter(x -> x.getReviewer().equals(u)).findFirst().orElseThrow(() -> {throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Unidentified error whilst editing the review");});
+                r.setValue(reviewRequest.getValue());
+
+                reviewRepository.save(r);
+                return;
+            }
+        }catch (NullPointerException ignored) {}
 
         Review review = Review.builder()
                 .reviewer(u)

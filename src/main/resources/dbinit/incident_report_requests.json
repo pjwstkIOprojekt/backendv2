@@ -4,8 +4,8 @@
     "victimCount": 1,
     "longitude": 21.00206971280936,
     "latitude": 52.237266362302464,
-    "concious": true,
-    "breathing": true,
+    "concious": false,
+    "breathing": false,
     "description": "string"
   },
   {
@@ -86,7 +86,7 @@
     "victimCount": 1,
     "longitude": 21.019419253165516,
     "latitude": 52.23337779680062,
-    "concious": true,
+    "concious": false,
     "breathing": true,
     "description": "string"
   },

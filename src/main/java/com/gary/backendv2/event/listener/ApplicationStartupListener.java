@@ -17,9 +17,11 @@ import com.gary.backendv2.model.enums.*;
 import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.inventory.items.*;
+import com.gary.backendv2.model.users.AdminUser;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.security.Role;
+import com.gary.backendv2.model.users.employees.AbstractEmployee;
 import com.gary.backendv2.model.users.employees.AmbulanceManager;
 import com.gary.backendv2.model.users.employees.Dispatcher;
 import com.gary.backendv2.model.users.employees.Medic;
@@ -227,7 +229,7 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
                 return;
             }
 
-            User user = new User();
+            AdminUser user = new AdminUser();
             user.setPassword(passwordEncoder.encode(adminPassword));
             user.setEmail(adminEmail);
             user.setRoles(Set.of(adminRole.get()));
@@ -282,7 +284,13 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
         tutorial6.setTutorialType(TutorialType.GENERAL);
         tutorial6.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_faint.html"));
 
-        List<Tutorial> tutorials = List.of(tutorial, tutorial1, tutorial2,tutorial3,tutorial4,tutorial5,tutorial6);
+        Tutorial tutorial7 = new Tutorial();
+        tutorial7.setName("Zakrztuszenia");
+        tutorial7.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_the_Red_Cross.svg/1280px-Flag_of_the_Red_Cross.svg.png");
+        tutorial7.setTutorialType(TutorialType.COURSE);
+        tutorial7.setTutorialHTML(Utils.loadClasspathResource("classpath:templates/tutorial_chocking.html"));
+
+        List<Tutorial> tutorials = List.of(tutorial, tutorial1, tutorial2,tutorial3,tutorial4,tutorial5,tutorial6,tutorial7);
         tutorialRepository.saveAll(tutorials);
     }
 

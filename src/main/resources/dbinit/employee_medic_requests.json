@@ -24,9 +24,9 @@
   {
   "firstName": "Adam",
   "lastName": "String",
-  "email": "Adam@gary.pl",
+  "email": "adam@gary.pl",
   "phoneNumber": "11111111",
-  "password": "11111111",
+  "password": "test123",
   "birthDate": "2011-01-19",
   "workSchedule": {
     "MONDAY": {
@@ -50,5 +50,125 @@
       "end": "16:00"
     }
   }
-}
+  },
+  {
+    "firstName": "Yvonne",
+    "lastName": "Scudamore",
+    "email": "yscudamore0@skype.com",
+    "phoneNumber": "4968513036",
+    "password": "test123",
+    "birthDate": "1982-08-28"
+  },
+  {
+    "firstName": "Devon",
+    "lastName": "Beers",
+    "email": "dbeers1@yahoo.co.jp",
+    "phoneNumber": "7826820445",
+    "password": "test123",
+    "birthDate": "1983-07-18"
+  },
+  {
+    "firstName": "Min",
+    "lastName": "Thring",
+    "email": "mthring2@gizmodo.com",
+    "phoneNumber": "9645062368",
+    "password": "test123",
+    "birthDate": "1985-10-22"
+  },
+  {
+    "firstName": "Shani",
+    "lastName": "Trussler",
+    "email": "strussler3@samsung.com",
+    "phoneNumber": "2543849811",
+    "password": "test123",
+    "birthDate": "1987-01-11"
+  },
+  {
+    "firstName": "Millisent",
+    "lastName": "Terbrugge",
+    "email": "mterbrugge4@t.co",
+    "phoneNumber": "1149301093",
+    "password": "test123",
+    "birthDate": "2000-03-23"
+  },
+  {
+    "firstName": "Scot",
+    "lastName": "Friar",
+    "email": "sfriar0@ezinearticles.com",
+    "phoneNumber": "5103232010",
+    "password": "test123",
+    "birthDate": "2003-05-15"
+  },
+  {
+    "firstName": "Ardra",
+    "lastName": "Sones",
+    "email": "asones1@list-manage.com",
+    "phoneNumber": "4555159504",
+    "password": "test123",
+    "birthDate": "1990-09-19"
+  },
+  {
+    "firstName": "Adela",
+    "lastName": "Loan",
+    "email": "aloan2@reddit.com",
+    "phoneNumber": "3663614456",
+    "password": "test123",
+    "birthDate": "1986-09-13"
+  },
+  {
+    "firstName": "Benjamin",
+    "lastName": "Sansam",
+    "email": "bsansam3@si.edu",
+    "phoneNumber": "3172137791",
+    "password": "test123",
+    "birthDate": "1981-02-26"
+  },
+  {
+    "firstName": "Durand",
+    "lastName": "Bartleman",
+    "email": "dbartleman4@unesco.org",
+    "phoneNumber": "5585760403",
+    "password": "test123",
+    "birthDate": "2000-10-04"
+  },
+  {
+    "firstName": "Mike",
+    "lastName": "Ramage",
+    "email": "mramage5@europa.eu",
+    "phoneNumber": "7936929785",
+    "password": "test123",
+    "birthDate": "2002-03-26"
+  },
+  {
+    "firstName": "Merna",
+    "lastName": "Towersey",
+    "email": "mtowersey6@odnoklassniki.ru",
+    "phoneNumber": "4498654638",
+    "password": "test123",
+    "birthDate": "1986-06-01"
+  },
+  {
+    "firstName": "Edvard",
+    "lastName": "Caraher",
+    "email": "ecaraher7@army.mil",
+    "phoneNumber": "9974903552",
+    "password": "test123",
+    "birthDate": "1990-08-29"
+  },
+  {
+    "firstName": "Shell",
+    "lastName": "Sarjent",
+    "email": "ssarjent8@hibu.com",
+    "phoneNumber": "9532181850",
+    "password": "test123",
+    "birthDate": "1987-11-20"
+  },
+  {
+    "firstName": "Cristabel",
+    "lastName": "Lax",
+    "email": "clax9@nbcnews.com",
+    "phoneNumber": "5337778078",
+    "password": "test123",
+    "birthDate": "2002-12-17"
+  }
 ]

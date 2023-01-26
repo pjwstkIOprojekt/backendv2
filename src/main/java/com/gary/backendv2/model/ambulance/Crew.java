@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,5 +20,5 @@ public class Crew {
     private Integer crewId;
 
     @OneToMany
-    private Set<Medic> medics = new HashSet<>();
+    private List<Medic> medics = new ArrayList<>();
 }

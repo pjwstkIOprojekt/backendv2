@@ -17,6 +17,7 @@ import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.inventory.Inventory;
 import com.gary.backendv2.model.inventory.ItemContainer;
 import com.gary.backendv2.model.inventory.items.Item;
+import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.utils.ItemUtils;
@@ -165,7 +166,7 @@ public class AmbulanceService {
         if (crew == null) {
             return Collections.emptyList();
         }
-        Set<Medic> medics = crew.getMedics();
+        List<Medic> medics = crew.getMedics();
 
         List<MedicResponse> medicResponses = new ArrayList<>();
         medics.forEach(x -> {
@@ -205,6 +206,7 @@ public class AmbulanceService {
     public void assignMedics(String licensePlate, List<Integer> medicIds) {
         Ambulance ambulance = getAmbulance(licensePlate);
 
+        log.info("Medic ids passed {}", medicIds);
         List<Medic> medics = medicRepository.getAllByUserIdIn(medicIds);
         if (medics.isEmpty()) {
             throw new HttpException(HttpStatus.BAD_REQUEST, String.format(", User with ids of: %s are not medics", medicIds));
@@ -273,6 +275,17 @@ public class AmbulanceService {
 
     public void deleteAmbulance(String licensePlate) {
         Ambulance ambulance = getAmbulance(licensePlate);
+
+        if (!ambulance.getCrew().getMedics().isEmpty()) {
+            removeMedics(licensePlate, ambulance.getCrew().getMedics().stream().map(User::getUserId).collect(Collectors.toList()));
+        }
+
+        try {
+            List<AmbulanceLocation> l = ambulanceLocationRepository.getAmbulanceLocationByAmbulance_LicensePlate(ambulance.getLicensePlate());
+            ambulanceLocationRepository.deleteAll(l);
+        }catch (RuntimeException e) {
+            e.printStackTrace();
+        }
 
         ambulanceRepository.delete(ambulance);
     }

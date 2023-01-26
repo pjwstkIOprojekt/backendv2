@@ -8,6 +8,7 @@ import com.gary.backendv2.model.ambulance.AmbulanceState;
 import com.gary.backendv2.model.dto.request.VictimInfoRequest;
 import com.gary.backendv2.model.dto.response.VictimInfoResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
+import com.gary.backendv2.model.enums.EmergencyType;
 import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.ambulance.Ambulance;
@@ -109,6 +110,7 @@ public class IncidentService {
 		Incident incident = Incident
 				.builder()
 				.incidentReport(incidentReport)
+				.ambulances(new HashSet<>())
 				.dangerScale(calculateDangerScale(incidentReport))
 				.incidentStatusType(IncidentStatusType.NEW)
 				.createdAt(LocalDateTime.now())
@@ -281,12 +283,21 @@ public class IncidentService {
 				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
 					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.REJECTED.toString().toLowerCase());
 				}else{
+					incident.getAmbulances().forEach(x -> {
+						x.getIncidents().remove(incident);
+						ambulanceService.changeAmbulanceState(x.getLicensePlate(), AmbulanceStateType.AVAILABLE);
+					});
 					incident.getDispatcher().setOpenIncidents(incident.getDispatcher().getOpenIncidents()-1);
 				}
 			}
 			case ACCEPTED -> {
 				if(incident.getIncidentStatusType() != IncidentStatusType.ASSIGNED){
 					throw new HttpException(HttpStatus.BAD_REQUEST, "Can't set status type as" + IncidentStatusType.ACCEPTED.toString().toLowerCase());
+				} else {
+					incident.getAmbulances().forEach(x -> {
+						x.getIncidents().remove(incident);
+						ambulanceService.changeAmbulanceState(x.getLicensePlate(), AmbulanceStateType.AVAILABLE);
+					});
 				}
 			}
 		}
@@ -340,10 +351,22 @@ public class IncidentService {
 	}
 
 	private int calculateDangerScale(IncidentReport incidentReport) {
-		int breathingValue = incidentReport.isBreathing() ? 1 : 0;
-		int consciousValue = incidentReport.isConscious() ? 1 : 0;
+		Map<EmergencyType, Double> dangerWeights = new HashMap<>() {{
+			put(EmergencyType.FIRE, 3d);
+			put(EmergencyType.COVID, 0.5);
+			put(EmergencyType.SUICIDE, 0.77);
+			put(EmergencyType.HEART_ATTACK, 5d);
+			put(EmergencyType.UNKNOWN, 1d);
+			put(EmergencyType.FLOOD, 1.33);
+			put(EmergencyType.CAR_ACCIDENT, 1.2d);
+		}};
 
-		int dangerScale = (int) (incidentReport.getVictimCount() * (0.75 * breathingValue + 0.55 * consciousValue));
+		int breathingValue = incidentReport.isBreathing() ? 1 : 2;
+		int consciousValue = incidentReport.isConscious() ? 1 : 2;
+		int victimWeight = incidentReport.getVictimCount() == 0 ? 1 : incidentReport.getVictimCount();
+
+
+		int dangerScale = (int) ((victimWeight * (1.33 * breathingValue + 1.55 * consciousValue)) * dangerWeights.get(incidentReport.getEmergencyType()));
 		if (dangerScale > 10) {
 			dangerScale = 10;
 		}
