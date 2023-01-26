@@ -229,11 +229,14 @@ public class AuthService {
         response.setBirthDate(user.getBirthDate());
         response.setPhone(user.getPhoneNumber());
         response.setBandCode(user.getBandCode());
-        if (user instanceof AbstractEmployee e) {
-            response.setEmployeeType(e.getDiscriminatorValue());
-            response.setWorkSchedule(
-                    Utils.createWorkScheduleResponse(e)
-            );
+
+        if (!(user instanceof AdminUser)) {
+            if (user instanceof AbstractEmployee e) {
+                response.setEmployeeType(e.getDiscriminatorValue());
+                response.setWorkSchedule(
+                        Utils.createWorkScheduleResponse(e)
+                );
+            }
         }
 
         return response;

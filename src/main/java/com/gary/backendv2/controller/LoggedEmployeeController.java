@@ -3,6 +3,8 @@ package com.gary.backendv2.controller;
 import com.gary.backendv2.model.dto.request.users.RegisterEmployeeRequest;
 import com.gary.backendv2.model.dto.request.users.UpdateWorkScheduleRequest;
 import com.gary.backendv2.model.dto.response.WorkScheduleResponse;
+import com.gary.backendv2.model.users.AdminUser;
+import com.gary.backendv2.security.service.AuthService;
 import com.gary.backendv2.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class LoggedEmployeeController {
     private final EmployeeService employeeService;
+    private final AuthService authService;
 
     @GetMapping("/shift/start")
     @Operation(summary = "Start shift for currently logged employee", security = @SecurityRequirement(name = "bearerAuth"))
@@ -37,12 +40,20 @@ public class LoggedEmployeeController {
     @PostMapping("/schedule/update")
     @Operation(summary = "Change logged user's work schedule", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> changeSchedule(@RequestBody UpdateWorkScheduleRequest workSchedule, Authentication authentication) {
+        if (authService.getLoggedUserFromAuthentication(authentication) instanceof AdminUser) {
+            return ResponseEntity.ok().build();
+        }
+
         return ResponseEntity.ok(employeeService.updateWorkSchedule(workSchedule, authentication));
     }
 
     @GetMapping("/schedule")
     @Operation(summary = "Change logged user's work schedule", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getSchedule(Authentication authentication) {
+        if (authService.getLoggedUserFromAuthentication(authentication) instanceof AdminUser) {
+            return ResponseEntity.ok().build();
+        }
+
         return ResponseEntity.ok(employeeService.getSchedule(authentication));
     }
 
