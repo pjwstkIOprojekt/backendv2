@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @Builder
 public class BackupResponse {
 	private Integer backupId;
+
+	private Integer incidentId;
+
 	private Boolean accepted;
 	private String justification;
 	private LocalDateTime time;

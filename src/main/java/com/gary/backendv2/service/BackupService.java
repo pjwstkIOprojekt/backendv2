@@ -56,6 +56,7 @@ public class BackupService {
 		return BackupResponse
 				.builder()
 				.backupId(backup.getBackupId())
+				.incidentId(backup.getIncident().getIncidentId())
 				.backupType(backup.getBackupType())
 				.accepted(backup.getAccepted())
 				.justification(backup.getJustification())
@@ -70,6 +71,7 @@ public class BackupService {
 					BackupResponse
 							.builder()
 							.time(backup.getTime())
+							.incidentId(backup.getIncident().getIncidentId())
 							.justification(backup.getJustification())
 							.accepted(backup.getAccepted())
 							.backupType(backup.getBackupType())
