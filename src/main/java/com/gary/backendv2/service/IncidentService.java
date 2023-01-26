@@ -4,12 +4,10 @@ import com.gary.backendv2.AmbulanceIncidentHistoryElementRepository;
 import com.gary.backendv2.exception.HttpException;
 import com.gary.backendv2.model.VictimInfo;
 import com.gary.backendv2.model.ambulance.AmbulanceIncidentHistoryElement;
-import com.gary.backendv2.model.ambulance.AmbulanceState;
 import com.gary.backendv2.model.dto.request.VictimInfoRequest;
 import com.gary.backendv2.model.dto.response.VictimInfoResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmergencyType;
-import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.ambulance.Ambulance;
 import com.gary.backendv2.model.users.User;
@@ -20,7 +18,6 @@ import com.gary.backendv2.model.dto.response.IncidentReportResponse;
 import com.gary.backendv2.model.dto.response.IncidentResponse;
 import com.gary.backendv2.model.enums.AmbulanceStateType;
 import com.gary.backendv2.model.enums.IncidentStatusType;
-import com.gary.backendv2.model.users.employees.Medic;
 import com.gary.backendv2.repository.*;
 import com.gary.backendv2.repository.projections.IncidentInfo;
 import com.gary.backendv2.security.service.AuthService;
@@ -170,6 +167,36 @@ public class IncidentService {
 		incidentRepository.save(incident);
 
 		return infoMap;
+	}
+
+	public VictimInfoResponse getVictimInfoById(Integer incidentId, Integer victimInfoId) {
+		Incident incident = incidentRepository.findByIncidentId(incidentId).orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, String.format("Incident id %s not found", incidentId)));
+
+		IncidentInfo incidentInfo = incidentRepository.getVictimsInfoByIncidentId(incidentId);
+
+
+		VictimInfoResponse response = new VictimInfoResponse();
+		for (IncidentInfo.VictimInfoInfo victim : incidentInfo.getVictims()) {
+			if (victim.getVictimInfoId().equals(victimInfoId)) {
+				MedicResponse medicResponse = new MedicResponse();
+				medicResponse.setFirstName(victim.getMedic().getFirstName());
+				medicResponse.setLastName(victim.getMedic().getLastName());
+				medicResponse.setEmail(victim.getMedic().getEmail());
+				medicResponse.setUserId(victim.getMedic().getUserId());
+
+				response.setVictimInfoId(victim.getVictimInfoId());
+				response.setGender(victim.getGender());
+				response.setStatus(victim.getVictimStatus());
+				response.setFirstName(victim.getFirstName());
+				response.setLastName(victim.getLastName());
+				response.setMedic(medicResponse);
+
+				return response;
+
+			}
+		}
+
+		throw new HttpException(HttpStatus.NO_CONTENT, "No victim info with given id " + victimInfoId);
 	}
 
 	public List<VictimInfoResponse> getVictimsInformation(Integer incidentId) {

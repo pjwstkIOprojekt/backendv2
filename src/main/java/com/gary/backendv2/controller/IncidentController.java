@@ -6,7 +6,6 @@ import com.gary.backendv2.model.enums.IncidentStatusType;
 import com.gary.backendv2.service.IncidentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -50,6 +49,12 @@ public class IncidentController {
 	@Operation(summary = "Gets victims in an incident", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<?> getVictimsByIncidentId(@PathVariable Integer id) {
 		return ResponseEntity.ok(incidentService.getVictimsInformation(id));
+	}
+
+	@GetMapping("/{id}/casualties/{victimInfoId}")
+	@Operation(summary = "Gets victims in an incident", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<?> getVictimInfoById(@PathVariable Integer id, @PathVariable Integer victimInfoId) {
+		return ResponseEntity.ok(incidentService.getVictimInfoById(id, victimInfoId));
 	}
 
 	@PostMapping("/{id}/casualties")

@@ -10,7 +10,9 @@ import com.gary.backendv2.model.dto.response.users.DispatcherResponse;
 import com.gary.backendv2.model.dto.response.users.GenericUserResponse;
 import com.gary.backendv2.model.dto.response.users.MedicResponse;
 import com.gary.backendv2.model.enums.EmployeeType;
+import com.gary.backendv2.model.enums.RoleName;
 import com.gary.backendv2.model.incident.Incident;
+import com.gary.backendv2.model.users.AdminUser;
 import com.gary.backendv2.model.users.employees.*;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.repository.*;
@@ -107,7 +109,13 @@ public class EmployeeService {
 
     public WorkScheduleResponse getSchedule(Authentication authentication) {
         User currentUser = authService.getLoggedUserFromAuthentication(authentication);
+
         if (currentUser instanceof AbstractEmployee employee) {
+            if (currentUser.getRoles().stream().anyMatch(x -> x.getName().equals(RoleName.ADMIN.getPrefixedName()))) {
+                throw new HttpException(HttpStatus.NO_CONTENT, "Admin doesnt have a schedule");
+            }
+
+
             return Utils.createWorkScheduleResponse(employee);
         }
 
@@ -129,6 +137,10 @@ public class EmployeeService {
         List<AbstractEmployee> employees = userRepository.findAllEmployees();
         for (AbstractEmployee e : employees) {
             GenericUserResponse response = new GenericUserResponse();
+
+            if (e instanceof AdminUser) {
+                continue;
+            }
 
             response.setEmail(e.getEmail());
             response.setId(e.getUserId());

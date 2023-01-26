@@ -18,6 +18,7 @@ import com.gary.backendv2.model.incident.Incident;
 import com.gary.backendv2.model.incident.IncidentReport;
 import com.gary.backendv2.model.inventory.items.*;
 import com.gary.backendv2.model.users.AdminUser;
+import com.gary.backendv2.model.users.MedicalInfo;
 import com.gary.backendv2.model.users.User;
 import com.gary.backendv2.model.dto.request.users.SignupRequest;
 import com.gary.backendv2.model.security.Role;
@@ -60,6 +61,8 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class ApplicationStartupListener implements ApplicationListener<ContextRefreshedEvent> {
+    @Autowired
+    private MedicalInfoRepository medicalInfoRepository;
     @Autowired
     PrimitiveEntitiesCreatedEventPublisher eventPublisher;
     @Autowired
@@ -229,10 +232,13 @@ public class ApplicationStartupListener implements ApplicationListener<ContextRe
                 return;
             }
 
+            MedicalInfo mi = medicalInfoRepository.save(new MedicalInfo());
+
             AdminUser user = new AdminUser();
             user.setPassword(passwordEncoder.encode(adminPassword));
             user.setEmail(adminEmail);
             user.setRoles(Set.of(adminRole.get()));
+            user.setMedicalInfo(mi);
 
             userRepository.save(user);
 
